@@ -6,7 +6,7 @@ from topo2vec.common.geographic.geo_utils import check_if_point_in_range
 from topo2vec.feature_extractors_pytorch.autoencoder import Autoencoder
 from topo2vec.feature_extractors_pytorch.classifier import Classifier
 
-logs_path = '/root/repositories/topo2vec/tb_logs'
+logs_path = '/home/morpheus/topo2vec_kavitzky/repositories/topo2vec/tb_logs'
 
 model = Classifier()
 logger = TensorBoardLogger(logs_path, name='classifier')

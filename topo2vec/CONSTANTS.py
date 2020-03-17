@@ -1,0 +1,1 @@
+N49_E05_STREAMS = '/home/morpheus/topo2vec_kavitzky/repositories/topo2vec/data/N049E005/classes/streams.geojson'

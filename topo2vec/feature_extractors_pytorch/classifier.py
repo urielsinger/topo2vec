@@ -1,20 +1,14 @@
 from pytorch_lightning import LightningModule
 
 from topo2vec.datasets.random_dataset import RandomDataset
-
-
-class classifier(LightningModule):
-    def __init__(self):
-        super(classifier, self).__init__()
-
 import torch
 from pytorch_lightning import LightningModule
 from torch import optim, nn
 import torch.nn.functional as F
-from torch.utils.data import DataLoader, ConcatDataset, random_split, SubsetRandomSampler
+from torch.utils.data import DataLoader, ConcatDataset, random_split
 
 from topo2vec.datasets.classification_dataset import ClassificationDataset
-
+from topo2vec.CONSTANTS import *
 
 class Classifier(LightningModule):
     def __init__(self, num_classes = 1, radius = 10, optimizer_cls = optim.Adam, loss_func = F.binary_cross_entropy,
@@ -42,8 +36,8 @@ class Classifier(LightningModule):
         self.build_dataset()
 
     def build_dataset(self):
-        classification_dataset = ClassificationDataset(radii = [self.radius], first_class_path='',
-                                        first_class_label = 'stream', outer_polygon='yes')
+        classification_dataset = ClassificationDataset(radii = [self.radius], first_class_path = N49_E05_STREAMS,
+                                        first_class_label = 'stream', outer_polygon=None)
         if self.total_dataset_size < len(classification_dataset):
             wanted_indices = list(range(0,int(self.total_dataset_size/2),1))
         else:
@@ -120,14 +114,14 @@ class Classifier(LightningModule):
 
     def training_step(self, batch, batch_idx):
         x, y = batch
-        y_hat = self.forward(x)
+        y_hat = self.forward(x.float())
         loss = self.loss_fn(y_hat, y)
         tensorboard_logs = {'train_loss': loss}
         return {'loss': loss, 'log': tensorboard_logs}
 
     def validation_step(self, batch, batch_idx):
         x, y = batch
-        y_hat = self.forward(x)
+        y_hat = self.forward(x.float())
         loss = self.loss_fn(y_hat, y)
         accuracy = torch.tensor([float(torch.sum(y == (y_hat>0.5)) / x.shape[0])])
 

@@ -32,6 +32,7 @@ class MultiRadiusDataset(Dataset):
         else:
             self.actual_patches = new_patches
 
+
     def add_points_as_patches_to_mask_patches(self, points: List[Point]):
         if self.outer_polygon is not None:
             points = [point for point in points if check_if_point_in_range(point)]

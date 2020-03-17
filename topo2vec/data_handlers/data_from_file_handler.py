@@ -16,7 +16,7 @@ class DataFromFileHandler(DataHandler):
             image_path: the path where the basic image is saved
         '''
         super().__init__()
-        self.min_lon, self.min_lat, self.max_lon, self.max_lat = 49, 5, 50, 6
+        self.min_lon, self.min_lat, self.max_lon, self.max_lat = 5, 49, 6, 50
         self.im = self.load_image(image_path)
         self.H, self.W = self.im.shape
 

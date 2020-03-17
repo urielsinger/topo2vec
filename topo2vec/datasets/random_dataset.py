@@ -9,7 +9,7 @@ from topo2vec.datasets.multi_radius_dataset import MultiRadiusDataset
 class RandomDataset(MultiRadiusDataset):
     def __init__(self, num_points: int, radii: List[int] = [10]):
         super().__init__(radii)
-        dataset_builder = DatasetBuilder(49,5,50,6)
+        dataset_builder = DatasetBuilder(5,49,6,50)
         random_points = dataset_builder.get_random_dataset(num_points)
 
         self.add_points_as_patches_to_actual_patches(random_points)
