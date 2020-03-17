@@ -1,1 +1,1 @@
-from topo2vec.background import visualizer
+from topo2vec.background import visualizer, mask_visualizer

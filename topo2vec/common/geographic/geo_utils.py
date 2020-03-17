@@ -15,7 +15,6 @@ from shapely.geometry.base import BaseGeometry
 from shapely.ops import cascaded_union
 from tqdm import tqdm
 import geopandas as gpd
-import cv2
 
 from topo2vec import important_places
 

@@ -42,7 +42,7 @@ class Classifier(LightningModule):
         self.build_dataset()
 
     def build_dataset(self):
-        classification_dataset = ClassificationDataset(radii = [self.radius], first_class_path=,
+        classification_dataset = ClassificationDataset(radii = [self.radius], first_class_path='',
                                         first_class_label = 'stream', outer_polygon='yes')
         if self.total_dataset_size < len(classification_dataset):
             wanted_indices = list(range(0,int(self.total_dataset_size/2),1))

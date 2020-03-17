@@ -16,7 +16,7 @@ from topo2vec import  visualizer
 import numpy as np
 
 class ClassificationDataset(MultiRadiusDataset):
-    def __init__(self, radii: List[int] =[10], first_class_path: str = BOTTOM_PEAKS, first_class_label: str,
+    def __init__(self, radii: List[int] =[10], first_class_path: str = BOTTOM_PEAKS, first_class_label: str ='',
                  outer_polygon = None):
         super().__init__(radii, outer_polygon)
         self.features = []

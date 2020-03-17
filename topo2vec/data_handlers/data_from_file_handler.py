@@ -1,26 +1,40 @@
+import os
 from typing import List
 
 import numpy as np
 from shapely.geometry import Point
 from skimage import io
-#from scipy import ndimage
 from sklearn.externals._pilutil import imresize
 
 from topo2vec.data_handlers.data_handler import DataHandler
 
 
 class DataFromFileHandler(DataHandler):
-    def __init__(self, image_path='/root/repositories/topo2vec/data/None.tif'):
+    def __init__(self, image_path):
         '''
         Args:
             image_path: the path where the basic image is saved
         '''
         super().__init__()
-        self.path = image_path
-        self.im = io.imread(self.path)
-        #self.im[self.im == -32768] = None
-        print(self.im.shape)
+        self.min_lon, self.min_lat, self.max_lon, self.max_lat = 49, 5, 50, 6
+        self.im = self.load_image(image_path)
         self.H, self.W = self.im.shape
+
+    def load_image(self, image_path):
+        file_name, file_extension = os.path.splitext(image_path)
+        if file_extension == '.tif':
+            print('.tif extension')
+            return io.imread(image_path)
+
+        elif file_extension == '.hgt':
+            SAMPLES = 3601
+            with open(image_path, 'rb') as hgt_data:
+                # Each data is 16bit signed integer(i2) - big endian(>)
+                elevations = np.fromfile(hgt_data, np.dtype('>i2'), SAMPLES * SAMPLES) \
+                    .reshape((SAMPLES, SAMPLES))
+
+                return elevations
+
 
 
     def get_data_as_np_array(self, center_point: Point, radius: int, dtype='tiff')-> np.ndarray:
