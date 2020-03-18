@@ -19,16 +19,17 @@ import geopandas as gpd
 from topo2vec import important_places
 
 
-def check_if_point_in_range(point:Point) -> bool:
+def check_if_point_in_range(point:Point, polygon: Polygon) -> bool:
     '''
     Returns True iff the point is in range (roughly)
     Args:
         point: the point to check
+        polygon: the polygon to check in
 
     Returns:
 
     '''
-    return point.within(important_places.POLYGON)
+    return point.within(polygon.POLYGON)
 
 def area_in_m2(poly: Polygon) -> float:
     """

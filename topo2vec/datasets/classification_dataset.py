@@ -5,19 +5,24 @@ from typing import List
 import fiona
 from shapely.geometry import Point
 from torch import tensor
-from torch.utils.data import Dataset
-
 from topo2vec.datasets.multi_radius_dataset import MultiRadiusDataset
 
 BOTTOM_PEAKS = None
 
-from topo2vec import  visualizer
 
 import numpy as np
 
 class ClassificationDataset(MultiRadiusDataset):
     def __init__(self, first_class_path: str, first_class_label: str, radii: List[int] =[10],
                  outer_polygon = None):
+        '''
+
+        Args:
+            first_class_path: The path to the data of the first class wanted in the dataset
+            first_class_label: The label of the first class wanted in the dataset
+            radii:
+            outer_polygon:
+        '''
         super().__init__(radii, outer_polygon)
         self.features = []
         self.points_locations = []
@@ -26,21 +31,44 @@ class ClassificationDataset(MultiRadiusDataset):
 
 
     def __getitem__(self, index):
-        #return (self.actual_patches[index], f'{self.labels[index]}'
-        #                                    f'{str(self.points_used[index].x)}, {str(self.points_used[index].y)}')
+        '''
+
+        Args:
+            index:
+
+        Returns: a tuple of the data and the label
+
+        '''
         return (self.actual_patches[index], tensor([1.]))
-    #TODO: change so the get item will make all calculations inside, altohugh I worked a lot for it.
 
     def __len__(self):
         return len(self.actual_patches)
 
 
     def add_class_from_file(self, file_path:str, label:str):
+        '''
+        updates self.actual_patches and self.labels
+        Args:
+            file_path: The path to the data of the class wanted to be added to the dataset
+            label: The label of the class wanted in the dataset
+
+        Returns: nothing
+
+        '''
         points_list = self.load_points_list_from_file(file_path)
         self.add_points_as_patches_to_actual_patches(points_list)
         self.labels += [label]*len(self.actual_patches)
 
     def load_points_list_from_file(self, file_path:str) -> List[Point]:
+        '''
+        load all the points that are inside a points list
+        Args:
+            file_path: The .shp or. geojson file of the class's data
+
+        Returns: a Points list of all the points in the file
+        (if the file contains lines - all the points in the line)
+
+        '''
         filename, file_extension = os.path.splitext(file_path)
         print(file_extension)
         if file_extension == '.shp':
@@ -59,7 +87,16 @@ class ClassificationDataset(MultiRadiusDataset):
 
         return points_list
 
-    def _get_coord_as_points_list(self, index, new_features):
+    def _get_coord_as_points_list(self, index:int, new_features:np.ndarray) -> List[Point]:
+        '''
+
+        Args:
+            index:
+            new_features: The features ndarray of the coordinate, got from the image
+
+        Returns: a list of all the points inside a row.
+
+        '''
         curr_idx_coords = new_features[index]['geometry']['coordinates']
         if len(curr_idx_coords)!=0:
             if type(curr_idx_coords[0]) == float:
@@ -67,16 +104,5 @@ class ClassificationDataset(MultiRadiusDataset):
             elif type(curr_idx_coords[0]) == list:
                 return [Point(curr_idx_coord[0], curr_idx_coord[1]) for curr_idx_coord in curr_idx_coords]
         return []
-
-
-
-
-
-    def __str__(self):
-        if self.features is not None:
-            print('the features that were loaded:')
-            for feature in self.features:
-                print(feature['geometry']['type'])
-                print(feature['geometry']['coordinates'])
 
 

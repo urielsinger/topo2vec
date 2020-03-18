@@ -1,3 +1,5 @@
+import math
+
 import torchvision as torchvision
 from pytorch_lightning import LightningModule
 
@@ -13,7 +15,7 @@ from topo2vec.CONSTANTS import *
 
 
 class Classifier(LightningModule):
-    def __init__(self, num_classes=1, radius=10, optimizer_cls=optim.Adam, loss_func=F.binary_cross_entropy,
+    def __init__(self, num_classes=1, radii=[10], optimizer_cls=optim.Adam, loss_func=F.binary_cross_entropy,
                  learning_rate=1e-4, total_dataset_size=100000):
         '''
         An autoencoder which is a topo2vec
@@ -27,9 +29,10 @@ class Classifier(LightningModule):
         '''
         super(Classifier, self).__init__()
         self.num_classes = num_classes
-        self.radius = radius
-        self.w = 2 * radius + 1
-        self.h = 2 * radius + 1
+        self.radii = radii
+        self.radius = min(radii)
+        self.w = 2 * self.radius + 1
+        self.h = 2 * self.radius + 1
         self.patch_size = self.w * self.h
         self.init_layers()
         self.loss_fn = loss_func
@@ -38,14 +41,14 @@ class Classifier(LightningModule):
         self.build_dataset()
 
     def build_dataset(self):
-        classification_dataset = ClassificationDataset(radii=[self.radius], first_class_path=N49_E05_STREAMS,
+        classification_dataset = ClassificationDataset(radii=self.radii, first_class_path=N49_E05_STREAMS,
                                                        first_class_label='stream', outer_polygon=None)
         if self.total_dataset_size < len(classification_dataset):
             wanted_indices = list(range(0, int(self.total_dataset_size / 2), 1))
         else:
             print('asked for too large dataset')
         classification_dataset = torch.utils.data.Subset(classification_dataset, wanted_indices)
-        random_dataset = RandomDataset(radii=[self.radius], num_points=len(classification_dataset))
+        random_dataset = RandomDataset(self.radii, len(classification_dataset), 5, 49, 6, 50)
         dataset = ConcatDataset([classification_dataset, random_dataset])
         total_len = len(dataset)
         size_train = int(0.7 * total_len)
@@ -72,7 +75,7 @@ class Classifier(LightningModule):
         '''
 
         # encoder init
-        self.enc_cnn_1 = nn.Conv2d(1, conv1_size, kernel_size=kernel_size1)
+        self.enc_cnn_1 = nn.Conv2d(len(self.radii), conv1_size, kernel_size=kernel_size1)
         self.max_pool_1 = nn.MaxPool2d(pool_kernel_1)
         self.enc_cnn_2 = nn.Conv2d(conv1_size, conv2_size, kernel_size=kernel_size2)
         self.max_pool_2 = nn.MaxPool2d(pool_kernel_2)
@@ -127,9 +130,10 @@ class Classifier(LightningModule):
 
         batch_size, channels, _, _ = x.size()
         x = x.float()
-        im_mean = x.view(batch_size, channels, -1).mean(2).view(batch_size, channels, 1, 1)
-        im_std = x.view(batch_size, channels, -1).std(2).view(batch_size, channels, 1, 1)
-        x_normalized = x #(x - im_mean) / (im_std)
+        # im_mean = x.view(batch_size, channels, -1).mean(2).view(batch_size, channels, 1, 1)
+        # im_std = x.view(batch_size, channels, -1).std(2).view(batch_size, channels, 1, 1)
+        x_normalized = x  # (x - im_mean) / (im_std)
+        x_normalized = x_normalized[:, 0, :, :].unsqueeze(1)
 
         false_negatives_idxs = ((y_tag != y) & (y == 1))
         self.sample_images_and_log(x_normalized, false_negatives_idxs, 'FN: positives, labeled wrong')

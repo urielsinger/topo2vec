@@ -21,6 +21,14 @@ class DataFromFileHandler(DataHandler):
         self.H, self.W = self.im.shape
 
     def load_image(self, image_path):
+        '''
+
+        Args:
+            image_path: the path to the image: .tif or .hgt files acceptable
+
+        Returns: an ndarray of the data image
+
+        '''
         file_name, file_extension = os.path.splitext(image_path)
         if file_extension == '.tif':
             print('.tif extension')
@@ -35,9 +43,7 @@ class DataFromFileHandler(DataHandler):
 
                 return elevations
 
-
-
-    def get_data_as_np_array(self, center_point: Point, radius: int, dtype='tiff')-> np.ndarray:
+    def get_data_as_np_array(self, center_point: Point, radius: int, dtype='tiff') -> np.ndarray:
         '''
 
         Args:
@@ -52,28 +58,37 @@ class DataFromFileHandler(DataHandler):
         normalize = False if dtype == "tiff" else True
         return self.get_elevation_map(center_point.x, center_point.y, radius, normalize)
 
-    def get_points_as_np_array(self, center_points:List[Point], radii: List[int]) -> np.ndarray:
+    def get_points_as_np_array(self, center_points: List[Point], radii: List[int]) -> np.ndarray:
+        '''
+
+        Args:
+            center_points: the points to get as np arrays, if possible
+            radii: the radii (L1 norm) to look in for the points
+
+        Returns: an np array of shape:
+         (num of possible points, len(radii) , 2*min(radii) + 1, 2*min(radii) + 1)
+        that is the actual elevation map in the neighbourhood of each point.
+        '''
         min_radius = min(radii)
         point_multi_patches = []
-        standard_size =(2*min_radius+1, 2*min_radius+1)
+        standard_size = (2 * min_radius + 1, 2 * min_radius + 1)
         points_used = []
         for point in center_points:
             point_patches = []
             for radius in radii:
                 patch = self.get_point_as_np_array(point, radius)
-                if radius != min_radius and patch.size!=0:
+                if radius != min_radius and patch.size != 0:
                     patch = imresize(patch, size=standard_size)
-                if patch.size!=0 and patch.shape == standard_size and np.min(patch) > -3000:
+                if patch.size != 0 and patch.shape == standard_size and np.min(patch) > -3000:
                     point_patches.append(patch)
-            if len(point_patches)!=0:
+            if len(point_patches) == len(radii):
                 point_patches_ndarray = np.stack(point_patches)
                 point_multi_patches.append(point_patches_ndarray)
                 points_used.append(point)
         point_multipatches_ndarray = np.stack(point_multi_patches)
         return point_multipatches_ndarray, points_used
 
-
-    def get_point_as_np_array(self, center_point:Point, radius: int)-> np.ndarray:
+    def get_point_as_np_array(self, center_point: Point, radius: int) -> np.ndarray:
         '''
 
         Args:
