@@ -26,7 +26,7 @@ class MultiRadiusDataset(Dataset):
             points that are inside it.
         '''
         self.radii = radii
-        self.actual_patches = None # the actual data of the dataset.
+        self.actual_patches = None  # the actual data of the dataset.
         self.mask_patches = None
         self.use_masks = False
         self.outer_polygon = outer_polygon

@@ -9,12 +9,12 @@ from topo2vec.datasets.multi_radius_dataset import MultiRadiusDataset
 
 BOTTOM_PEAKS = None
 
-
 import numpy as np
 
+
 class ClassificationDataset(MultiRadiusDataset):
-    def __init__(self, first_class_path: str, first_class_label: str, radii: List[int] =[10],
-                 outer_polygon = None):
+    def __init__(self, first_class_path: str, first_class_label: str, radii: List[int] = [10],
+                 outer_polygon=None):
         '''
 
         Args:
@@ -28,7 +28,6 @@ class ClassificationDataset(MultiRadiusDataset):
         self.points_locations = []
         self.labels = []
         self.add_class_from_file(first_class_path, first_class_label)
-
 
     def __getitem__(self, index):
         '''
@@ -44,8 +43,7 @@ class ClassificationDataset(MultiRadiusDataset):
     def __len__(self):
         return len(self.actual_patches)
 
-
-    def add_class_from_file(self, file_path:str, label:str):
+    def add_class_from_file(self, file_path: str, label: str):
         '''
         updates self.actual_patches and self.labels
         Args:
@@ -57,9 +55,9 @@ class ClassificationDataset(MultiRadiusDataset):
         '''
         points_list = self.load_points_list_from_file(file_path)
         self.add_points_as_patches_to_actual_patches(points_list)
-        self.labels += [label]*len(self.actual_patches)
+        self.labels += [label] * len(self.actual_patches)
 
-    def load_points_list_from_file(self, file_path:str) -> List[Point]:
+    def load_points_list_from_file(self, file_path: str) -> List[Point]:
         '''
         load all the points that are inside a points list
         Args:
@@ -87,7 +85,7 @@ class ClassificationDataset(MultiRadiusDataset):
 
         return points_list
 
-    def _get_coord_as_points_list(self, index:int, new_features:np.ndarray) -> List[Point]:
+    def _get_coord_as_points_list(self, index: int, new_features: np.ndarray) -> List[Point]:
         '''
 
         Args:
@@ -98,11 +96,9 @@ class ClassificationDataset(MultiRadiusDataset):
 
         '''
         curr_idx_coords = new_features[index]['geometry']['coordinates']
-        if len(curr_idx_coords)!=0:
+        if len(curr_idx_coords) != 0:
             if type(curr_idx_coords[0]) == float:
                 return [Point(curr_idx_coords[0], curr_idx_coords[1])]
             elif type(curr_idx_coords[0]) == list:
                 return [Point(curr_idx_coord[0], curr_idx_coord[1]) for curr_idx_coord in curr_idx_coords]
         return []
-
-
