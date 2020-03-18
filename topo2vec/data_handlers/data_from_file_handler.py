@@ -83,7 +83,7 @@ class DataFromFileHandler(DataHandler):
         Returns:
 
         '''
-        normalize = False
+        normalize = True
         return self.get_elevation_map(center_point.x, center_point.y, radius, normalize)
 
     def crop_image(self, lon, lat, radius):
@@ -117,6 +117,6 @@ class DataFromFileHandler(DataHandler):
 
         '''
         res_map = self.crop_image(lon, lat, radius)
-        if normalize:
+        if normalize and res_map.size != 0:
             res_map = (res_map - np.min(res_map)) / (np.max(res_map) - np.min(res_map))
         return res_map
