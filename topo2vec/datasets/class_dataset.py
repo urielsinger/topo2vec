@@ -7,14 +7,11 @@ from shapely.geometry import Point
 from torch import tensor
 from topo2vec.datasets.multi_radius_dataset import MultiRadiusDataset
 
-BOTTOM_PEAKS = None
-
 import numpy as np
 
-
-class ClassificationDataset(MultiRadiusDataset):
-    def __init__(self, first_class_path: str, first_class_label: str, radii: List[int] = [10],
-                 outer_polygon=None):
+class ClassDataset(MultiRadiusDataset):
+    def __init__(self, first_class_path: str, first_class_label: float,
+                 radii: List[int] = [10], outer_polygon=None):
         '''
 
         Args:
@@ -27,7 +24,7 @@ class ClassificationDataset(MultiRadiusDataset):
         self.features = []
         self.points_locations = []
         self.labels = []
-        self.add_class_from_file(first_class_path, first_class_label)
+        self.add_class_from_file(first_class_path, float(first_class_label))
 
     def __getitem__(self, index):
         '''
@@ -38,12 +35,9 @@ class ClassificationDataset(MultiRadiusDataset):
         Returns: a tuple of the data and the label
 
         '''
-        return (self.actual_patches[index], tensor([1.]))
+        return (self.actual_patches[index], tensor([self.labels[index]]))
 
-    def __len__(self):
-        return len(self.actual_patches)
-
-    def add_class_from_file(self, file_path: str, label: str):
+    def add_class_from_file(self, file_path: str, label: float):
         '''
         updates self.actual_patches and self.labels
         Args:

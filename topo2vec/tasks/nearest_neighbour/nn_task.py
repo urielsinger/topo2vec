@@ -5,7 +5,6 @@ from sklearn.neighbors import NearestNeighbors
 
 from topo2vec import visualizer
 from topo2vec.common.visualizations import plot_n_np_arrays_one_row
-from topo2vec.datasets.random_dataset_builder import DatasetBuilder
 
 from topo2vec.feature_aggregators.naive_features_aggregator import NaiveFeaturesAggregator
 from topo2vec.tasks.task import Task

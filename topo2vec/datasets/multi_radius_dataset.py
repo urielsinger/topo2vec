@@ -62,7 +62,8 @@ class MultiRadiusDataset(Dataset):
 
         '''
         if self.outer_polygon is not None:
-            points = [point for point in points if check_if_point_in_range(point)]
+            points = [point for point in points
+                      if check_if_point_in_range(point, self.outer_polygon)]
 
         new_patches, _ = mask_visualizer.get_points_as_np_array(points, self.radii)
 

@@ -1,0 +1,23 @@
+way
+  [waterway=river]
+  (49,5,50,6);
+/*added by auto repair*/
+(._;>;);
+/*end of auto repair*/
+out;
+
+way
+  [waterway=stream]
+  (49,5,50,6);
+/*added by auto repair*/
+(._;>;);
+/*end of auto repair*/
+out;
+
+way
+  [natural=cliff]
+  (49,5,50,6);
+/*added by auto repair*/
+(._;>;);
+/*end of auto repair*/
+out;

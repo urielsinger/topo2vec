@@ -1,11 +1,11 @@
 from unittest import TestCase
 
-from topo2vec.feature_extractors_pytorch.autoencoder import Autoencoder
+from topo2vec.modules.autoencoder import Autoencoder
 
 import pytorch_lightning as pl
 from pytorch_lightning.loggers import TensorBoardLogger
 
-from topo2vec.feature_extractors_pytorch.autoencoder import Autoencoder
+from topo2vec.modules.autoencoder import Autoencoder
 
 logs_path = '/root/repositories/topo2vec/tb_logs'
 

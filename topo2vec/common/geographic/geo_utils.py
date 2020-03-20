@@ -29,7 +29,7 @@ def check_if_point_in_range(point:Point, polygon: Polygon) -> bool:
     Returns:
 
     '''
-    return point.within(polygon.POLYGON)
+    return point.within(polygon)
 
 def area_in_m2(poly: Polygon) -> float:
     """
@@ -133,6 +133,11 @@ def sample_point_in_range(min_lon: float, min_lat: float, max_lon: float, max_la
 def sample_points_in_range(min_lon: float, min_lat: float, max_lon: float, max_lat: float, number:int,
                           seed=None) -> Point:
     points_list = [sample_point_in_range(min_lon, min_lat, max_lon, max_lat) for i in range(number)]
+    return points_list
+
+def sample_points_in_polygon(poly: Polygon, number:int,
+                          seed=None) -> Point:
+    points_list = [sample_point_in_poly(poly) for i in range(number)]
     return points_list
 
 def sample_point_in_poly(poly: Polygon, seed=None) -> Point:

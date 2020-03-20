@@ -2,7 +2,7 @@ import logging
 import requests
 import os
 from io import BytesIO
-from PIL import Image, ImageTk
+from PIL import Image
 import numpy as np
 
 from topo2vec.data_handlers.data_handler import DataHandler
