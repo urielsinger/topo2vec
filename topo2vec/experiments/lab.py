@@ -2,8 +2,7 @@ from abc import abstractmethod
 
 from pytorch_lightning.loggers import TensorBoardLogger
 from sklearn.model_selection import ParameterGrid
-from torch import optim
-import torch.nn.functional as F
+from torch import optim, nn
 import pytorch_lightning as pl
 from topo2vec.modules.classifier import Classifier
 
@@ -15,7 +14,7 @@ class Lab:
         self.model_hyperparams = {
             'max_epochs': [100],
             'optimizer_cls': [optim.Adam],
-            'loss_func': [F.binary_cross_entropy],
+            'loss_func': [nn.CrossEntropyLoss()]
         }
 
     def run_experiment(self, max_epochs, name, **hparams):

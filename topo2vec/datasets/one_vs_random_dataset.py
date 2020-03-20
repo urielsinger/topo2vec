@@ -5,7 +5,6 @@ from torch.utils.data import ConcatDataset
 
 from topo2vec.CONSTANTS import N49_E05_STREAMS
 from topo2vec.datasets.class_dataset import ClassDataset
-from topo2vec.datasets.multi_radius_dataset import MultiRadiusDataset
 from topo2vec.datasets.random_dataset import RandomDataset
 
 

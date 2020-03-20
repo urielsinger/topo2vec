@@ -15,7 +15,7 @@ class StreamsVsAllLab(ClassificationLab):
         super().__init__()
         self.model_hyperparams.update({
             'arch': ['simpleconvnet'],
-            'num_classes': [1]
+            'num_classes': [2]
         })
 
     def _generate_datasets(self, radii, total_dataset_size):

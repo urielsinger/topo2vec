@@ -2,7 +2,6 @@ from shapely.geometry import Polygon, Point
 from torch import nn
 
 from topo2vec.CONSTANTS import N49_E05_RIVERS, N49_E05_CLIFFS, N49_E05_STREAMS
-from topo2vec.datasets.one_vs_random_dataset import OneVsRandomDataset
 from topo2vec.datasets.several_classes_datasets import SeveralClassesDataset
 from topo2vec.experiments.classification_lab import ClassificationLab
 
@@ -13,6 +12,9 @@ validation_half = Polygon([Point(5, 49.5), Point(5, 50), Point(6, 50),
                            Point(6, 49.5), Point(5, 49.5)])
 
 class_paths = [N49_E05_RIVERS, N49_E05_CLIFFS, N49_E05_STREAMS]
+class_paths = [N49_E05_RIVERS, N49_E05_CLIFFS, N49_E05_RIVERS]
+class_paths = [N49_E05_CLIFFS, N49_E05_STREAMS]
+
 class_names = ['River', 'Cliff', 'Stream']
 
 
@@ -22,9 +24,8 @@ class TriClassLab(ClassificationLab):
         super().__init__()
         self.model_hyperparams.update({
             'arch': ['simpleconvnet'],
-            'num_classes': [3],
-            'loss_func': [nn.CrossEntropyLoss()],
-
+            'num_classes': [len(class_paths)],
+            'loss_func': [nn.CrossEntropyLoss()]
         })
 
     def _generate_datasets(self, radii, total_dataset_size):

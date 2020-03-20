@@ -14,7 +14,7 @@ class ClassificationLab(Lab):
         })
 
     def run_experiment(self, radii: List[int], learning_rate: float,
-                       total_dataset_size: int, max_epochs: int, num_classes: int,
+                       total_dataset_size: int, max_epochs: int,
                        **hparams):
         name = f'streams_vs_all_radii_{str(radii)}_lr_{str(learning_rate)}_size_{total_dataset_size}'
         print(f'started running, name = {name}')

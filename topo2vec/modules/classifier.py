@@ -1,3 +1,4 @@
+import random
 from typing import List
 
 import torchvision as torchvision
@@ -38,40 +39,41 @@ class Classifier(LightningModule):
 
     def training_step(self, batch, batch_idx):
         x, y = batch
-        y_hat = self.forward(x.float())
-        loss = self.loss_fn(y_hat, y)
+        outputs = self.forward(x.float())
+        loss = self.loss_fn(outputs.float(), y.squeeze().long())
         tensorboard_logs = {'train_loss': loss}
         return {'loss': loss, 'log': tensorboard_logs}
 
     def validation_step(self, batch, batch_idx):
         x, y = batch
-        y_hat = self.forward(x.float())
-        y_tag = (y_hat > 0.5)
-
+        outputs = self.forward(x.float())
+        _, predicted = torch.max(outputs.data, 1)
         batch_size, channels, _, _ = x.size()
-        x = x.float()
-        # im_mean = x.view(batch_size, channels, -1).mean(2).view(batch_size, channels, 1, 1)
-        # im_std = x.view(batch_size, channels, -1).std(2).view(batch_size, channels, 1, 1)
-        x_normalized = x  # (x - im_mean) / (im_std)
-        x_normalized = x_normalized[:, 0, :, :].unsqueeze(1)
+        sumy = torch.sum(predicted == y)
+        accuracy = torch.tensor([float(torch.sum(predicted == y.squeeze())) / batch_size])
+        loss = self.loss_fn(outputs.float(), y.squeeze().long())
 
-        false_negatives_idxs = ((y_tag != y) & (y == 1))
-        self.sample_images_and_log(x_normalized, false_negatives_idxs, 'FN: positives, labeled wrong')
+        if self.num_classes == 2:
+            x = x.float()
+            # im_mean = x.view(batch_size, channels, -1).mean(2).view(batch_size, channels, 1, 1)
+            # im_std = x.view(batch_size, channels, -1).std(2).view(batch_size, channels, 1, 1)
+            x_normalized = x  # (x - im_mean) / (im_std)
+            x_normalized = x_normalized[:, 0, :, :].unsqueeze(1)
 
-        false_positives_idxs = ((y_tag != y) & (y == 0))
-        self.sample_images_and_log(x_normalized, false_positives_idxs, 'FP: negatives, labeled wrong')
+            false_negatives_idxs = ((predicted != y) & (y == 1))
+            self.sample_images_and_log(x_normalized, false_negatives_idxs, 'FN: positives, labeled wrong')
 
-        true_negatives_idxs = ((y_tag == y) & (y == 0))
-        self.sample_images_and_log(x_normalized, true_negatives_idxs, 'TN: negatives, labeled right')
+            false_positives_idxs = ((predicted != y) & (y == 0))
+            self.sample_images_and_log(x_normalized, false_positives_idxs, 'FP: negatives, labeled wrong')
 
-        true_positives_idxs = ((y_tag == y) & (y == 1))
-        self.sample_images_and_log(x_normalized, true_positives_idxs, 'TP: positives, labeled right')
+            true_negatives_idxs = ((predicted == y) & (y == 0))
+            self.sample_images_and_log(x_normalized, true_negatives_idxs, 'TN: negatives, labeled right')
 
-        grid = torchvision.utils.make_grid(x_normalized)
-        self.logger.experiment.add_image('example images', grid, 0)
+            true_positives_idxs = ((predicted == y) & (y == 1))
+            self.sample_images_and_log(x_normalized, true_positives_idxs, 'TP: positives, labeled right')
 
-        loss = self.loss_fn(y_hat, y)
-        accuracy = torch.tensor([float(torch.sum(y == y_tag)) / x.shape[0]])
+            grid = torchvision.utils.make_grid(x_normalized)
+            self.logger.experiment.add_image('example images', grid, 0)
 
         return {'val_loss': loss, 'val_acc': accuracy}
 
@@ -80,7 +82,9 @@ class Classifier(LightningModule):
         if torch.sum(one_hot_vector) > 0:
             actual_idxs = torch.nonzero(one_hot_vector)
             images = all_images[actual_idxs[:, 0]]
-            sample_imgs = images[:number_to_log]
+            num_images = images.shape[0]
+            rand_indexes = [random.randint(0, num_images-1) for i in range(number_to_log)]
+            sample_imgs = [images[rand_num] for rand_num in rand_indexes]
             grid = torchvision.utils.make_grid(sample_imgs)
             self.logger.experiment.add_image(title, grid, 0)
 

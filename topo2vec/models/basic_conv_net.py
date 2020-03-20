@@ -33,14 +33,14 @@ class SimpleConvNet(nn.Module):
             nn.Linear(50, num_classes),
         )
 
-        self.activation_function = nn.Softmax()
+        #self.activation_function = nn.Softmax()
 
 
     def forward(self, x):
         x = self.features(x)
         x = torch.flatten(x, 1)
         x = self.classifier(x)
-        x = self.activation_function(x)
+        #x = self.activation_function(x)
         return x
 
 
