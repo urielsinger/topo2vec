@@ -9,8 +9,17 @@ from topo2vec.datasets.random_dataset import RandomDataset
 
 
 class OneVsRandomDataset:
-    def __init__(self, radii: List[int], size, outer_polygon, class_path=N49_E05_STREAMS,
+    def __init__(self, radii: List[int], size: int, outer_polygon, class_path=N49_E05_STREAMS,
                  class_label=1):
+        '''
+        init a dataset for the one class vs all task.
+        Args:
+            radii: radii list
+            size: max size of the wanted dataset
+            outer_polygon: the polygon to keep the points from
+            class_path:
+            class_label:
+        '''
         classification_dataset = ClassDataset(class_path, class_label,
                                               radii=radii,
                                               outer_polygon=outer_polygon)

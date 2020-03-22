@@ -1,6 +1,6 @@
 import json
 import os
-from typing import List
+from typing import List, Tuple
 
 import fiona
 from shapely.geometry import Point
@@ -9,7 +9,12 @@ from topo2vec.datasets.multi_radius_dataset import MultiRadiusDataset
 
 import numpy as np
 
+
 class ClassDataset(MultiRadiusDataset):
+    '''
+    A dataset contains only one class
+    '''
+
     def __init__(self, first_class_path: str, first_class_label: float,
                  radii: List[int] = [10], outer_polygon=None):
         '''
@@ -26,7 +31,7 @@ class ClassDataset(MultiRadiusDataset):
         self.labels = []
         self.add_class_from_file(first_class_path, float(first_class_label))
 
-    def __getitem__(self, index):
+    def __getitem__(self, index) -> Tuple[np.ndarray, tensor]:
         '''
 
         Args:

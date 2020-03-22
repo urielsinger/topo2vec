@@ -19,6 +19,15 @@ class StreamsVsAllLab(ClassificationLab):
         })
 
     def _generate_datasets(self, radii, total_dataset_size):
+        '''
+
+        Args:
+            radii: The radii to be used in the dataset
+            total_dataset_size: the size of the dataset needed
+
+        Returns:
+
+        '''
         size_train = int(0.8 * total_dataset_size)
         size_val = int(0.2 * total_dataset_size)
         train_set = OneVsRandomDataset(radii, size_train, train_half)

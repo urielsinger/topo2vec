@@ -1,3 +1,5 @@
+from typing import List
+
 from shapely.geometry import Polygon, Point
 from torch import nn
 
@@ -28,9 +30,16 @@ class TriClassLab(ClassificationLab):
             'loss_func': [nn.CrossEntropyLoss()]
         })
 
-    def _generate_datasets(self, radii, total_dataset_size):
-        size_train = int(0.8 * total_dataset_size)
-        size_val = int(0.2 * total_dataset_size)
+    def _generate_datasets(self, radii: List[int], total_dataset_size: int):
+        '''
+
+        Args:
+            radii: the radii to be used
+            total_dataset_size: the max dataset size asked for
+
+        Returns: the train set and test sets generated
+
+        '''
         train_set = SeveralClassesDataset(radii, train_half, class_paths, class_names)
         val_set = SeveralClassesDataset(radii, validation_half, class_paths, class_names)
         return train_set, val_set

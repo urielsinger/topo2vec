@@ -8,7 +8,7 @@ from topo2vec import mask_visualizer
 
 import numpy as np
 
-from topo2vec.common.geographic.geo_utils import check_if_point_in_range
+from topo2vec.common.geographic.geo_utils import check_if_point_in_polygon
 
 
 class MultiRadiusDataset(Dataset):
@@ -30,6 +30,7 @@ class MultiRadiusDataset(Dataset):
         self.mask_patches = None
         self.use_masks = False
         self.outer_polygon = outer_polygon
+        self.points_locations = None
 
     def add_points_as_patches_to_actual_patches(self, points: List[Point]):
         '''
@@ -40,9 +41,9 @@ class MultiRadiusDataset(Dataset):
         '''
         if self.outer_polygon is not None:
             points = [point for point in points if
-                      check_if_point_in_range(point, self.outer_polygon)]
+                      check_if_point_in_polygon(point, self.outer_polygon)]
 
-        new_patches, _ = visualizer.get_points_as_np_array(points, self.radii)
+        new_patches, self.points_locations = visualizer.get_points_as_np_array(points, self.radii)
 
         if self.actual_patches is not None:
             all_patches = [self.actual_patches, new_patches]
@@ -63,7 +64,7 @@ class MultiRadiusDataset(Dataset):
         '''
         if self.outer_polygon is not None:
             points = [point for point in points
-                      if check_if_point_in_range(point, self.outer_polygon)]
+                      if check_if_point_in_polygon(point, self.outer_polygon)]
 
         new_patches, _ = mask_visualizer.get_points_as_np_array(points, self.radii)
 

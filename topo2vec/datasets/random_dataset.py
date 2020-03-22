@@ -8,7 +8,7 @@ from topo2vec.datasets.multi_radius_dataset import MultiRadiusDataset
 
 
 class RandomDataset(MultiRadiusDataset):
-    def __init__(self, num_points: int, radii: List[int], outer_polygon:Polygon, label:int=0):
+    def __init__(self, num_points: int, radii: List[int], outer_polygon: Polygon, label: int = 0):
         '''
 
         Args:

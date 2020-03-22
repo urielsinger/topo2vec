@@ -49,7 +49,6 @@ class Classifier(LightningModule):
         outputs = self.forward(x.float())
         _, predicted = torch.max(outputs.data, 1)
         batch_size, channels, _, _ = x.size()
-        sumy = torch.sum(predicted == y)
         accuracy = torch.tensor([float(torch.sum(predicted == y.squeeze())) / batch_size])
         loss = self.loss_fn(outputs.float(), y.squeeze().long())
 
