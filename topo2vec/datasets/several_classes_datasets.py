@@ -7,11 +7,13 @@ from topo2vec.datasets.class_dataset import ClassDataset
 
 
 class SeveralClassesDataset(Dataset):
-    def __init__(self, radii: List[int], outer_polygon: Polygon,
+    def __init__(self, radii: List[int], outer_polygon: Polygon, wanted_size: int,
                  class_paths: List[str], class_names: List[str]):
         all_datasets = []
+        class_wanted_size = int(wanted_size/len(class_names))+1
         for i, class_path in enumerate(class_paths):
             class_dataset = ClassDataset(class_path, i, radii=radii,
+                                         wanted_size=class_wanted_size,
                                          outer_polygon=outer_polygon)
 
             print(f'{len(class_dataset)} {class_names[i]} points')

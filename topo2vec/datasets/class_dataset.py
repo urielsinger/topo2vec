@@ -1,5 +1,6 @@
 import json
 import os
+import random
 from typing import List, Tuple
 
 import fiona
@@ -16,7 +17,7 @@ class ClassDataset(MultiRadiusDataset):
     '''
 
     def __init__(self, first_class_path: str, first_class_label: float,
-                 radii: List[int] = [10], outer_polygon=None):
+                 radii: List[int], wanted_size:int, outer_polygon=None):
         '''
 
         Args:
@@ -29,10 +30,12 @@ class ClassDataset(MultiRadiusDataset):
         self.features = []
         self.points_locations = []
         self.labels = []
+        self.wanted_size = wanted_size
         self.add_class_from_file(first_class_path, float(first_class_label))
 
     def __getitem__(self, index) -> Tuple[np.ndarray, tensor]:
         '''
+184 River points
 
         Args:
             index:
@@ -40,7 +43,7 @@ class ClassDataset(MultiRadiusDataset):
         Returns: a tuple of the data and the label
 
         '''
-        return (self.actual_patches[index], tensor([self.labels[index]]))
+        return self.actual_patches[index], tensor([self.labels[index]])
 
     def add_class_from_file(self, file_path: str, label: float):
         '''
@@ -68,6 +71,7 @@ class ClassDataset(MultiRadiusDataset):
         '''
         filename, file_extension = os.path.splitext(file_path)
         print(file_extension)
+        new_features = None
         if file_extension == '.shp':
             collection = fiona.open(file_path, encoding='ISO8859-1')
             new_features = list(collection)
@@ -77,14 +81,28 @@ class ClassDataset(MultiRadiusDataset):
                 data = json.load(bottom_peaks_file)
             new_features = data['features']
 
+        elif file_extension == '.json':
+            with open(file_path, encoding='utf-8') as bottom_peaks_file:
+                data = json.load(bottom_peaks_file)
+            new_features = data['elements']
+
+        else:
+            raise Exception('No points in file!')
+
         points_list = []
         for index in range(len(new_features)):
-            coord_as_points_list = self._get_coord_as_points_list(index, new_features)
+            coord_as_points_list = self._get_coord_as_points_list(index, new_features, file_extension)
             points_list += coord_as_points_list
+            if len(points_list) >= self.wanted_size:
+                break
 
-        return points_list
 
-    def _get_coord_as_points_list(self, index: int, new_features: np.ndarray) -> List[Point]:
+        if len(points_list) >= self.wanted_size:
+            return points_list[:self.wanted_size]
+        else:
+            raise Exception('Not enough points in class in this region as needed!')
+
+    def _get_coord_as_points_list(self, index: int, new_features: np.ndarray, file_extension:str) -> List[Point]:
         '''
 
         Args:
@@ -94,10 +112,15 @@ class ClassDataset(MultiRadiusDataset):
         Returns: a list of all the points inside a row.
 
         '''
-        curr_idx_coords = new_features[index]['geometry']['coordinates']
-        if len(curr_idx_coords) != 0:
-            if type(curr_idx_coords[0]) == float:
-                return [Point(curr_idx_coords[0], curr_idx_coords[1])]
-            elif type(curr_idx_coords[0]) == list:
-                return [Point(curr_idx_coord[0], curr_idx_coord[1]) for curr_idx_coord in curr_idx_coords]
+        if file_extension == '.shp' or file_extension == '.geojson':
+            curr_idx_coords = new_features[index]['geometry']['coordinates']
+            if len(curr_idx_coords) != 0:
+                if type(curr_idx_coords[0]) == float:
+                    return [Point(curr_idx_coords[0], curr_idx_coords[1])]
+                elif type(curr_idx_coords[0]) == list:
+                    curr_idx_coord = random.choice(curr_idx_coords)
+                    # return [Point(curr_idx_coord[0], curr_idx_coord[1]) for curr_idx_coord in curr_idx_coords]
+                    return [Point(curr_idx_coord[0], curr_idx_coord[1])]
+        elif file_extension == '.json':
+            return [Point(new_features[index]['lon'], new_features[index]['lat'])]
         return []

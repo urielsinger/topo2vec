@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from topo2vec.experiments.streams_vs_all_lab import StreamsVsAllLab
 
-
+'''
 class TestClassifier(TestCase):
     def test_classifier(self):
         lab = StreamsVsAllLab()
@@ -14,3 +14,4 @@ class TestClassifier(TestCase):
         lab.run()
 
 
+'''

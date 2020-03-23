@@ -1,3 +1,5 @@
+way[waterway=river] \(49,5,50,6\); rivers
+
 way
   [waterway=river]
   (49,5,50,6);
@@ -5,6 +7,9 @@ way
 (._;>;);
 /*end of auto repair*/
 out;
+
+way[waterway=stream] \(49,5,50,6\); streams
+
 
 way
   [waterway=stream]
@@ -14,8 +19,20 @@ way
 /*end of auto repair*/
 out;
 
+way[natural=cliff] \(45,5,50,15\); cliffs
+
 way
   [natural=cliff]
+  (49,5,50,6);
+/*added by auto repair*/
+(._;>;);
+/*end of auto repair*/
+out;
+
+node[natural=peak] \(45,5,50,15\) peaks
+
+node
+  [natural=peak]
   (49,5,50,6);
 /*added by auto repair*/
 (._;>;);

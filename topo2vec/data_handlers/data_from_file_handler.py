@@ -1,5 +1,6 @@
+import math
 import os
-from typing import List
+from typing import List, Tuple
 
 import numpy as np
 from shapely.geometry import Point
@@ -10,15 +11,42 @@ from topo2vec.data_handlers.data_handler import DataHandler
 
 
 class DataFromFileHandler(DataHandler):
-    def __init__(self, image_path):
+    def __init__(self, elevation_base_dir, bounding_box=(5, 49, 6, 50)):
         '''
+
         Args:
-            image_path: the path where the basic image is saved
+            elevation_base_dir: The directory in which all the images are stored
+            bounding_box: the bounding box of the data
         '''
         super().__init__()
-        self.min_lon, self.min_lat, self.max_lon, self.max_lat = 5, 49, 6, 50
-        self.im = self.load_image(image_path)
-        self.H, self.W = self.im.shape
+        self.min_lon, self.min_lat, self.max_lon, self.max_lat = bounding_box
+        self.images = {}
+        for min_lin in range(self.min_lon, self.max_lon, 1):
+            for min_lat in range(self.min_lat, self.max_lat, 1):
+                im_name = self.lon_lat_to_string(min_lin, min_lat) + '_AVE_DSM.tif'
+                im = self.load_image(os.path.join(elevation_base_dir, im_name))
+                self.images[self.lon_lat_to_string(min_lin, min_lat)] = im
+
+        self.H, self.W = self.images[self.lon_lat_to_string(
+            self.min_lon, self.min_lat)].shape
+
+        self.step_lon = 1 / self.W
+        self.step_lat = 1 / self.H
+
+    def point_to_string(self, point: Point) -> str:
+        return self.lon_lat_to_string(point.x, point.y)
+
+    def lon_lat_to_string(self, lon: float, lat: float) -> str:
+        lon_floor, lat_floor = self.floor_lon_lat(lon, lat)
+        zeros_for_lon = '0' * (3 - len(str(lon_floor)))
+        zeros_for_lat = '0' * (3 - len(str(lat_floor)))
+
+        return f'N{zeros_for_lat}{lat_floor}E{zeros_for_lon}{lon_floor}'
+
+    def floor_lon_lat(self, lon: float, lat: float) -> Tuple[int, int]:
+        lon_floor = int(math.floor(lon))
+        lat_floor = int(math.floor(lat))
+        return lon_floor, lat_floor
 
     def load_image(self, image_path):
         '''
@@ -47,8 +75,7 @@ class DataFromFileHandler(DataHandler):
         '''
 
         Args:
-            lon:
-            lat:
+            center_point: the point around which to extract the data
             radius: the radius to 2 sides the patch should go through
             dtype: 'tiff' or 'png'
 
@@ -92,46 +119,22 @@ class DataFromFileHandler(DataHandler):
         '''
 
         Args:
-            center_point: the point to do it arrounf
+            center_point: the point to do it around
             radius: the radius to 2 sides the patch should go through
 
-        Returns:
+        Returns: the certain patch
 
         '''
+        #TODO: WHAT IF FROM TWO FILES?
         normalize = True
-        return self.get_elevation_map(center_point.x, center_point.y, radius, normalize)
+        lon, lat = center_point.x, center_point.y
 
-    def crop_image(self, lon, lat, radius):
-        '''
-
-        Args:
-            lon: patches center lon
-            lat: patches center lat
-            radius: the distance from lon,lat to each side
-
-        Returns: The certain patch
-
-        '''
-        step_lon = (self.max_lon - self.min_lon) / self.W
-        step_lat = (self.max_lat - self.min_lat) / self.H
-        lon_index = int((lon - self.min_lon) / step_lon)
-        lat_index = int((lat - self.min_lat) / step_lat)
-        res_map = self.im[-lat_index - radius:-lat_index + radius + 1, lon_index - radius:lon_index + radius + 1]
-        return res_map
-
-    def get_elevation_map(self, lon, lat, radius, normalize=False):
-        '''
-        normalize the crop_image's result
-        Args:
-            lon:
-            lat:
-            radius:
-            normalize: normalize or not the elevation map
-
-        Returns: the certain patch normalized if needed
-
-        '''
-        res_map = self.crop_image(lon, lat, radius)
+        im_min_lon, im_min_lat = self.floor_lon_lat(lon, lat)
+        lon_index = int((lon - im_min_lon) / self.step_lon)
+        lat_index = int((lat - im_min_lat) / self.step_lat)
+        relevant_image = self.images[self.lon_lat_to_string(im_min_lon, im_min_lat)]
+        res_map = relevant_image[-lat_index - radius:-lat_index + radius + 1,
+                  lon_index - radius:lon_index + radius + 1]
         if normalize and res_map.size != 0:
             res_map = (res_map - np.min(res_map)) / (np.max(res_map) - np.min(res_map))
         return res_map

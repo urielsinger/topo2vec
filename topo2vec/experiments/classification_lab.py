@@ -15,7 +15,7 @@ class ClassificationLab(Lab):
         self.model_hyperparams.update({
             'radii': [[8], [8, 16], [16], [8, 16, 24], [24]],
             'learning_rate': [1e-4, 1e-5, 1e-6],
-            'total_dataset_size': [1000, 10000, 40000],
+            'total_dataset_size': [50000],
             'loss_func': [nn.CrossEntropyLoss()]
         })
 

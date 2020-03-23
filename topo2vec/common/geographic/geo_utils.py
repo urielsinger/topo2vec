@@ -16,8 +16,6 @@ from shapely.ops import cascaded_union
 from tqdm import tqdm
 import geopandas as gpd
 
-from topo2vec import important_places
-
 
 def check_if_point_in_polygon(point:Point, polygon: Polygon) -> bool:
     '''
