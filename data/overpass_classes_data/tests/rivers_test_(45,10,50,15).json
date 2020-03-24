@@ -1,0 +1,160 @@
+{
+  "version": 0.6,
+  "generator": "Jonathan Kavitzky",
+  "osm3s": {
+    "timestamp_osm_base": "2020-03-22T21:58:02Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+{
+	"type": "node",
+	"lat": 49.8542707,
+	"lon": 6.8912207,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat": 45.3022875,
+	"lon": 5.4987645,
+	"tags": {
+		"natural": "river"
+	}
+},
+    {
+	"type": "node",
+	"lat": 47.9411824,
+	"lon": 6.864941,
+	"tags": {
+		"natural": "river"
+	}
+},
+    {
+	"type": "node",
+	"lat": 46.6785026,
+	"lon": 8.7990822,
+	"tags": {
+		"natural": "river"
+	}
+},
+    {
+	"type": "node",
+	"lat": 48.8202903,
+	"lon": 9.9382615,
+	"tags": {
+		"natural": "river"
+	}
+},
+    {
+	"type": "node",
+	"lat": 48.8979074,
+	"lon": 5.2412564,
+	"tags": {
+		"natural": "river"
+	}
+},
+    {
+	"type": "node",
+	"lat": 46.7860502,
+	"lon": 6.2751204,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat": 46.027668,
+	"lon": 7.3157161,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat": 49.6139702,
+	"lon": 5.0588287,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat": 48.5755294,
+	"lon": 7.140907,
+	"tags": {
+		"natural": "river"
+	}
+},
+    {
+	"type": "node",
+	"lat": 45.1341914,
+	"lon": 9.9633706,
+	"tags": {
+		"natural": "river"
+	}
+},{
+	"type": "node",
+	"lat": 45.7762911,
+	"lon": 9.8205908,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat": 49.9432487,
+	"lon": 6.4073689,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat": 46.5223427,
+	"lon": 6.1170808,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat": 47.6482505,
+	"lon": 5.0839996,
+	"tags": {
+		"natural": "river"
+	}
+}, {
+	"type": "node",
+	"lat": 46.0150065,
+	"lon": 6.1424891,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat": 47.9993032,
+	"lon": 6.8706171,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat": 45.2794321,
+	"lon": 7.4224444,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat": 45.0077039,
+	"lon": 6.8230067,
+	"tags": {
+		"natural": "river"
+	}
+}
+  ]
+}

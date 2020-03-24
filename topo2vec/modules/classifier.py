@@ -11,7 +11,8 @@ import topo2vec.models as models
 
 class Classifier(LightningModule):
     def __init__(self, validation_dataset: Dataset, train_dataset: Dataset,
-                 loss_func, optimizer_cls, arch: str = 'simpleconvnet',
+                 loss_func, optimizer_cls, test_dataset: Dataset,
+                 arch: str = 'simpleconvnet',
                  pretrained: bool = False, radii: List[int] = [10],
                  num_classes: int = 1, learning_rate: float = 0.0001):
         """
@@ -27,6 +28,7 @@ class Classifier(LightningModule):
 
         self.val_set = validation_dataset
         self.train_set = train_dataset
+        self.test_set = test_dataset
 
     def forward(self, x):
         return self.model(x)
@@ -37,14 +39,25 @@ class Classifier(LightningModule):
     def val_dataloader(self):
         return DataLoader(self.val_set, shuffle=True, num_workers=0, batch_size=1000)
 
+    def test_dataloader(self):
+        return DataLoader(self.test_set, shuffle=True, num_workers=0, batch_size=10)
+
     def training_step(self, batch, batch_idx):
         x, y = batch
         outputs = self.forward(x.float())
+        _, predicted = torch.max(outputs.data, 1)
         loss = self.loss_fn(outputs.float(), y.squeeze().long())
+
         tensorboard_logs = {'train_loss': loss}
         return {'loss': loss, 'log': tensorboard_logs}
 
+    def test_step(self, batch, batch_idx):
+        return self.evaluation_step(batch, 'test')
+
     def validation_step(self, batch, batch_idx):
+        return self.evaluation_step(batch, 'validation')
+
+    def evaluation_step(self, batch, name):
         x, y = batch
         outputs = self.forward(x.float())
         _, predicted = torch.max(outputs.data, 1)
@@ -53,28 +66,31 @@ class Classifier(LightningModule):
         loss = self.loss_fn(outputs.float(), y.squeeze().long())
 
         if self.num_classes == 2:
-            x = x.float()
-            # im_mean = x.view(batch_size, channels, -1).mean(2).view(batch_size, channels, 1, 1)
-            # im_std = x.view(batch_size, channels, -1).std(2).view(batch_size, channels, 1, 1)
-            x_normalized = x  # (x - im_mean) / (im_std)
-            x_normalized = x_normalized[:, 0, :, :].unsqueeze(1)
+            self.run_images_TP_TN_FP_FN_evaluation(predicted, x, y)
 
-            false_negatives_idxs = ((predicted != y) & (y == 1))
-            self.sample_images_and_log(x_normalized, false_negatives_idxs, 'FN: positives, labeled wrong')
+        return {name + '_loss': loss, name + '_acc': accuracy}
 
-            false_positives_idxs = ((predicted != y) & (y == 0))
-            self.sample_images_and_log(x_normalized, false_positives_idxs, 'FP: negatives, labeled wrong')
+    def run_images_TP_TN_FP_FN_evaluation(self, predicted, x, y):
+        x = x.float()
+        # im_mean = x.view(batch_size, channels, -1).mean(2).view(batch_size, channels, 1, 1)
+        # im_std = x.view(batch_size, channels, -1).std(2).view(batch_size, channels, 1, 1)
+        x_normalized = x  # (x - im_mean) / (im_std)
+        x_normalized = x_normalized[:, 0, :, :].unsqueeze(1)
 
-            true_negatives_idxs = ((predicted == y) & (y == 0))
-            self.sample_images_and_log(x_normalized, true_negatives_idxs, 'TN: negatives, labeled right')
+        false_negatives_idxs = ((predicted != y) & (y == 1))
+        self.sample_images_and_log(x_normalized, false_negatives_idxs, 'FN: positives, labeled wrong')
 
-            true_positives_idxs = ((predicted == y) & (y == 1))
-            self.sample_images_and_log(x_normalized, true_positives_idxs, 'TP: positives, labeled right')
+        false_positives_idxs = ((predicted != y) & (y == 0))
+        self.sample_images_and_log(x_normalized, false_positives_idxs, 'FP: negatives, labeled wrong')
 
-            grid = torchvision.utils.make_grid(x_normalized)
-            self.logger.experiment.add_image('example images', grid, 0)
+        true_negatives_idxs = ((predicted == y) & (y == 0))
+        self.sample_images_and_log(x_normalized, true_negatives_idxs, 'TN: negatives, labeled right')
 
-        return {'val_loss': loss, 'val_acc': accuracy}
+        true_positives_idxs = ((predicted == y) & (y == 1))
+        self.sample_images_and_log(x_normalized, true_positives_idxs, 'TP: positives, labeled right')
+
+        grid = torchvision.utils.make_grid(x_normalized)
+        self.logger.experiment.add_image('example images', grid, 0)
 
     def sample_images_and_log(self, all_images: torch.tensor, one_hot_vector: torch.tensor,
                               title: str, number_to_log: int = 5):
@@ -87,11 +103,18 @@ class Classifier(LightningModule):
             grid = torchvision.utils.make_grid(sample_imgs)
             self.logger.experiment.add_image(title, grid, 0)
 
+    def test_epoch_end(self, outputs: list):
+        return self.evaluation_epoch_end(outputs, 'test')
+
     def validation_epoch_end(self, outputs: list):
-        avg_loss = torch.stack([x['val_loss'] for x in outputs]).mean()
-        avg_accuracy = torch.stack([x['val_acc'] for x in outputs]).mean()
-        tensorboard_logs = {'val_loss': avg_loss, 'val_acc': avg_accuracy}
-        return {'avg_val_loss': avg_loss, 'log': tensorboard_logs}
+        return self.evaluation_epoch_end(outputs, 'validation')
+
+    def evaluation_epoch_end(self, outputs: list, name:str):
+        avg_loss = torch.stack([x[name + '_loss'] for x in outputs]).mean()
+        avg_accuracy = torch.stack([x[name + '_acc'] for x in outputs]).mean()
+        tensorboard_logs = {name + '_loss': avg_loss,
+                            name + '_acc': avg_accuracy}
+        return {'avg_'+name+'_loss': avg_loss, 'log': tensorboard_logs}
 
     def configure_optimizers(self):
         return self.optimizer

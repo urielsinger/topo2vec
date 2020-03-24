@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from topo2vec.experiments.streams_vs_all_lab import StreamsVsAllLab
+from topo2vec.experiments.peaks_vs_all_experiment import StreamsVsAllTask
 
 '''
 class TestClassifier(TestCase):

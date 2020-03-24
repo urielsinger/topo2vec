@@ -21,7 +21,7 @@ class OneVsRandomDataset:
             class_label:
         '''
         classification_dataset = ClassDataset(class_path, class_label,
-                                              radii=radii, wanted_size=int(size/2),
+                                              radii=radii, wanted_size=int(size),
                                               outer_polygon=outer_polygon)
 
         wanted_indices = list(range(0, int(size / 2), 1))

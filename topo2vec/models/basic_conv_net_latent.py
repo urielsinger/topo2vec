@@ -1,17 +1,22 @@
 import torch
 import torch.nn as nn
 
-__all__ = ['SimpleConvNet', 'simpleconvnet']
+__all__ = ['BasicConvNetLatent', 'basicconvnetlatent']
 
 
-class SimpleConvNet(nn.Module):
+class BasicConvNetLatent(nn.Module):
     def __init__(self, num_classes=1,  radii=[10]):
-        super(SimpleConvNet, self).__init__()
+        super(BasicConvNetLatent, self).__init__()
         self.radii = radii
         self.radius = min(radii)
         self.w = 2 * self.radius + 1
         self.h = 2 * self.radius + 1
         self.patch_size = self.w * self.h
+
+        size_after_cnn_1 = self.w - 5 + 1
+        size_after_relu_1 = int((size_after_cnn_1 + - 1 * (2 - 1) - 1) / 2 + 1)
+        size_after_cnn_2 = size_after_relu_1 - 5 + 1
+        size_after_relu_2 = int((size_after_cnn_2 + - 1 * (2 - 1) - 1) / 2 + 1)
 
         self.features = nn.Sequential(
             nn.Conv2d(len(radii), 10, kernel_size=5),
@@ -20,15 +25,11 @@ class SimpleConvNet(nn.Module):
             nn.Conv2d(10, 20, kernel_size=5),
             nn.SELU(inplace=True),
             nn.MaxPool2d(kernel_size=2),
+            nn.Linear(20 * size_after_relu_2 ** 2, 10),
         )
-        size_after_cnn_1 = self.w - 5 + 1
-        size_after_relu_1 = int((size_after_cnn_1 + - 1 * (2 - 1) - 1) / 2 + 1)
-        size_after_cnn_2 = size_after_relu_1 - 5 + 1
-        size_after_relu_2 = int((size_after_cnn_2 + - 1 * (2 - 1) - 1) / 2 + 1)
 
         self.classifier = nn.Sequential(
             #nn.Dropout(),
-            nn.Linear(20 * size_after_relu_2**2, 50),
             nn.SELU(inplace=True),
             nn.Linear(50, num_classes),
         )
@@ -41,14 +42,14 @@ class SimpleConvNet(nn.Module):
         return x
 
 
-def simpleconvnet(pretrained=False, progress=True, **kwargs):
+def basicconvnetlatent(pretrained=False, progress=True, **kwargs):
     r"""Simple convolutional network
 
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
         progress (bool): If True, displays a progress bar of the download to stderr
     """
-    model = SimpleConvNet(**kwargs)
+    model = BasicConvNetLatent(**kwargs)
     if pretrained:
         # state_dict = load_state_dict_from_url(model_urls['alexnet'],
         #                                      progress=progress)

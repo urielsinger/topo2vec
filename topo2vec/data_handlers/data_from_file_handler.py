@@ -20,18 +20,20 @@ class DataFromFileHandler(DataHandler):
         '''
         super().__init__()
         self.min_lon, self.min_lat, self.max_lon, self.max_lat = bounding_box
-        self.images = {}
-        for min_lin in range(self.min_lon, self.max_lon, 1):
+        images = []
+        for min_lon in range(self.min_lon, self.max_lon, 1):
+            this_lon_images = []
             for min_lat in range(self.min_lat, self.max_lat, 1):
-                im_name = self.lon_lat_to_string(min_lin, min_lat) + '_AVE_DSM.tif'
+                im_name = self.lon_lat_to_string(min_lon, min_lat) + '_AVE_DSM.tif'
                 im = self.load_image(os.path.join(elevation_base_dir, im_name))
-                self.images[self.lon_lat_to_string(min_lin, min_lat)] = im
+                this_lon_images.append(im)
+            this_lon_images = np.concatenate(list(reversed(this_lon_images)), axis=0)
+            images.append(this_lon_images)
+        self.im = np.concatenate(images, axis=1)
 
-        self.H, self.W = self.images[self.lon_lat_to_string(
-            self.min_lon, self.min_lat)].shape
-
-        self.step_lon = 1 / self.W
-        self.step_lat = 1 / self.H
+        self.H, self.W = self.im.shape
+        self.step_lon = (self.max_lon-self.min_lon) / self.W
+        self.step_lat = (self.max_lat-self.min_lat) / self.H
 
     def point_to_string(self, point: Point) -> str:
         return self.lon_lat_to_string(point.x, point.y)
@@ -52,9 +54,9 @@ class DataFromFileHandler(DataHandler):
         '''
 
         Args:
-            image_path: the path to the image: .tif or .hgt files acceptable
+            image_path:
 
-        Returns: an ndarray of the data image
+        Returns: an ndarray of the image of type
 
         '''
         file_name, file_extension = os.path.splitext(image_path)
@@ -71,11 +73,13 @@ class DataFromFileHandler(DataHandler):
 
                 return elevations
 
+
     def get_data_as_np_array(self, center_point: Point, radius: int, dtype='tiff') -> np.ndarray:
         '''
 
         Args:
-            center_point: the point around which to extract the data
+            lon:
+            lat:
             radius: the radius to 2 sides the patch should go through
             dtype: 'tiff' or 'png'
 
@@ -87,7 +91,22 @@ class DataFromFileHandler(DataHandler):
 
     def get_points_as_np_array(self, center_points: List[Point], radii: List[int]) -> np.ndarray:
         '''
+        Args:
+            center_points: the points to get as np arrays, if possible
+            radii: the radii (L1 norm) to look in for the points
 
+        Returns: an np array of shape:
+         (num of possible points, len(radii) , 2*min(radii) + 1, 2*min(radii) + 1)
+        that is the actual elevation map in the neighbourhood of each point.
+        '''
+        point_multi_patches, points_used = \
+            self.get_points_as_list_of_np_arrays(center_points, radii)
+        point_multipatches_ndarray = np.stack(point_multi_patches)
+        return point_multipatches_ndarray, points_used
+
+    def get_points_as_list_of_np_arrays(self, center_points:
+    List[Point], radii: List[int]) -> List[Point]:
+        '''
         Args:
             center_points: the points to get as np arrays, if possible
             radii: the radii (L1 norm) to look in for the points
@@ -112,29 +131,51 @@ class DataFromFileHandler(DataHandler):
                 point_patches_ndarray = np.stack(point_patches)
                 point_multi_patches.append(point_patches_ndarray)
                 points_used.append(point)
-        point_multipatches_ndarray = np.stack(point_multi_patches)
-        return point_multipatches_ndarray, points_used
+        return point_multi_patches, points_used
 
     def get_point_as_np_array(self, center_point: Point, radius: int) -> np.ndarray:
         '''
 
         Args:
-            center_point: the point to do it around
+            center_point: the point to do it arrounf
             radius: the radius to 2 sides the patch should go through
 
-        Returns: the certain patch
+        Returns:
 
         '''
-        #TODO: WHAT IF FROM TWO FILES?
         normalize = True
-        lon, lat = center_point.x, center_point.y
+        return self.get_elevation_map(center_point.x, center_point.y, radius, normalize)
 
-        im_min_lon, im_min_lat = self.floor_lon_lat(lon, lat)
-        lon_index = int((lon - im_min_lon) / self.step_lon)
-        lat_index = int((lat - im_min_lat) / self.step_lat)
-        relevant_image = self.images[self.lon_lat_to_string(im_min_lon, im_min_lat)]
-        res_map = relevant_image[-lat_index - radius:-lat_index + radius + 1,
+    def crop_image(self, lon, lat, radius):
+        '''
+
+        Args:
+            lon: patches center lon
+            lat: patches center lat
+            radius: the distance from lon,lat to each side
+
+        Returns: The certain patch
+
+        '''
+        lon_index = int((lon - self.min_lon) / self.step_lon)
+        lat_index = int((lat - self.min_lat) / self.step_lat)
+        res_map = self.im[-lat_index - radius:-lat_index + radius + 1,
                   lon_index - radius:lon_index + radius + 1]
-        if normalize and res_map.size != 0:
+        return res_map
+
+    def get_elevation_map(self, lon, lat, radius, normalize=False):
+        '''
+        normalize the crop_image's result
+        Args:
+            lon:
+            lat:
+            radius:
+            normalize: normalize or not the elevation map
+
+        Returns: the certain patch normalized if needed
+
+        '''
+        res_map = self.crop_image(lon, lat, radius)
+        if normalize and res_map.size > 1:
             res_map = (res_map - np.min(res_map)) / (np.max(res_map) - np.min(res_map))
         return res_map

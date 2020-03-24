@@ -1,0 +1,28 @@
+{
+  "version": 0.6,
+  "generator": "Jonathan Kavitzky",
+  "osm3s": {
+    "timestamp_osm_base": "2020-03-22T21:58:02Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+{
+  "type": "node",
+  "id": 21634385,
+  "lat": 47.6935146,
+  "lon": 12.9866190,
+  "tags": {
+    "natural": "peak"
+  }
+},
+{
+  "type": "node",
+  "id": 21634651,
+  "lat": 47.5757111,
+  "lon": 13.0202823,
+  "tags": {
+    "natural": "peak",
+  }
+}
+  ]
+}

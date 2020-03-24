@@ -1,11 +1,10 @@
-import json
-import os
-import random
+
 from typing import List, Tuple
 
-import fiona
-from shapely.geometry import Point
 from torch import tensor
+
+from topo2vec.background import classes_data_handlers
+from topo2vec.data_handlers.classes_data_file_handler import ClassesDataFileHadler
 from topo2vec.datasets.multi_radius_dataset import MultiRadiusDataset
 
 import numpy as np
@@ -35,7 +34,7 @@ class ClassDataset(MultiRadiusDataset):
 
     def __getitem__(self, index) -> Tuple[np.ndarray, tensor]:
         '''
-184 River points
+        184 River points
 
         Args:
             index:
@@ -55,72 +54,12 @@ class ClassDataset(MultiRadiusDataset):
         Returns: nothing
 
         '''
-        points_list = self.load_points_list_from_file(file_path)
+        if file_path in classes_data_handlers.keys():
+            class_data_handler = classes_data_handlers[file_path]
+        else:
+            class_data_handler = ClassesDataFileHadler(file_path)
+        points_list = class_data_handler.\
+            get_random_subset_in_polygon(self.wanted_size, self.outer_polygon)
+
         self.add_points_as_patches_to_actual_patches(points_list)
         self.labels += [label] * len(self.actual_patches)
-
-    def load_points_list_from_file(self, file_path: str) -> List[Point]:
-        '''
-        load all the points that are inside a points list
-        Args:
-            file_path: The .shp or. geojson file of the class's data
-
-        Returns: a Points list of all the points in the file
-        (if the file contains lines - all the points in the line)
-
-        '''
-        filename, file_extension = os.path.splitext(file_path)
-        print(file_extension)
-        new_features = None
-        if file_extension == '.shp':
-            collection = fiona.open(file_path, encoding='ISO8859-1')
-            new_features = list(collection)
-
-        elif file_extension == '.geojson':
-            with open(file_path, encoding='utf-8') as bottom_peaks_file:
-                data = json.load(bottom_peaks_file)
-            new_features = data['features']
-
-        elif file_extension == '.json':
-            with open(file_path, encoding='utf-8') as bottom_peaks_file:
-                data = json.load(bottom_peaks_file)
-            new_features = data['elements']
-
-        else:
-            raise Exception('No points in file!')
-
-        points_list = []
-        for index in range(len(new_features)):
-            coord_as_points_list = self._get_coord_as_points_list(index, new_features, file_extension)
-            points_list += coord_as_points_list
-            if len(points_list) >= self.wanted_size:
-                break
-
-
-        if len(points_list) >= self.wanted_size:
-            return points_list[:self.wanted_size]
-        else:
-            raise Exception('Not enough points in class in this region as needed!')
-
-    def _get_coord_as_points_list(self, index: int, new_features: np.ndarray, file_extension:str) -> List[Point]:
-        '''
-
-        Args:
-            index:
-            new_features: The features ndarray of the coordinate, got from the image
-
-        Returns: a list of all the points inside a row.
-
-        '''
-        if file_extension == '.shp' or file_extension == '.geojson':
-            curr_idx_coords = new_features[index]['geometry']['coordinates']
-            if len(curr_idx_coords) != 0:
-                if type(curr_idx_coords[0]) == float:
-                    return [Point(curr_idx_coords[0], curr_idx_coords[1])]
-                elif type(curr_idx_coords[0]) == list:
-                    curr_idx_coord = random.choice(curr_idx_coords)
-                    # return [Point(curr_idx_coord[0], curr_idx_coord[1]) for curr_idx_coord in curr_idx_coords]
-                    return [Point(curr_idx_coord[0], curr_idx_coord[1])]
-        elif file_extension == '.json':
-            return [Point(new_features[index]['lon'], new_features[index]['lat'])]
-        return []
