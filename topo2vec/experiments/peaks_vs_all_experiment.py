@@ -21,7 +21,7 @@ def _generate_datasets(radii, total_dataset_size):
     size_val = int(0.2 * total_dataset_size)
     train_set = OneVsRandomDataset(radii, size_train, TRAIN_HALF, class_path=N45_50_E5_15_PEAKS)
     val_set = OneVsRandomDataset(radii, size_val, VALIDATION_HALF, class_path=N45_50_E5_15_PEAKS)
-    return train_set, val_set, None
+    return train_set, val_set, None, None
 
 model_hyperparams = {
             'radii': [[8, 16, 24], [24]],

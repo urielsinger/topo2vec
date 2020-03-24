@@ -15,6 +15,7 @@ LOGS_PATH = '/home/morpheus/topo2vec_kavitzky/repositories/topo2vec/tb_logs/1cla
 CLIFFS_TEST = '/home/morpheus/topo2vec_kavitzky/repositories/topo2vec/data/overpass_classes_data/tests/cliffs_test_(45,10,50,15).json'
 PEAKS_TEST = '/home/morpheus/topo2vec_kavitzky/repositories/topo2vec/data/overpass_classes_data/tests/peaks_test_(45,10,50,15).json'
 RIVERS_TEST ='/home/morpheus/topo2vec_kavitzky/repositories/topo2vec/data/overpass_classes_data/tests/rivers_test_(45,10,50,15).json'
+POINT_TO_SEARCH_SIMILAR = '/home/morpheus/topo2vec_kavitzky/repositories/topo2vec/data/overpass_classes_data/tests/points_to_search_similar_(45,10,50,15).json'
 
 VALIDATION_HALF = Polygon([Point(5, 45), Point(5, 50), Point(10, 50),
                       Point(10, 45), Point(5, 45)])

@@ -133,9 +133,9 @@ def sample_points_in_range(min_lon: float, min_lat: float, max_lon: float, max_l
     points_list = [sample_point_in_range(min_lon, min_lat, max_lon, max_lat) for i in range(number)]
     return points_list
 
-def sample_points_in_polygon(poly: Polygon, number:int,
-                          seed=None) -> Point:
-    points_list = [sample_point_in_poly(poly) for i in range(number)]
+def sample_points_in_polygon(outer_polygon: Polygon, number:int,
+                             seed=None) -> Point:
+    points_list = [sample_point_in_poly(outer_polygon) for i in range(number)]
     return points_list
 
 def sample_point_in_poly(poly: Polygon, seed=None) -> Point:

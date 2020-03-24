@@ -5,18 +5,13 @@ __all__ = ['BasicConvNetLatent', 'basicconvnetlatent']
 
 
 class BasicConvNetLatent(nn.Module):
-    def __init__(self, num_classes=1,  radii=[10]):
+    def __init__(self, num_classes=1, radii=[10]):
         super(BasicConvNetLatent, self).__init__()
         self.radii = radii
         self.radius = min(radii)
         self.w = 2 * self.radius + 1
         self.h = 2 * self.radius + 1
         self.patch_size = self.w * self.h
-
-        size_after_cnn_1 = self.w - 5 + 1
-        size_after_relu_1 = int((size_after_cnn_1 + - 1 * (2 - 1) - 1) / 2 + 1)
-        size_after_cnn_2 = size_after_relu_1 - 5 + 1
-        size_after_relu_2 = int((size_after_cnn_2 + - 1 * (2 - 1) - 1) / 2 + 1)
 
         self.features = nn.Sequential(
             nn.Conv2d(len(radii), 10, kernel_size=5),
@@ -25,22 +20,30 @@ class BasicConvNetLatent(nn.Module):
             nn.Conv2d(10, 20, kernel_size=5),
             nn.SELU(inplace=True),
             nn.MaxPool2d(kernel_size=2),
-            nn.Linear(20 * size_after_relu_2 ** 2, 10),
+        )
+        size_after_cnn_1 = self.w - 5 + 1
+        size_after_relu_1 = int((size_after_cnn_1 + - 1 * (2 - 1) - 1) / 2 + 1)
+        size_after_cnn_2 = size_after_relu_1 - 5 + 1
+        size_after_relu_2 = int((size_after_cnn_2 + - 1 * (2 - 1) - 1) / 2 + 1)
+
+        latent_size = 5
+        self.middle_seq = nn.Sequential(
+            # nn.Dropout(),
+            nn.Linear(20 * size_after_relu_2 ** 2, latent_size)
         )
 
         self.classifier = nn.Sequential(
-            #nn.Dropout(),
+            # nn.Dropout(),
             nn.SELU(inplace=True),
-            nn.Linear(50, num_classes),
+            nn.Linear(latent_size, num_classes),
         )
-
 
     def forward(self, x):
         x = self.features(x)
-        x = torch.flatten(x, 1)
-        x = self.classifier(x)
-        return x
-
+        latent = torch.flatten(x, 1)
+        latent = self.middle_seq(latent)
+        x = self.classifier(latent)
+        return x, latent
 
 def basicconvnetlatent(pretrained=False, progress=True, **kwargs):
     r"""Simple convolutional network

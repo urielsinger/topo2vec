@@ -4,6 +4,7 @@ from typing import List
 import torchvision as torchvision
 import torch
 from pytorch_lightning import LightningModule
+from sklearn.neighbors import NearestNeighbors
 from torch.utils.data import DataLoader, Dataset
 
 import topo2vec.models as models
@@ -12,6 +13,7 @@ import topo2vec.models as models
 class Classifier(LightningModule):
     def __init__(self, validation_dataset: Dataset, train_dataset: Dataset,
                  loss_func, optimizer_cls, test_dataset: Dataset,
+                 random_dataset: Dataset, typical_images_dataset: Dataset,
                  arch: str = 'simpleconvnet',
                  pretrained: bool = False, radii: List[int] = [10],
                  num_classes: int = 1, learning_rate: float = 0.0001):
@@ -29,6 +31,9 @@ class Classifier(LightningModule):
         self.val_set = validation_dataset
         self.train_set = train_dataset
         self.test_set = test_dataset
+        self.random_set = random_dataset
+        self.typical_images_set = typical_images_dataset
+        self.k = 5
 
     def forward(self, x):
         return self.model(x)
@@ -44,7 +49,7 @@ class Classifier(LightningModule):
 
     def training_step(self, batch, batch_idx):
         x, y = batch
-        outputs = self.forward(x.float())
+        outputs, _ = self.forward(x.float())
         _, predicted = torch.max(outputs.data, 1)
         loss = self.loss_fn(outputs.float(), y.squeeze().long())
 
@@ -52,14 +57,63 @@ class Classifier(LightningModule):
         return {'loss': loss, 'log': tensorboard_logs}
 
     def test_step(self, batch, batch_idx):
-        return self.evaluation_step(batch, 'test')
+        if self.random_set is not None:
+            self.test_k_nn()
+        basic_dict = self.evaluation_step(batch, 'test')
+        return basic_dict
+
+    def _get_dataset_as_tensor(self, dataset):
+        dataset_length = len(dataset)
+        data_loader = DataLoader(dataset, shuffle=True, num_workers=0, batch_size=dataset_length)
+        images_as_tensor, _ = next(iter(data_loader))
+        return images_as_tensor
+
+    def _get_dataset_latent_space_as_np(self, images_as_tensor):
+        _, images_latent_as_tensor = self.forward(images_as_tensor.float())
+        images_latent_as_np = images_latent_as_tensor.data.numpy()
+        return images_latent_as_np
+
+    def test_k_nn(self):
+        random_images_as_tensor = self._get_dataset_as_tensor(self.random_set)
+        random_images_set_to_calc_distance = random_images_as_tensor[:, -1, :, :].data.numpy()
+        typical_images_as_tensor = self._get_dataset_as_tensor(self.typical_images_set)
+        typical_images_to_calc_distance = typical_images_as_tensor[:, -1, :, :].data.numpy()
+
+        # calc closest images in images space
+        nn_classifier_images = NearestNeighbors(n_neighbors=self.k, metric='euclidean')
+        nn_classifier_images.fit(random_images_set_to_calc_distance.reshape(
+            random_images_set_to_calc_distance.shape[0], -1))
+        distances_images, indices_images = nn_classifier_images.kneighbors(
+            typical_images_to_calc_distance.reshape(
+                typical_images_to_calc_distance.shape[0], -1))
+
+        # images in latent space
+        random_images_latent_as_np = self._get_dataset_latent_space_as_np(random_images_as_tensor)
+        typical_images_latent_as_np = self._get_dataset_latent_space_as_np(typical_images_as_tensor)
+
+        # calc closest images in latent space
+        nn_classifier_latent = NearestNeighbors(n_neighbors=self.k, metric='euclidean')
+        nn_classifier_latent.fit(random_images_latent_as_np)
+        distances_latent, indices_latent = nn_classifier_latent.kneighbors(typical_images_latent_as_np)
+
+        random_images_set_to_show = random_images_as_tensor[:, -1, :, :].unsqueeze(1)
+        typical_images_set_to_show = typical_images_as_tensor[:, -1, :, :].unsqueeze(1)
+
+        for i in range(len(typical_images_latent_as_np)):
+            self.sample_images_and_log(random_images_set_to_show, torch.tensor(indices_latent[i]),
+                                       f'closest_samples_latent_{i}', self.k)
+            self.sample_images_and_log(random_images_set_to_show, torch.tensor(indices_images[i]),
+                                       f'closest_samples_euclid_{i}', self.k)
+            grid = torchvision.utils.make_grid(typical_images_set_to_show[i])
+            self.logger.experiment.add_image(f'example images_{i}', grid, 0)
+
 
     def validation_step(self, batch, batch_idx):
         return self.evaluation_step(batch, 'validation')
 
     def evaluation_step(self, batch, name):
         x, y = batch
-        outputs = self.forward(x.float())
+        outputs, _ = self.forward(x.float())
         _, predicted = torch.max(outputs.data, 1)
         batch_size, channels, _, _ = x.size()
         accuracy = torch.tensor([float(torch.sum(predicted == y.squeeze())) / batch_size])
@@ -104,10 +158,12 @@ class Classifier(LightningModule):
             self.logger.experiment.add_image(title, grid, 0)
 
     def test_epoch_end(self, outputs: list):
-        return self.evaluation_epoch_end(outputs, 'test')
+        basic_dict = self.evaluation_epoch_end(outputs, 'test')
+        return basic_dict
 
     def validation_epoch_end(self, outputs: list):
-        return self.evaluation_epoch_end(outputs, 'validation')
+        basic_dict = self.evaluation_epoch_end(outputs, 'validation')
+        return basic_dict
 
     def evaluation_epoch_end(self, outputs: list, name:str):
         avg_loss = torch.stack([x[name + '_loss'] for x in outputs]).mean()
