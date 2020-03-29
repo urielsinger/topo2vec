@@ -1,16 +1,17 @@
 from typing import List
 
 from shapely.geometry import Polygon
-from torch.utils.data import ConcatDataset, Dataset, Subset
+from torch.utils.data import ConcatDataset, Subset
 
 from topo2vec.datasets.class_dataset import ClassDataset
+from topo2vec.datasets.multi_radius_dataset import MultiRadiusDataset
 
 
-class SeveralClassesDataset(Dataset):
+class SeveralClassesDataset(MultiRadiusDataset):
     def __init__(self, radii: List[int], outer_polygon: Polygon, wanted_size: int,
                  class_paths: List[str], class_names: List[str]):
         all_datasets = []
-        class_wanted_size = int(wanted_size/len(class_names))+1
+        class_wanted_size = int(wanted_size / len(class_names)) + 1
         for i, class_path in enumerate(class_paths):
             class_dataset = ClassDataset(class_path, i, radii=radii,
                                          wanted_size=class_wanted_size,

@@ -2,11 +2,10 @@ import math
 import os
 from typing import List, Tuple
 
+import cv2
 import numpy as np
 from shapely.geometry import Point
 from skimage import io
-from sklearn.externals._pilutil import imresize
-
 from topo2vec.data_handlers.data_handler import DataHandler
 
 
@@ -124,7 +123,7 @@ class DataFromFileHandler(DataHandler):
             for radius in radii:
                 patch = self.get_point_as_np_array(point, radius)
                 if radius != min_radius and patch.size != 0:
-                    patch = imresize(patch, size=standard_size)
+                    patch = cv2.resize(patch, dsize=standard_size)
                 if patch.size != 0 and patch.shape == standard_size and np.min(patch) > -3000:
                     point_patches.append(patch)
             if len(point_patches) == len(radii):

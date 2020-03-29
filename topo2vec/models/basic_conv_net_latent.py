@@ -1,20 +1,20 @@
 import torch
 import torch.nn as nn
 
-__all__ = ['BasicConvNetLatent', 'basicconvnetlatent']
+__all__ = ['BasicConvNetLatent']
 
 
 class BasicConvNetLatent(nn.Module):
-    def __init__(self, num_classes=1, radii=[10]):
+    def __init__(self, hparams):
         super(BasicConvNetLatent, self).__init__()
-        self.radii = radii
-        self.radius = min(radii)
+        self.radii = hparams.radii
+        self.radius = min(self.radii)
         self.w = 2 * self.radius + 1
         self.h = 2 * self.radius + 1
         self.patch_size = self.w * self.h
 
         self.features = nn.Sequential(
-            nn.Conv2d(len(radii), 10, kernel_size=5),
+            nn.Conv2d(len(self.radii), 10, kernel_size=5),
             nn.SELU(inplace=True),
             nn.MaxPool2d(kernel_size=2),
             nn.Conv2d(10, 20, kernel_size=5),
@@ -33,9 +33,8 @@ class BasicConvNetLatent(nn.Module):
         )
 
         self.classifier = nn.Sequential(
-            # nn.Dropout(),
             nn.SELU(inplace=True),
-            nn.Linear(latent_size, num_classes),
+            nn.Linear(latent_size, self.num_classes),
         )
 
     def forward(self, x):
@@ -44,18 +43,3 @@ class BasicConvNetLatent(nn.Module):
         latent = self.middle_seq(latent)
         x = self.classifier(latent)
         return x, latent
-
-def basicconvnetlatent(pretrained=False, progress=True, **kwargs):
-    r"""Simple convolutional network
-
-    Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
-        progress (bool): If True, displays a progress bar of the download to stderr
-    """
-    model = BasicConvNetLatent(**kwargs)
-    if pretrained:
-        # state_dict = load_state_dict_from_url(model_urls['alexnet'],
-        #                                      progress=progress)
-        state_dict = None
-        model.load_state_dict(state_dict)
-    return model

@@ -1,0 +1,58 @@
+{
+  "version": 0.6,
+  "generator": "Jonathan Kavitzky",
+  "osm3s": {
+    "timestamp_osm_base": "2020-03-22T21:58:02Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+{
+	"type": "node",
+	"lat": 49.92404043839403,
+	"lon": 5.887952890455851,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat": 49.49940684182964,
+	"lon": 5.628757283349492,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat": 49.29504542703378,
+	"lon": 5.865865173947608,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat": 49.44925357683876,
+	"lon": 5.25821546028311,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat": 49.697356426003516,
+	"lon": 5.459653104405348,
+	"tags": {
+		"natural": "river"
+	}
+},
+	  {
+	"type": "node",
+	"lat": 49.636429649653905,
+	"lon": 5.174592318601883,
+	"tags": {
+		"natural": "river"
+	}
+}
+  ]
+}

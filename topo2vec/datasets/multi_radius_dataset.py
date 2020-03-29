@@ -1,6 +1,7 @@
 from typing import List
 
 from shapely.geometry import Point, Polygon
+from torch import Tensor
 from torch.utils.data import Dataset
 
 from topo2vec import visualizer
@@ -76,3 +77,5 @@ class MultiRadiusDataset(Dataset):
 
     def __len__(self):
         return len(self.actual_patches)
+
+
