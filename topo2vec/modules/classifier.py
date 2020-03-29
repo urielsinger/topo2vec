@@ -152,7 +152,8 @@ class Classifier(LightningModule):
 
     def svm_classifier_test(self):
         if self.hparams.svm_classify_latent_space:
-            svm_train_dataset = SeveralClassesDataset(self.radii, TRAIN_HALF, self.hparams.random_set_size_for_svm, class_paths, class_names)
+            svm_train_dataset = SeveralClassesDataset(self.radii, TRAIN_HALF, self.hparams.random_set_size_for_svm,
+                                                      class_paths, class_names)
             X_train, y_train = visualizations.get_dataset_as_tensor(svm_train_dataset)
             _, latent_train = self.forward(X_train)
             SVMClassifier = svm.SVC()
@@ -199,35 +200,35 @@ class Classifier(LightningModule):
         parser.add_argument('--radii', type=str, default='[8, 16, 24]')
         parser.add_argument('--arch', type=str)
         parser.add_argument('--lr', '--learning_rate', default=1e-4, type=float,
-                                   metavar='LR', help='initial learning rate', dest='learning_rate')
+                            metavar='LR', help='initial learning rate', dest='learning_rate')
         parser.add_argument('--total_dataset_size', type=int, default=75000)
         parser.add_argument('--max_epochs', default=100, type=int, metavar='N',
-                                   help='number of total epochs to run')
+                            help='number of total epochs to run')
         parser.add_argument('--num_classes', type=int, default=len(class_paths),
-                                   help='number of the classes in the dataset. ')
+                            help='number of the classes in the dataset. ')
         parser.add_argument('--name', type=str,
-                                   help='number of the classes in the dataset. ')
+                            help='number of the classes in the dataset. ')
         parser.add_argument('--pytorch_module', type=str)
         parser.add_argument('--seed', type=int, default=42,
-                                   help='seed for initializing training. ')
+                            help='seed for initializing training. ')
         parser.add_argument('--pretrained', dest='pretrained', action='store_true',
-                                   help='use pre-trained model')
+                            help='use pre-trained model')
         parser.add_argument('--save_model', dest='save_model', action='store_true',
-                                   help='use pre-trained model')
+                            help='use pre-trained model')
         parser.add_argument('--save_path', metavar='DIR', default=STATE_DICT_PATH, type=str,
-                                   help='path to save model')
+                            help='path to save model')
         parser.add_argument('--random_set_size', type=int, default=1000,
-                                   help='seed for initializing training. ')
+                            help='seed for initializing training. ')
         parser.add_argument('--k', type=int, default=5,
-                                   help='seed for initializing training. ')
+                            help='seed for initializing training. ')
         parser.add_argument('--train_portion', type=float, default=0.8,
-                                   help='portion of the total_dataset_Size to put into training.')
-        parser.add_argument('--latent_space_size', type=int, default=100,
                             help='portion of the total_dataset_Size to put into training.')
+        parser.add_argument('--latent_space_size', type=int, default=50,
+                            help='size of the desired latent space of the autoencoder.')
         parser.add_argument('--test_knn', dest='test_knn', action='store_true',
-                                   help='test the latent space to find the knn of the main things')
+                            help='test the latent space to find the knn of the main things')
         parser.add_argument('--svm_classify_latent_space', dest='svm_classify_latent_space', action='store_true',
-                                   help='classify the latent space using one linear layer to check if it is good')
+                            help='classify the latent space using one linear layer to check if it is good')
         parser.add_argument('--random_set_size_for_svm', type=int, default=1000)
 
         return parser

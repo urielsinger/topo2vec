@@ -1,17 +1,20 @@
 import torch
 import torch.nn as nn
 
+from topo2vec.common.other_scripts import str_to_int_list
+
 __all__ = ['BasicConvNetLatent']
 
 
 class BasicConvNetLatent(nn.Module):
     def __init__(self, hparams):
         super(BasicConvNetLatent, self).__init__()
-        self.radii = hparams.radii
+        self.radii = str_to_int_list(hparams.radii)
         self.radius = min(self.radii)
         self.w = 2 * self.radius + 1
         self.h = 2 * self.radius + 1
         self.patch_size = self.w * self.h
+        self.num_classes = hparams.num_classes
 
         self.features = nn.Sequential(
             nn.Conv2d(len(self.radii), 10, kernel_size=5),

@@ -17,7 +17,7 @@ if not LOAD_CLASSES_LARGE:
     classifier_regular_args = classifier_parser.parse_args(['--save_model',
                                                             '--learning_rate', '1e-2',
                                                             '--max_epochs', '1',
-                                                            '--total_dataset_size', '10',
+                                                            '--total_dataset_size', '1000',
                                                             '--arch', 'BasicConvNetLatent',
                                                             '--svm_classify_latent_space',
                                                             '--name', 'classifier',
@@ -27,12 +27,12 @@ else:
     classifier_regular_args = classifier_parser.parse_args(['--save_model',
                                                             '--learning_rate', '1e-4',
                                                             '--max_epochs', '10',
-                                                            '--total_dataset_size', '100000',
+                                                            '--total_dataset_size', '10000',
                                                             '--arch', 'BasicConvNetLatent',
                                                             '--svm_classify_latent_space',
                                                             '--name', 'classifier',
                                                             '--pytorch_module', 'Classifier',
                                                             '--random_set_size', '100'])
 
-lab = TaskHandler(classifier_check_args)
+lab = TaskHandler(classifier_regular_args)
 lab.run()

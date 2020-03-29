@@ -6,7 +6,6 @@ from torch import Tensor
 from topo2vec.background import TRAIN_HALF, VALIDATION_HALF, LOAD_CLASSES_LARGE, class_names
 from topo2vec.common.visualizations import get_random_part_of_dataset, convert_multi_radius_tensor_to_printable
 from topo2vec.constants import class_paths_test
-from topo2vec.datasets.multi_radius_dataset import MultiRadiusDataset
 from topo2vec.datasets.random_dataset import RandomDataset
 from topo2vec.datasets.several_classes_datasets import SeveralClassesDataset
 from topo2vec.modules.classifier import Classifier

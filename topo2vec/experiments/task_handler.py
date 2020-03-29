@@ -45,7 +45,9 @@ class TaskHandler:
             trainer = pl.Trainer(max_epochs=0, logger=logger)
         else:
             trainer = pl.Trainer(max_epochs=hparams.max_epochs, logger=logger)
-        trainer.fit(model)
+
+        if len(list(model.parameters())) != 0:
+            trainer.fit(model)
 
         #test time
         if model.test_dataset is not None:

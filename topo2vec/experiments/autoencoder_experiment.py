@@ -10,7 +10,8 @@ autoencoder_check_args = parser.parse_args(['--save_model',
                                             '--arch', 'BasicAmphibAutoencoder',
                                             '--svm_classify_latent_space',
                                             '--name', 'autoencoder',
-                                            '--pytorch_module', 'Autoencoder'])
+                                            '--pytorch_module', 'Autoencoder',
+                                            '--random_set_size_for_svm', '10'])
 
 if not LOAD_CLASSES_LARGE:
     autoencoder_regular_args = parser.parse_args(['--save_model',
@@ -21,8 +22,9 @@ if not LOAD_CLASSES_LARGE:
                                                   '--svm_classify_latent_space',
                                                   '--name', 'autoencoder',
                                                   '--pytorch_module', 'Autoencoder',
-                                                  '--total_dataset_size', '10', '--max_epochs', '10',
-                                                  '--random_set_size', '100'])
+                                                  '--total_dataset_size', '10',
+                                                  '--random_set_size', '100',
+                                                  '--random_set_size_for_svm', '1000'])
 else:
     autoencoder_regular_args = parser.parse_args(['--save_model',
                                                   '--learning_rate', '1e-2',
@@ -31,7 +33,9 @@ else:
                                                   '--arch', 'BasicAmphibAutoencoder',
                                                   '--svm_classify_latent_space',
                                                   '--name', 'autoencoder',
-                                                  '--pytorch_module', 'Autoencoder'])
+                                                  '--pytorch_module', 'Autoencoder',
+                                                  '--random_set_size_for_svm', '1000',
+                                                  '--latent_space_size', '1'])
 
 lab = TaskHandler(autoencoder_regular_args)
 lab.run()

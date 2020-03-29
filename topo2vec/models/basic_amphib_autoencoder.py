@@ -23,11 +23,11 @@ class BasicAmphibAutoencoder(nn.Module):
             nn.MaxPool2d(2, stride=2),
         )
         self.encoder_linear = nn.Sequential(
-            nn.Linear(196, 50),
+            nn.Linear(196, hparams.latent_space_size),
             nn.ReLU(True),
         )
         self.decoder = nn.Sequential(
-            nn.Linear(50, self.im_size),
+            nn.Linear(hparams.latent_space_size, self.im_size),
             nn.Sigmoid()
         )
 
