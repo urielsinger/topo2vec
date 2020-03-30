@@ -45,13 +45,13 @@ class Classifier(LightningModule):
         size_train = int(self.train_portion * self.total_dataset_size)
         size_val = int((1 - self.train_portion) * self.total_dataset_size)
 
-        self.train_dataset = SeveralClassesDataset(self.radii, TRAIN_HALF, size_train, class_paths, class_names)
-        self.validation_dataset = SeveralClassesDataset(self.radii, VALIDATION_HALF, size_val, class_paths, class_names)
+        self.train_dataset = SeveralClassesDataset(self.radii, TRAIN_HALF, size_train, class_paths, class_names, 'train')
+        self.validation_dataset = SeveralClassesDataset(self.radii, VALIDATION_HALF, size_val, class_paths, class_names, 'validation')
 
         if LOAD_CLASSES_LARGE:
             size_test = 55
             self.test_dataset = SeveralClassesDataset(self.radii, VALIDATION_HALF, size_test, class_paths_test,
-                                                      class_names)
+                                                      class_names, 'test')
         else:
             self.test_dataset = None
 
@@ -153,7 +153,7 @@ class Classifier(LightningModule):
     def svm_classifier_test(self):
         if self.hparams.svm_classify_latent_space:
             svm_train_dataset = SeveralClassesDataset(self.radii, TRAIN_HALF, self.hparams.random_set_size_for_svm,
-                                                      class_paths, class_names)
+                                                      class_paths, class_names, 'train_svm')
             X_train, y_train = visualizations.get_dataset_as_tensor(svm_train_dataset)
             _, latent_train = self.forward(X_train)
             SVMClassifier = svm.SVC()

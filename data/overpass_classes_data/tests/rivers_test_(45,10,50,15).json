@@ -6,152 +6,319 @@
     "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
   },
   "elements": [
+
 {
 	"type": "node",
-	"lat": 49.8542707,
-	"lon": 6.8912207,
-	"tags": {
-		"natural": "river"
-	}
-},
-{
-	"type": "node",
-	"lat": 45.3022875,
-	"lon": 5.4987645,
-	"tags": {
-		"natural": "river"
-	}
-},
-    {
-	"type": "node",
-	"lat": 47.9411824,
-	"lon": 6.864941,
-	"tags": {
-		"natural": "river"
-	}
-},
-    {
-	"type": "node",
-	"lat": 46.6785026,
-	"lon": 8.7990822,
-	"tags": {
-		"natural": "river"
-	}
-},
-    {
-	"type": "node",
-	"lat": 48.8202903,
-	"lon": 9.9382615,
-	"tags": {
-		"natural": "river"
-	}
-},
-    {
-	"type": "node",
-	"lat": 48.8979074,
-	"lon": 5.2412564,
-	"tags": {
-		"natural": "river"
-	}
-},
-    {
-	"type": "node",
-	"lat": 46.7860502,
-	"lon": 6.2751204,
+	"lat":45.695626,
+	"lon":5.8110146,
 	"tags": {
 		"natural": "river"
 	}
 },
 {
 	"type": "node",
-	"lat": 46.027668,
-	"lon": 7.3157161,
+	"lat":47.1423001,
+	"lon":5.9560447,
 	"tags": {
 		"natural": "river"
 	}
 },
 {
 	"type": "node",
-	"lat": 49.6139702,
-	"lon": 5.0588287,
+	"lat":48.311141,
+	"lon":8.3684757,
 	"tags": {
 		"natural": "river"
 	}
 },
 {
 	"type": "node",
-	"lat": 48.5755294,
-	"lon": 7.140907,
+	"lat":48.6431986,
+	"lon":9.4757671,
 	"tags": {
 		"natural": "river"
 	}
 },
-    {
+	{
 	"type": "node",
-	"lat": 45.1341914,
-	"lon": 9.9633706,
+	"lat":47.2093625,
+	"lon":7.5508442,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat":48.5986162,
+	"lon":8.3813926,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat":47.949274,
+	"lon":9.3847883,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat":45.5649238,
+	"lon":5.9379712,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat":48.9071234,
+	"lon":8.1226443,
+	"tags": {
+		"natural": "river"
+	}
+},
+	  {
+	"type": "node",
+	"lat":47.8101978,
+	"lon":5.9715155,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat":45.680544,
+	"lon":9.842938,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat":46.5767045,
+	"lon":9.4342749,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat":45.1825369,
+	"lon":9.3347848,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat":49.9298218,
+	"lon":7.4824259,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat":48.2005383,
+	"lon":8.1127772,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat":48.1427799,
+	"lon":6.7830869,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat":49.3796713,
+	"lon":7.1698525,
 	"tags": {
 		"natural": "river"
 	}
 },{
 	"type": "node",
-	"lat": 45.7762911,
-	"lon": 9.8205908,
+	"lat":45.3735585,
+	"lon":7.0668949,
 	"tags": {
 		"natural": "river"
 	}
 },
 {
 	"type": "node",
-	"lat": 49.9432487,
-	"lon": 6.4073689,
+	"lat":49.9045456,
+	"lon":6.0841408,
 	"tags": {
 		"natural": "river"
 	}
 },
 {
 	"type": "node",
-	"lat": 46.5223427,
-	"lon": 6.1170808,
+	"lat":48.7200265,
+	"lon":7.7448453,
 	"tags": {
 		"natural": "river"
 	}
 },
 {
 	"type": "node",
-	"lat": 47.6482505,
-	"lon": 5.0839996,
-	"tags": {
-		"natural": "river"
-	}
-}, {
-	"type": "node",
-	"lat": 46.0150065,
-	"lon": 6.1424891,
+	"lat":48.8473416,
+	"lon":7.0861197,
 	"tags": {
 		"natural": "river"
 	}
 },
 {
 	"type": "node",
-	"lat": 47.9993032,
-	"lon": 6.8706171,
+	"lat":48.1835415,
+	"lon":6.7203522,
 	"tags": {
 		"natural": "river"
 	}
 },
 {
 	"type": "node",
-	"lat": 45.2794321,
-	"lon": 7.4224444,
+	"lat":48.9635563,
+	"lon":9.0238837,
 	"tags": {
 		"natural": "river"
 	}
 },
 {
 	"type": "node",
-	"lat": 45.0077039,
-	"lon": 6.8230067,
+	"lat":47.4144407,
+	"lon":7.5001181,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat":48.2539881,
+	"lon":8.6951962,
+	"tags": {
+		"natural": "river"
+	}
+},{
+	"type": "node",
+	"lat":48.1175408,
+	"lon":8.0180965,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat":49.1300774,
+	"lon":5.0895752,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat":48.0719926,
+	"lon":9.3901418,
+	"tags": {
+		"natural": "river"
+	}
+},{
+	"type": "node",
+	"lat":49.9927936,
+	"lon":5.998478,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat":45.8678025,
+	"lon":9.2646162,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat":49.8471105,
+	"lon":7.8430675,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat":48.0255727,
+	"lon":7.5812645,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat":47.4130574,
+	"lon":6.5457458,
+	"tags": {
+		"natural": "river"
+	}
+},{
+	"type": "node",
+	"lat":45.7035432,
+	"lon":9.8296878,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat":46.6894482,
+	"lon":6.9193067,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat":47.4033428,
+	"lon":8.0663788,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat":47.6100471,
+	"lon":5.7272141,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat":49.3166476,
+	"lon":9.3585295,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat":46.0610257,
+	"lon":9.6967926,
+	"tags": {
+		"natural": "river"
+	}
+},
+{
+	"type": "node",
+	"lat":48.2395222,
+	"lon":7.477009,
 	"tags": {
 		"natural": "river"
 	}

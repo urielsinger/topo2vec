@@ -6,6 +6,7 @@ QUERY_PEAKS='node[natural=peak]'${EARTH_LOCATION}';(._;>;);out;'
 QUERY_STREAMS='way[waterway=stream]'${EARTH_LOCATION}';(._;>;);out;'
 QUERY_RIVERS='way[waterway=river]'${EARTH_LOCATION}';(._;>;);out;'
 QUERY_CLIFFS='way[natural=cliff]'${EARTH_LOCATION}';(._;>;);out;'
+QUERY_SADDLES='node[natural=peak]'${EARTH_LOCATION}';(._;>;);out;'
 
 declare -a INDEXES=(0 1 2 3)
 declare -a QUERIES=('node[natural=peak]'${EARTH_LOCATION}';(._;>;);out;'

@@ -20,19 +20,19 @@ classes_data_handlers = {}
 
 if LOAD_CLASSES_LARGE:
     # use data of the large area (5,45,15,50)
-    class_paths = [N45_50_E5_15_CLIFFS, N45_50_E5_15_RIVERS, N45_50_E5_15_PEAKS]  # ], N45_50_E5_15_STREAMS]
+    class_paths = [N45_50_E5_15_CLIFFS, N45_50_E5_15_RIVERS, N45_50_E5_15_PEAKS]#, N45_50_E5_15_STREAMS]
 
     for class_path in class_paths:
         classes_data_handlers[class_path] = ClassesDataFileHadler(class_path)
 
-    class_names = ['Cliff', 'River', 'Peak']
+    class_names = ['Cliff', 'River', 'Peak']#, 'Stream']
     TRAIN_HALF = TRAIN_HALF_LARGE
     VALIDATION_HALF = VALIDATION_HALF_LARGE
     POINT_TO_SEARCH_SIMILAR = POINT_TO_SEARCH_SIMILAR_LARGE
 
 else:
     # use data of only the small area (5,49,6,50)
-    class_paths = [N49_E05_CLIFFS, N49_E05_RIVERS, N49_E05_PEAKS, N49_E05_STREAMS]  # ], N45_50_E5_15_STREAMS]
+    class_paths = [N49_E05_CLIFFS, N49_E05_RIVERS, N49_E05_PEAKS, N49_E05_STREAMS]
 
     for class_path in class_paths:
         classes_data_handlers[class_path] = ClassesDataFileHadler(class_path)

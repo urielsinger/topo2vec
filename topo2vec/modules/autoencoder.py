@@ -43,7 +43,7 @@ class Autoencoder(Classifier):
         if LOAD_CLASSES_LARGE:
             size_test = 55
             self.test_dataset = SeveralClassesDataset(self.radii, VALIDATION_HALF, size_test, class_paths_test,
-                                                      class_names)
+                                                      class_names, 'test')
         else:
             self.test_dataset = None
 

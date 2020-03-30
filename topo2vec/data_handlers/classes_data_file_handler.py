@@ -4,16 +4,20 @@ import fiona
 import json
 import random
 import numpy as np
+import pickle
 
 from shapely.geometry import Point, Polygon
 from typing import List, Tuple
 
+from topo2vec.common.other_scripts import points_list_to_floats_list, floats_list_to_points_list, load_list_from_file, \
+    cache_path_name_to_full_path, save_list_to_file
+from topo2vec.constants import CACHE_BASE_DIR
 from topo2vec.data_handlers.data_handler import DataHandler
 from topo2vec.common.geographic.geo_utils import check_if_point_in_polygon
 
 
 class ClassesDataFileHadler(DataHandler):
-    def __init__(self, file_path):
+    def __init__(self, file_path, cache_dir=CACHE_BASE_DIR):
         '''
         load all the points that are inside a points list
         Args:
@@ -23,29 +27,37 @@ class ClassesDataFileHadler(DataHandler):
         (if the file contains lines - all the points in the line)
 
         '''
-        filename, file_extension = os.path.splitext(file_path)
-        print(file_extension)
-        if file_extension == '.shp':
-            collection = fiona.open(file_path, encoding='ISO8859-1')
-            new_features = list(collection)
+        file_name, file_extension = os.path.splitext(file_path)
+        full_path = cache_path_name_to_full_path(cache_dir, file_path, 'points')
 
-        elif file_extension == '.geojson':
-            with open(file_path, encoding='utf-8') as bottom_peaks_file:
-                data = json.load(bottom_peaks_file)
-            new_features = data['features']
-
-        elif file_extension == '.json':
-            with open(file_path, encoding='utf-8') as bottom_peaks_file:
-                data = json.load(bottom_peaks_file)
-            new_features = data['elements']
-
+        points_list = load_list_from_file(full_path)
+        if points_list is not None:
+            self.points_list = floats_list_to_points_list(points_list)
+            print('hi')
         else:
-            raise Exception('No points in file!')
+            if file_extension == '.shp':
+                collection = fiona.open(file_path, encoding='ISO8859-1')
+                new_features = list(collection)
 
-        self.points_list = []
-        for index in range(len(new_features)):
-            coord_as_points_list = self._get_coord_as_points_list(index, new_features, file_extension)
-            self.points_list += coord_as_points_list
+            elif file_extension == '.geojson':
+                with open(file_path, encoding='utf-8') as bottom_peaks_file:
+                    data = json.load(bottom_peaks_file)
+                new_features = data['features']
+
+            elif file_extension == '.json':
+                with open(file_path, encoding='utf-8') as bottom_peaks_file:
+                    data = json.load(bottom_peaks_file)
+                new_features = data['elements']
+
+            else:
+                raise Exception('No points in file!')
+
+            self.points_list = []
+            for index in range(len(new_features)):
+                coord_as_points_list = self._get_coord_as_points_list(index, new_features, file_extension)
+                self.points_list += coord_as_points_list
+
+            save_list_to_file(full_path, points_list_to_floats_list(self.points_list))
 
     def get_random_subset_in_polygon(self, wanted_size: int, outer_polygon: Polygon = None):
         if outer_polygon is not None:
