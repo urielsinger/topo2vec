@@ -1,9 +1,12 @@
+import os
+from pathlib import Path
 from typing import List
 
 from shapely.geometry import Polygon
 from torch import tensor
 
 from topo2vec.common.geographic import geo_utils
+from topo2vec.constants import CACHE_BASE_DIR
 from topo2vec.datasets.multi_radius_dataset import MultiRadiusDataset
 
 
@@ -17,6 +20,10 @@ class RandomDataset(MultiRadiusDataset):
         '''
         super().__init__(radii)
         random_points = geo_utils.sample_points_in_polygon(outer_polygon, num_points)
+        self.full_base_dir = os.path.join(CACHE_BASE_DIR, 'datasets', 'random', f'size_{num_points}')
+
+        Path(self.full_base_dir).mkdir(parents=True, exist_ok=True)
+
         self.add_points_as_patches_to_actual_patches(random_points)
         if self.use_masks:
             self.add_points_as_patches_to_mask_patches(random_points)

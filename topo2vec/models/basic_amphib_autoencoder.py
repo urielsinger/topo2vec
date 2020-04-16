@@ -34,7 +34,6 @@ class BasicAmphibAutoencoder(nn.Module):
 
     def forward(self, x):
         final_view = x.shape
-
         encoded = self.encoder(x)
         latent = torch.flatten(encoded, 1)
         latent = self.encoder_linear(latent)

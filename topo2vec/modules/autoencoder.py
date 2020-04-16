@@ -3,9 +3,10 @@ from typing import Dict
 import torchvision
 from torch import Tensor
 
-from topo2vec.background import TRAIN_HALF, VALIDATION_HALF, LOAD_CLASSES_LARGE, class_names
-from topo2vec.common.visualizations import get_random_part_of_dataset, convert_multi_radius_tensor_to_printable
-from topo2vec.constants import class_paths_test
+from topo2vec.background import TRAIN_HALF, VALIDATION_HALF, LOAD_CLASSES_LARGE, CLASS_NAMES, CLASS_PATHS_TEST, \
+    CLASS_NAMES_TEST
+from topo2vec.common.other_scripts import get_random_part_of_dataset
+from topo2vec.common.visualizations import convert_multi_radius_tensor_to_printable
 from topo2vec.datasets.random_dataset import RandomDataset
 from topo2vec.datasets.several_classes_datasets import SeveralClassesDataset
 from topo2vec.modules.classifier import Classifier
@@ -27,6 +28,9 @@ class Autoencoder(Classifier):
         self.w_h = min(self.radii) * 2 + 1
         self.img_size = len(self.radii) * self.w_h ** 2
         self.train_portion = hparams.train_portion
+        self.svm_validation_accuracy = 0
+        self.svm_test_accuracy = 0
+
 
 
     def prepare_data(self):
@@ -41,9 +45,8 @@ class Autoencoder(Classifier):
         self.validation_dataset = RandomDataset(size_val, self.radii, VALIDATION_HALF)
 
         if LOAD_CLASSES_LARGE:
-            size_test = 55
-            self.test_dataset = SeveralClassesDataset(self.radii, VALIDATION_HALF, size_test, class_paths_test,
-                                                      class_names, 'test')
+            self.test_dataset = SeveralClassesDataset(self.radii, VALIDATION_HALF, self.size_test, CLASS_PATHS_TEST,
+                                                      CLASS_NAMES_TEST, 'num_classes_' + str(self.num_classes) + 'test')
         else:
             self.test_dataset = None
 
@@ -53,6 +56,8 @@ class Autoencoder(Classifier):
             'test': self.test_dataset
         }
 
+
+
     def training_step(self, batch: Tensor, batch_idx: int) -> Dict:
         x, y = batch
         decoded, latent = self.forward(x.float())
@@ -60,7 +65,7 @@ class Autoencoder(Classifier):
         tensorboard_logs = {'train_loss': loss}
         return {'loss': loss, 'log': tensorboard_logs}
 
-    def evaluation_step(self, batch: Tensor, name: str) -> Dict:
+    def _evaluation_step(self, batch: Tensor, name: str) -> Dict:
         x, y = batch
         decoded, latent = self.forward(x.float())
         loss = self.loss_fn(decoded.float(), x.float())
@@ -68,7 +73,11 @@ class Autoencoder(Classifier):
 
     def plot_before_after(self, dataset_name: str, number_to_plot: int = 5):
         random_images_as_tensor, y = get_random_part_of_dataset(self.datasets[dataset_name], number_to_plot)
-        random_images_after_autoencoder, _ = self.model(random_images_as_tensor.float())
+        random_images_as_tensor = random_images_as_tensor.float()
+        if self.hparams.use_gpu:
+            random_images_as_tensor = random_images_as_tensor.cuda()
+
+        random_images_after_autoencoder, _ = self.model(random_images_as_tensor)
         grid_before = torchvision.utils.make_grid(
             convert_multi_radius_tensor_to_printable(random_images_as_tensor))
         grid_after = torchvision.utils.make_grid(
@@ -76,9 +85,12 @@ class Autoencoder(Classifier):
         self.logger.experiment.add_image(f'{dataset_name}_before autoencoder', grid_before, 0)
         self.logger.experiment.add_image(f'{dataset_name}_after autoencoder', grid_after, 0)
 
-    def evaluation_epoch_end(self, outputs: list, name: str) -> Dict:
+    def _evaluation_epoch_end(self, outputs: list, name: str) -> Dict:
         avg_loss = torch.stack([x[name + '_loss'] for x in outputs]).mean()
         tensorboard_logs = {name + '_loss': avg_loss}
         self.plot_before_after(name)
         self.plot_before_after('train')
         return {'avg_' + name + '_loss': avg_loss, 'log': tensorboard_logs}
+
+    def get_hyperparams_value(self):
+        return self.svm_validation_accuracy

@@ -12,13 +12,32 @@ class BasicAutoencoder(nn.Module):
         self.radii = str_to_int_list(hparams.radii)
 
         self.encoder = nn.Sequential(
-            nn.Conv2d(len(self.radii), 4, 15, stride=1),
+            nn.Conv2d(len(self.radii), 4, 3, stride=1, padding=2),
             nn.ReLU(True),
-            nn.MaxPool2d(2, stride=2),
+            nn.Conv2d(4, 8, 5, stride=1),
+            nn.ReLU(True),
+            nn.Conv2d(8, 16, 5, stride=1),
+            nn.ReLU(True),
+            nn.Conv2d(16, 16, 5, stride=1),
+            nn.ReLU(True),
+            nn.Conv2d(16, 32, 5, stride=1),
+            nn.ReLU(True),
+            nn.Conv2d(32, 32, 3, stride=2),
+            nn.ReLU(True),
         )
         self.decoder = nn.Sequential(
-            nn.ConvTranspose2d(4, 3, 17, stride=1),
-            nn.Tanh()
+            nn.ConvTranspose2d(32, 32, 3, stride=2),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(32, 16, 5, stride=1),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(16, 16, 5, stride=1),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(16, 8, 5, stride=1),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(8, 4, 5, stride=1),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(4, len(self.radii), 3, stride=1, padding=2),
+            nn.Sigmoid()
         )
 
     def forward(self, x):
