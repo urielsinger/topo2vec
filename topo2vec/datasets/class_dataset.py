@@ -21,7 +21,7 @@ class ClassDataset(MultiRadiusDataset):
 
     def __init__(self, class_path: str, class_label: float,
                  radii: List[int], wanted_size: int, outer_polygon=None,
-                 dataset_type_name: str = None, load_save=True):
+                 dataset_type_name: str = None, load_save=True, return_point = False):
         '''
 
         Args:
@@ -43,6 +43,7 @@ class ClassDataset(MultiRadiusDataset):
         if self.load_save:
             Path(self.full_base_dir).mkdir(parents=True, exist_ok=True)
         self.add_class_from_file(class_path, float(class_label))
+        self.return_point = return_point
 
     def __getitem__(self, index) -> Tuple[np.ndarray, tensor]:
         '''
@@ -54,7 +55,11 @@ class ClassDataset(MultiRadiusDataset):
         Returns: a tuple of the data and the label
 
         '''
-        return self.actual_patches[index], tensor([self.labels[index]])
+        if self.return_point:
+            return self.actual_patches[index], tensor([self.labels[index]]), \
+                   np.array([self.points_locations[index].x, self.points_locations[index].y])
+        else:
+            return self.actual_patches[index], tensor([self.labels[index]])
 
     def add_class_from_file(self, file_path: str, label: float):
         '''

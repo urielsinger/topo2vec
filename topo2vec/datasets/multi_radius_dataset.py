@@ -55,7 +55,7 @@ class MultiRadiusDataset(Dataset):
                           check_if_point_in_polygon(point, self.outer_polygon)]
 
             new_patches, points_locations_list = visualizer.get_points_as_np_array(points, self.radii)
-            self.points_locations = points_locations_list
+            self.points_locations = np.array(points_locations_list)
             if self.actual_patches is not None:
                 all_patches = [self.actual_patches, new_patches]
                 self.actual_patches = Tensor(np.concatenate(all_patches))

@@ -14,6 +14,7 @@ from torch.utils.data import DataLoader
 
 from topo2vec.common.geographic.geo_utils import sample_grid_in_poly
 from topo2vec.common.other_scripts import save_points_to_json_file, str_to_int_list
+from topo2vec.common.visualizations import convert_multi_radius_ndarray_to_printable, plot_n_np_arrays
 from topo2vec.datasets.class_dataset import ClassDataset
 from topo2vec.modules import Classifier
 from pathlib import Path
@@ -57,7 +58,8 @@ def build_new_dataset_for_query(points: List[Point], class_name: str = 'no_name'
     class_file_path = save_points_to_json_file(points, class_name, queried_classes_path)
     points_dataset = ClassDataset(class_file_path, 0, str_to_int_list(FINAL_HPARAMS.radii),
                                   len(points), outer_polygon=WORKING_POLYGON,
-                                  dataset_type_name=USER_DEFINED)
+                                  dataset_type_name=USER_DEFINED, return_point=True)
+    points_used = points_dataset.points_locations
 
     if len(points_dataset) != len(points):
         print('some of the points are not in the right area and thus ignored')
@@ -65,7 +67,7 @@ def build_new_dataset_for_query(points: List[Point], class_name: str = 'no_name'
     if len(points_dataset) == 0:
         raise Exception('there is no single point in the data that is acceptable')
 
-    return points_dataset
+    return points_dataset, points_used
 
 
 def get_features(points: List[Point], class_name: str = 'no_name') -> np.ndarray:
@@ -78,11 +80,11 @@ def get_features(points: List[Point], class_name: str = 'no_name') -> np.ndarray
     Returns: the points' features, as (len(points), latent_size) np.ndarray.
 
     '''
-    points_dataset = build_new_dataset_for_query(points, class_name)
+    points_dataset, _ = build_new_dataset_for_query(points, class_name)
     class_dataloader = DataLoader(points_dataset, FORWARD_BATCH_SIZE)
     latent_features_list = []
     for batch in class_dataloader:
-        X, _ = batch
+        X, _, _ = batch
         _, latent_features_batch = final_model_classifier(X.detach().float())
         latent_features_list.append(latent_features_batch.detach())
     np_latent_features = np.concatenate(latent_features_list, axis=0)
@@ -106,18 +108,23 @@ def get_all_class_points_in_polygon(polygon: Polygon, deg_step: float, class_nam
 
     '''
     points_in_polygon = sample_grid_in_poly(polygon, deg_step)
-    points_in_polygon_dataset = build_new_dataset_for_query(points_in_polygon, class_name)
-    assert len(points_in_polygon_dataset) == len(points_in_polygon)
+    points_in_polygon_dataset, points_used = build_new_dataset_for_query(points_in_polygon, class_name)
+    assert len(points_in_polygon_dataset) == len(points_used)
+
     class_dataloader = DataLoader(points_in_polygon_dataset, FORWARD_BATCH_SIZE)
     points_list = []
+    patches_list = []
     class_number = final_model_classifier.class_names.index(class_name)
     for batch in class_dataloader:
-        X, _ = batch
+        X, _, points_used = batch
         predicted = final_model_classifier.get_classifications(X.detach().float())
         class_indexes = predicted.detach() == class_number
-        points_list.append(X[class_indexes, :])
-    np_points_patches = np.concatenate(points_list, axis=0)
-    return points_in_polygon, np_points_patches
+        patches_list.append(X[class_indexes, :])
+        points_list.append(points_used[class_indexes, :])
+
+    np_points_patches = np.concatenate(patches_list, axis=0)
+    points_used = np.concatenate(points_list, axis=0)
+    return points_used, np_points_patches
 
 
 def get_top_n_similar_points(points: List[Point], n: int) -> List[Point]:
@@ -130,3 +137,13 @@ def get_top_n_similar_points(points: List[Point], n: int) -> List[Point]:
     Returns: list of n points that are similar to the points in here.
 
     '''
+
+
+polygon_to_search_in = Polygon([Point(5, 45), Point(5, 45.1), Point(5.1, 45.1),
+                                Point(5.1, 45.1), Point(5, 45)])
+
+points, pathches_lis = get_all_class_points_in_polygon(polygon_to_search_in, 100, 'peaks')
+
+patches_printable = convert_multi_radius_ndarray_to_printable(pathches_lis)
+patches_printable = patches_printable[0:12]
+plot_n_np_arrays(patches_printable, lines_number=3)

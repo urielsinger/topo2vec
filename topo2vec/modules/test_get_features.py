@@ -3,6 +3,7 @@ from unittest import TestCase
 from shapely.geometry import Point, Polygon
 
 import topo2vec.modules.topography_profiler as tp
+from topo2vec.common.visualizations import  plot_n_np_arrays, convert_multi_radius_ndarray_to_printable
 
 
 class TestGet_features(TestCase):
@@ -20,5 +21,5 @@ class TestGet_features(TestCase):
         polygon_to_search_in = Polygon([Point(5, 45), Point(5, 45.1), Point(5.1, 45.1),
                                         Point(5.1, 45.1), Point(5, 45)])
 
-        points, lis = tp.get_all_class_points_in_polygon(polygon_to_search_in, 100, 'peaks')
-        self.assertTupleEqual(lis.shape, (len(points), 3, 17, 17))
+        points, pathches_lis = tp.get_all_class_points_in_polygon(polygon_to_search_in, 100, 'peaks')
+        self.assertTupleEqual(pathches_lis.shape, (len(points), 3, 17, 17))

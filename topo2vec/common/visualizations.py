@@ -8,7 +8,6 @@ import torch
 import torchvision
 from PIL import Image
 from torch import Tensor
-from torch.utils.data import DataLoader, Dataset
 import itertools
 
 import numpy as np
@@ -122,19 +121,33 @@ def get_grid_sample_images(images: Tensor, randomize: bool, number_to_log: int) 
     return grid
 
 
-def convert_multi_radius_tensor_to_printable(tesor: Tensor) -> Tensor:
+def convert_multi_radius_tensor_to_printable(tensor: Tensor) -> Tensor:
     '''
 
     Args:
-        tesor: The tensor of the multi-radiii examples
+        tensor: The tensor of the multi-radiii examples
         with shape: (num_lines, len(radii), h, w)
 
     Returns: a vector of shape (num_lines, 1, len(radii)*h, w)
 
     '''
-    num_samples_in_dataset, _, _, w = tesor.shape
-    printable_tensor = tesor.view(num_samples_in_dataset, 1, -1, w)
+    num_samples_in_dataset, _, _, w = tensor.shape
+    printable_tensor = tensor.view(num_samples_in_dataset, 1, -1, w)
     return printable_tensor
+
+def convert_multi_radius_ndarray_to_printable(array: np.ndarray) -> np.ndarray:
+    '''
+
+    Args:
+        tensor: The tensor of the multi-radiii examples
+        with shape: (num_lines, len(radii), h, w)
+
+    Returns: a vector of shape (num_lines, 1, len(radii)*h, w)
+
+    '''
+    num_samples_in_dataset, _, _, w = array.shape
+    printable_ndarray = array.reshape(num_samples_in_dataset, -1, w)
+    return printable_ndarray
 
 
 def plot_confusion_matrix(cm: object,
