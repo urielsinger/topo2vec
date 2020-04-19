@@ -3,7 +3,7 @@
 
 import os
 import random
-from typing import List
+from typing import List, Tuple
 
 import torch
 from shapely.geometry import Point, Polygon
@@ -94,7 +94,8 @@ def get_features(points: List[Point], class_name: str = 'no_name') -> np.ndarray
     return np_latent_features
 
 
-def get_all_class_points_in_polygon(polygon: Polygon, deg_step: float, class_name: str) -> List[Point]:
+def get_all_class_points_in_polygon(polygon: Polygon, meters_step: float, class_name: str) -> \
+        Tuple[np.ndarray, np.ndarray]:
     '''
         TODO: default of deg_eps is quarter the radius.
 
@@ -102,14 +103,14 @@ def get_all_class_points_in_polygon(polygon: Polygon, deg_step: float, class_nam
 
     Args:
         polygon: The polygon to search in
-        deg_step: what is the x-y resolution to search inside the polygon (in degrees)
+        meters_step: what is the x-y resolution to search inside the polygon (in degrees)
         class_name: the class to search for
 
     Returns: all the points in this area which are in the polygon and classified as
     the class_name using the classifier
 
     '''
-    points_in_polygon = sample_grid_in_poly(polygon, deg_step)
+    points_in_polygon = sample_grid_in_poly(polygon, meters_step)
 
     points_in_polygon_dataset, points_used = build_new_dataset_for_query(points_in_polygon, class_name)
     assert len(points_in_polygon_dataset) == len(points_used)
@@ -126,9 +127,9 @@ def get_all_class_points_in_polygon(polygon: Polygon, deg_step: float, class_nam
         patches_list.append(X[class_indexes, :])
         points_list.append(points_used[class_indexes, :])
 
-    np_points_patches = np.concatenate(patches_list, axis=0)
-    points_used = np.concatenate(points_list, axis=0)
-    return points_used, np_points_patches
+    np_points_patches_used = np.concatenate(patches_list, axis=0)
+    np_points_used = np.concatenate(points_list, axis=0)
+    return np_points_used, np_points_patches_used
 
 
 def get_top_n_similar_points_in_polygon(points: List[Point], n: int, polygon: Polygon,

@@ -135,18 +135,24 @@ def convert_multi_radius_tensor_to_printable(tensor: Tensor) -> Tensor:
     printable_tensor = tensor.view(num_samples_in_dataset, 1, -1, w)
     return printable_tensor
 
-def convert_multi_radius_ndarray_to_printable(array: np.ndarray) -> np.ndarray:
+def convert_multi_radius_ndarray_to_printable(array: np.ndarray, dir = True) -> np.ndarray:
     '''
 
     Args:
         tensor: The tensor of the multi-radiii examples
         with shape: (num_lines, len(radii), h, w)
+        dir = True -> vertically
+        dir = False -> horizontally
 
     Returns: a vector of shape (num_lines, 1, len(radii)*h, w)
 
     '''
-    num_samples_in_dataset, _, _, w = array.shape
-    printable_ndarray = array.reshape(num_samples_in_dataset, -1, w)
+    num_samples_in_dataset, _, h, w = array.shape
+    if dir:
+        printable_ndarray = array.reshape(num_samples_in_dataset, -1, w)
+    else:
+        print(array.shape)
+        printable_ndarray = array.transpose((0,1,3,2)).reshape(num_samples_in_dataset, -1, h).transpose((0,2,1))
     return printable_ndarray
 
 
