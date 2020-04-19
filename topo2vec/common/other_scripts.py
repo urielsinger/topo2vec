@@ -10,6 +10,7 @@ from sklearn.metrics import accuracy_score
 from torch import Tensor
 from torch.utils.data import Dataset, DataLoader
 import json
+from datetime import datetime
 
 
 def str_to_int_list(string_list: str):
@@ -109,8 +110,8 @@ def get_random_part_of_dataset(dataset: Dataset, size_wanted: int, shuffle=True)
     '''
 
     data_loader = DataLoader(dataset, shuffle=shuffle, num_workers=0, batch_size=size_wanted)
-    images_as_tensor, y = next(iter(data_loader))
-    return images_as_tensor, y
+    batch = next(iter(data_loader))
+    return batch
 
 
 def get_paths_and_names_wanted(list_wanted, class_paths_list, class_names_list):
@@ -140,7 +141,7 @@ def svm_accuracy_on_dataset_in_latent_space(SVMClassifier, dataset, model):
 
 
 def save_points_to_json_file(points: List[Point], class_name: str, file_dir: str):
-    data = {}
+    data={}
     data['elements'] = []
     for point in points:
         point_dict = {
@@ -153,7 +154,7 @@ def save_points_to_json_file(points: List[Point], class_name: str, file_dir: str
         }
         data['elements'].append(point_dict)
 
-    file_path = os.path.join(file_dir, class_name + '.json')
+    file_path = os.path.join(file_dir, class_name + str(datetime.now())+'.json')
     with open(file_path, 'w') as outfile:
         json.dump(data, outfile)
 

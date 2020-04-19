@@ -276,14 +276,14 @@ class Classifier(LightningModule):
         return {'avg_' + name + '_loss': avg_loss, 'log': tensorboard_logs}
 
     def _log_embedding_visualization(self):
-        x, coords = get_random_part_of_dataset(self.test_dataset,
+        x, y = get_random_part_of_dataset(self.test_dataset,
                                                self.embedding_visualization_size)
         x = x.float()
         if self.hparams.use_gpu:
             x = x.cuda()
         _, embedding = self.forward(x)
         images_set_to_show = x[:, 0, :, :].unsqueeze(1)
-        self.logger.experiment.add_embedding(embedding, metadata=coords, label_img=images_set_to_show)
+        self.logger.experiment.add_embedding(embedding, metadata=y, label_img=images_set_to_show)
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.hparams.learning_rate)

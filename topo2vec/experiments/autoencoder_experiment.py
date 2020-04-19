@@ -11,6 +11,7 @@ autoencoder_check_args = parser.parse_args(['--save_model',
                                             '--svm_classify_latent_space',
                                             '--name', 'autoencoder',
                                             '--pytorch_module', 'Autoencoder',
+                                            '--test_knn',
                                             '--random_set_size_for_svm', '10'])
 
 if LOAD_CLASSES_LARGE:
@@ -29,7 +30,7 @@ if LOAD_CLASSES_LARGE:
                                                   '--test_knn',
                                                   '--use_gpu'])
 
-lab = TaskHandler(autoencoder_regular_args)
+lab = TaskHandler(autoencoder_check_args)
 lab.run()
 
 

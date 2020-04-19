@@ -21,7 +21,7 @@ class ClassDataset(MultiRadiusDataset):
 
     def __init__(self, class_path: str, class_label: float,
                  radii: List[int], wanted_size: int, outer_polygon=None,
-                 dataset_type_name: str = None, load_save=True, return_point = False):
+                 dataset_type_name: str = None, load_save=True, return_point=False):
         '''
 
         Args:

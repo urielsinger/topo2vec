@@ -81,7 +81,8 @@ class TaskHandler:
                                            method=hparams.knn_method_for_typical_choosing,
                                            json_file_of_group=hparams.json_file_of_group_for_knn)
             knn.prepare_data()
-            knn.test()
+            knn.test_and_plot_via_feature_extractor_tensorboard()
+
 
 
         #save if needed
