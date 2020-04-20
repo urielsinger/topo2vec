@@ -19,8 +19,8 @@ classifier_check_args = classifier_parser.parse_args(['--save_model',
                                                       '--knn_method_for_typical_choosing', 'group_from_file',
                                                       '--random_set_size_for_svm_special', '1000',
                                                       '--test_knn',
-                                                      '--use_gpu',
                                                       '--svm_classify_latent_space',
+                                                      '--save_to_final',
                                                       ])
 
 if not LOAD_CLASSES_LARGE:
@@ -33,7 +33,8 @@ if not LOAD_CLASSES_LARGE:
                                                             '--name', 'classifier',
                                                             '--pytorch_module', 'Classifier',
                                                             '--latent_space_size', '20',
-                                                            '--random_set_size', '100'])
+                                                            '--random_set_size', '100',
+                                                            '--save_to_final'])
 else:
     classifier_regular_args = classifier_parser.parse_args(['--save_model',
                                                             '--learning_rate', '0.00005',
@@ -52,7 +53,6 @@ else:
                                                             '--test_set_size_for_svm', '100',
                                                             '--special_classes_for_validation',
                                                             '["cliffs", "peaks"]',
-                                                            '--use_gpu',
                                                             ])
 lab = TaskHandler(classifier_regular_args)
 lab.run()

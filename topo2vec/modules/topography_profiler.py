@@ -1,6 +1,5 @@
 # the topography profiler module
 
-
 import os
 import random
 from typing import List, Tuple
@@ -15,6 +14,7 @@ from torch.utils.data import DataLoader
 from topo2vec.common.geographic.geo_utils import sample_grid_in_poly
 from topo2vec.common.other_scripts import save_points_to_json_file, str_to_int_list
 from topo2vec.common.visualizations import convert_multi_radius_ndarray_to_printable, plot_n_np_arrays
+from topo2vec.constants import BASE_LOCATION
 from topo2vec.datasets.class_dataset import ClassDataset
 from topo2vec.modules import Classifier
 from pathlib import Path
@@ -24,7 +24,7 @@ from pathlib import Path
 ################################################################################
 from topo2vec.modules.knearestneighbourstester import KNearestNeighboursTester
 
-FINAL_MODEL_DIR = '/home/morpheus/topo2vec_kavitzky/repositories/topo2vec/data/final_model'
+FINAL_MODEL_DIR = BASE_LOCATION + 'data/final_model'
 FINAL_SEED = 665
 FINAL_HPARAMS = Classifier.get_args_parser().parse_args(
     ['--total_dataset_size', '1000',
@@ -32,6 +32,7 @@ FINAL_HPARAMS = Classifier.get_args_parser().parse_args(
      '--name', 'final_model',
      '--pytorch_module', 'Classifier',
      '--latent_space_size', '35',
+     '--num_classes', '5',
      ]
 )
 USER_DEFINED = 'user_defined'
@@ -46,9 +47,11 @@ cudnn.deterministic = True
 np.random.seed(FINAL_SEED)
 
 load_path = os.path.join(FINAL_MODEL_DIR, 'final_model.pt')
-
 final_model_classifier = Classifier(FINAL_HPARAMS)
-final_model_classifier.load_state_dict(torch.load(load_path))
+print('asdjfhjashdf')
+print('out' + str(final_model_classifier.class_names))
+
+final_model_classifier.load_state_dict(torch.load(load_path, map_location=torch.device('cpu')))
 final_model_classifier.eval()
 
 FINAL_RADII = str_to_int_list(FINAL_HPARAMS.radii)

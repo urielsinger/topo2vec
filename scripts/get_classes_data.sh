@@ -45,7 +45,7 @@ declare -a NAMES4=("antenas"  "communications_towers" "waterfalls" "alpine_huts"
 
 for i in "${INDEXES[@]}"
 do
-    SAVE_LOCATION='/home/morpheus/topo2vec_kavitzky/repositories/topo2vec/data/overpass_classes_data/'${NAMES3[i]}'_'${EARTH_LOCATION}'.json'
+    SAVE_LOCATION='//home/topo2vec_kavitzky/topo2vec/data/overpass_classes_data/'${NAMES3[i]}'_'${EARTH_LOCATION}'.json'
     echo ${SAVE_LOCATION}
     LINK='http://overpass-api.de/api/interpreter?data=[out:json];'${QUERIES3[i]}
     echo ${LINK}

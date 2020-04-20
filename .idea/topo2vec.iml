@@ -2,14 +2,13 @@
 <module type="PYTHON_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$" />
-    <orderEntry type="jdk" jdkName="Remote Python 3.8.1 (sftp://morpheus@40.127.166.177:22/anaconda/envs/topo2vec/bin/python)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Remote Python 2.7.17 (sftp://root@159.122.160.134:22/usr/bin/python)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PackageRequirementsSettings">
     <option name="requirementsPath" value="" />
   </component>
   <component name="PyDocumentationSettings">
-    <option name="format" value="GOOGLE" />
     <option name="myDocStringFormat" value="Google" />
   </component>
 </module>

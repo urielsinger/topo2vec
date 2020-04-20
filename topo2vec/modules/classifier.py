@@ -47,6 +47,7 @@ class Classifier(LightningModule):
         self.max_validation_accuracy = 0
         self.final_test_accuracy = 0
         self.class_names = CLASS_NAMES
+        print(self.class_names)
         self.class_paths = CLASS_PATHS
 
     def prepare_data(self):
