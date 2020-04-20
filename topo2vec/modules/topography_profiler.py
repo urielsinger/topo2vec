@@ -13,19 +13,47 @@ from torch.utils.data import DataLoader
 
 from topo2vec.common.geographic.geo_utils import sample_grid_in_poly
 from topo2vec.common.other_scripts import save_points_to_json_file, str_to_int_list
-from topo2vec.common.visualizations import convert_multi_radius_ndarray_to_printable, plot_n_np_arrays
 from topo2vec.constants import BASE_LOCATION
 from topo2vec.datasets.class_dataset import ClassDataset
 from topo2vec.modules import Classifier
 from pathlib import Path
-
-################################################################################
-# Load the extension module
-################################################################################
 from topo2vec.modules.knearestneighbourstester import KNearestNeighboursTester
 
-FINAL_MODEL_DIR = BASE_LOCATION + 'data/final_model'
+################################################################################
+# init profiling environment
+################################################################################
+USER_DEFINED = 'user_defined'
+default_working_polygon = Polygon([Point(5, 45), Point(5, 50), Point(10, 50),
+                                   Point(10, 45), Point(5, 45)])
+
+
+def set_working_polygon(polygon: Polygon):
+    '''
+    the working polygon is the polygon which is assumed to contain all the data the user wants
+    Args:
+        polygon:
+
+    Returns:
+
+    '''
+    global WORKING_POLYGON
+    WORKING_POLYGON = polygon
+
+
+set_working_polygon(working_polygon)
+
 FINAL_SEED = 665
+
+FORWARD_BATCH_SIZE = 1024
+random.seed(FINAL_SEED)
+torch.manual_seed(FINAL_SEED)
+cudnn.deterministic = True
+np.random.seed(FINAL_SEED)
+
+################################################################################
+# Load the final model
+################################################################################
+FINAL_MODEL_DIR = BASE_LOCATION + 'data/final_model'
 FINAL_HPARAMS = Classifier.get_args_parser().parse_args(
     ['--total_dataset_size', '1000',
      '--arch', 'AdvancedConvNetLatent',
@@ -35,29 +63,22 @@ FINAL_HPARAMS = Classifier.get_args_parser().parse_args(
      '--num_classes', '5',
      ]
 )
-USER_DEFINED = 'user_defined'
-WORKING_POLYGON = Polygon([Point(5, 45), Point(5, 50), Point(10, 50),
-                           Point(10, 45), Point(5, 45)])
-
-FORWARD_BATCH_SIZE = 1024
-
-random.seed(FINAL_SEED)
-torch.manual_seed(FINAL_SEED)
-cudnn.deterministic = True
-np.random.seed(FINAL_SEED)
 
 load_path = os.path.join(FINAL_MODEL_DIR, 'final_model.pt')
 final_model_classifier = Classifier(FINAL_HPARAMS)
-print('asdjfhjashdf')
-print('out' + str(final_model_classifier.class_names))
-
 final_model_classifier.load_state_dict(torch.load(load_path, map_location=torch.device('cpu')))
 final_model_classifier.eval()
 
 FINAL_RADII = str_to_int_list(FINAL_HPARAMS.radii)
 
-def build_new_dataset_for_query(points: List[Point], class_name: str = 'no_name') \
-        -> ClassDataset:
+
+################################################################################
+# module functions
+################################################################################
+
+
+def _build_new_dataset_for_query(points: List[Point], class_name: str = 'no_name') \
+        -> Tuple[ClassDataset, np.ndarray]:
     queried_classes_path = os.path.join(FINAL_MODEL_DIR, 'queried_classes')
     Path(queried_classes_path).mkdir(parents=True, exist_ok=True)
     class_file_path = save_points_to_json_file(points, class_name, queried_classes_path)
@@ -85,7 +106,7 @@ def get_features(points: List[Point], class_name: str = 'no_name') -> np.ndarray
     Returns: the points' features, as (len(points), latent_size) np.ndarray.
 
     '''
-    points_dataset, _ = build_new_dataset_for_query(points, class_name)
+    points_dataset, _ = _build_new_dataset_for_query(points, class_name)
     class_dataloader = DataLoader(points_dataset, FORWARD_BATCH_SIZE)
     latent_features_list = []
     for batch in class_dataloader:
@@ -100,8 +121,6 @@ def get_features(points: List[Point], class_name: str = 'no_name') -> np.ndarray
 def get_all_class_points_in_polygon(polygon: Polygon, meters_step: float, class_name: str) -> \
         Tuple[np.ndarray, np.ndarray]:
     '''
-        TODO: default of deg_eps is quarter the radius.
-
     get all the class points in a certain polygon.
 
     Args:
@@ -115,7 +134,7 @@ def get_all_class_points_in_polygon(polygon: Polygon, meters_step: float, class_
     '''
     points_in_polygon = sample_grid_in_poly(polygon, meters_step)
 
-    points_in_polygon_dataset, points_used = build_new_dataset_for_query(points_in_polygon, class_name)
+    points_in_polygon_dataset, points_used = _build_new_dataset_for_query(points_in_polygon, class_name)
     assert len(points_in_polygon_dataset) == len(points_used)
 
     class_dataloader = DataLoader(points_in_polygon_dataset, FORWARD_BATCH_SIZE)
@@ -147,9 +166,9 @@ def get_top_n_similar_points_in_polygon(points: List[Point], n: int, polygon: Po
     Returns: list of n points that are similar to the points in here.
     '''
     points_in_polygon = sample_grid_in_poly(polygon, meters_step)
-    points_in_polygon_dataset, points_typical_used = build_new_dataset_for_query(points_in_polygon, 'dataset')
+    points_in_polygon_dataset, points_typical_used = _build_new_dataset_for_query(points_in_polygon, 'dataset')
 
-    typical_points_dataset, _ = build_new_dataset_for_query(points, class_name)
+    typical_points_dataset, _ = _build_new_dataset_for_query(points, class_name)
 
     knn_tester = KNearestNeighboursTester(FINAL_RADII, final_model_classifier, n,
                                           method='group_from_file', random_set_size=0,
@@ -162,7 +181,6 @@ def get_top_n_similar_points_in_polygon(points: List[Point], n: int, polygon: Po
     typical_images_set_to_show, number_to_log, closest_points_list_latent_space = knn_tester.test()
 
     return closest_images_list_latent_space[0], closest_points_list_latent_space[0]
-
 
 # polygon_to_search_in = Polygon([Point(5, 45), Point(5, 45.1), Point(5.1, 45.1),
 #                                 Point(5.1, 45.1), Point(5, 45)])
