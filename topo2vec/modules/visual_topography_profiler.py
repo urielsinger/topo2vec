@@ -68,6 +68,7 @@ class TopoMap:
     '''
 
     def __init__(self, polygon_of_interest: Polygon = None):
+        self.version = 0
         self.polygon_of_interest = polygon_of_interest
         if self.polygon_of_interest is not None:
             self.center = point_to_location(self.polygon_of_interest.centroid)[::-1]
@@ -93,6 +94,24 @@ class TopoMap:
         self.map = geo_map
 
     def add_points_with_text(self, points: List[Point], color: str = 'red', text: str = 'None', tooltip='Click me!'
+                                      ):
+        '''
+
+        Args:
+            points: the points to show on the map
+            color: the color the points should have
+            test: the tesxt that all the points should contain
+            tooltip: the text pops with hover
+
+        Returns:
+
+        '''
+        for point in points:
+            point = [point.x, point.y]
+            folium.Marker(point[::-1], popup=f'<i>{text}</i>', tooltip=tooltip,
+                          icon=folium.Icon(color=color)).add_to(self.map)
+
+    def add_points_as_lists_with_text(self, points: List[List[int]], color: str = 'red', text: str = 'None', tooltip='Click me!'
                              ):
         '''
 

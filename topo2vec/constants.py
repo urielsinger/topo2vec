@@ -48,3 +48,7 @@ CLASSES_TEST_POINTS_FOLDER = BASE_LOCATION + 'data/overpass_classes_data/tests'
 CACHE_BASE_DIR = BASE_LOCATION + 'data/cache'
 
 NONE_STR = 'None'
+
+#server routes
+GET_CLASS_POINTS_ROUTE = '/get_class'
+GET_SIMILAR_POINTS_ROUTE =  '/get_similar'

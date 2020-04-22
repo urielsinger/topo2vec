@@ -40,7 +40,7 @@ def set_working_polygon(polygon: Polygon):
     WORKING_POLYGON = polygon
 
 
-set_working_polygon(working_polygon)
+set_working_polygon(default_working_polygon)
 
 FINAL_SEED = 665
 

@@ -232,3 +232,11 @@ def plot_to_image(figure):
     im = Image.open(tmp_path).convert('RGB')
     image = np.array(im)
     return image
+
+def np_array_to_png_list(np_array:np.ndarray) ->List:
+    images_list = []
+    for im in np_array:
+        im_rescaled = 255.0 /im.max() * (im-im.min()).astype(np.uint8)
+        image = Image.fromarray(im_rescaled)
+        images_list.append(image)
+    return images_list

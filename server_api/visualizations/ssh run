@@ -1,0 +1,1 @@
+ssh -i /home/yonatanz/.ssh/id_rsa -L 5006:127.0.0.1:5006 root@159.122.160.134
