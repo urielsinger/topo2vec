@@ -81,6 +81,7 @@ class DataFromFileHandler(DataHandler):
             res_map = (res_map - np.min(res_map)) / (np.max(res_map) - np.min(res_map))
         return res_map
 
+
     def crop_image(self, lon, lat, radius):
         for image in self.elevation_data_squares.values():
             if image.point_inside(lon, lat):

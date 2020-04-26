@@ -6,67 +6,12 @@ channels:
 
 dependencies:
 # Core scientific python
-- numpy
-- matplotlib
-- python=3.6.7
-- seaborn
 - pip
-- scikit-learn
-- scikit-image
-- pytest
-- argparse
-
-# Deep Learning
-- pytorch=1.4.0
-- torchvision
-- cudatoolkit
-- ignite  # from the pytorch channel
-
-# Spatial packages
-#- rasterstats
-- geopy
-#- cartopy
-- geoalchemy2
-- geopandas
-#- rasterio
-#- contextily
-#- pysal
-- pyproj
-- folium
-- gdal
-- libgdal
-#- kealib
-#- geocoder
-- geojson
-- psycopg2
-
-# Jupyter Environment
-- autopep8
-- notebook
-- ipython
-- jupyter_contrib_nbextensions
-- jupyter
-- nb_conda
 
 # Web app / visualization
-- flask
 - bokeh
-- holoviews
 
 - pip:
-    - panel
-    - nbclean
-    - imageio
-    - tqdm
-    - auto-tqdm
-    - staticmap
-    - pathos
-    - torchsummary
-    - openrouteservice
-    - xlrd
-    - opencv-python
-    - shap
-    - future
     - numpy
     - pandas
     - geopandas
@@ -74,6 +19,11 @@ dependencies:
     - scikit-image
     - sklearn
     - jupyter
+    - folium
     - opencv-python
     - optuna
     - folium
+    - geopy
+    - flask
+    - torchvision
+    - bokeh
