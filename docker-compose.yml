@@ -12,11 +12,13 @@ services:
       dockerfile: "Dockerfile"
     image: 'web_api'
     ports:
-      - "5000:5000"
-  web_gui:
-    build:
-      context: "docker/web_gui"
-      dockerfile: "Dockerfile"
-    image: 'web_gui'
-    ports:
-      - "5432:5432"
+      - "8765:8765"
+      - "8888:8888"
+      - "7777:7777"
+#  web_gui:
+#    build:
+#      context: "docker/web_gui"
+#      dockerfile: "Dockerfile"
+#    image: 'web_gui'
+#    ports:
+#      - "5432:5432"

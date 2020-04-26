@@ -6,7 +6,7 @@ WORKDIR /home/root
 EXPOSE 5432
 
 #run the bokeh server for using the GUI
-RUN /bin/sh -c "cd /home/root/server_api/visualizations; bokeh serve --address=0.0.0.0 --port=5432"
+CMD ["bash", "/home/root/docker/web_gui/web_gui_startup.sh"]
 
 
 #run tensorboard in the right place

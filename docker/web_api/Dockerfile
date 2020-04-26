@@ -9,6 +9,7 @@ FROM base_anaconda
 #RUN conda activate coord2vec
 #ENTRYPOINT ["/bin/bash"]
 #CMD ["bash"]
+CMD ["bash", "/home/root/docker/web_api/web_api_startup.sh"]
 
 
 EXPOSE 80 443
