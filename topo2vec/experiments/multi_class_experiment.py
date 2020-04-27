@@ -37,10 +37,10 @@ if not LOAD_CLASSES_LARGE:
                                                             '--save_to_final'])
 else:
     classifier_regular_args = classifier_parser.parse_args(['--save_model',
-                                                            '--learning_rate', '0.00005',
-                                                            '--max_epochs', '200',
-                                                            '--total_dataset_size', '10000',
-                                                            '--arch', 'AdvancedConvNetLatent',
+                                                            '--learning_rate', '0.0003200196036593708',
+                                                            '--max_epochs', '95',
+                                                            '--total_dataset_size', '2500',
+                                                            '--arch', 'BasicConvNetLatent',
                                                             '--svm_classify_latent_space',
                                                             '--name', 'classifier',
                                                             '--pytorch_module', 'Classifier',
@@ -53,6 +53,7 @@ else:
                                                             '--test_set_size_for_svm', '100',
                                                             '--special_classes_for_validation',
                                                             '["cliffs", "peaks"]',
+                                                            '--save_to_final',
                                                             ])
 lab = TaskHandler(classifier_regular_args)
 lab.run()
@@ -91,4 +92,24 @@ lab.run()
 #                                                         '--special_classes_for_validation',
 #                                                         '["cliffs", "peaks"]',
 #                                                         '--use_gpu'
+#                                                         ])
+
+
+# classifier_regular_args = classifier_parser.parse_args(['--save_model',
+#                                                         '--learning_rate', '0.00005',
+#                                                         '--max_epochs', '200',
+#                                                         '--total_dataset_size', '10000',
+#                                                         '--arch', 'AdvancedConvNetLatent',
+#                                                         '--svm_classify_latent_space',
+#                                                         '--name', 'classifier',
+#                                                         '--pytorch_module', 'Classifier',
+#                                                         '--random_set_size_for_svm', '4000',
+#                                                         '--random_set_size_for_svm_special', '1000',
+#                                                         '--random_set_size', '1000',
+#                                                         '--latent_space_size', '35',
+#                                                         '--knn_method_for_typical_choosing', 'group_from_file',
+#                                                         '--test_knn',
+#                                                         '--test_set_size_for_svm', '100',
+#                                                         '--special_classes_for_validation',
+#                                                         '["cliffs", "peaks"]',
 #                                                         ])
