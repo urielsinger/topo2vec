@@ -1,0 +1,319 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.56.2 b688b00f",
+  "osm3s": {
+    "timestamp_osm_base": "2020-04-05T07:41:01Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "node",
+  "id": 251668165,
+  "lat": 48.5499025,
+  "lon": 9.3392139,
+  "tags": {
+    "alt_name": "Jusenberg",
+    "ele": "673",
+    "loc_name": "Jusi",
+    "name": "Jusiberg",
+    "natural": "volcano",
+    "volcano:status": "extinct",
+    "volcano:type": "stratovolcano",
+    "wikidata": "Q1545974"
+  }
+},
+{
+  "type": "node",
+  "id": 298284263,
+  "lat": 48.4715567,
+  "lon": 9.2115685,
+  "tags": {
+    "direction": "0-360",
+    "ele": "602",
+    "name": "Georgenberg",
+    "natural": "volcano",
+    "volcano:status": "extinct",
+    "volcano:type": "stratovolcano",
+    "wikidata": "Q1508708"
+  }
+},
+{
+  "type": "node",
+  "id": 306182349,
+  "lat": 47.7647081,
+  "lon": 8.8189490,
+  "tags": {
+    "condition": "extinct",
+    "ele": "686",
+    "name": "Hohentwiel",
+    "natural": "volcano",
+    "tourism": "viewpoint",
+    "wheelchair": "no",
+    "wikidata": "Q700092",
+    "wikipedia": "de:Hohentwiel"
+  }
+},
+{
+  "type": "node",
+  "id": 339039706,
+  "lat": 48.6188151,
+  "lon": 9.5086354,
+  "tags": {
+    "ele": "428",
+    "loc_name": "Bürrle",
+    "name": "Egelsberg",
+    "natural": "volcano",
+    "volcano:status": "extinct",
+    "volcano:type": "scoria"
+  }
+},
+{
+  "type": "node",
+  "id": 343649996,
+  "lat": 48.5225566,
+  "lon": 9.3433844,
+  "tags": {
+    "direction": "0-360",
+    "ele": "509",
+    "name": "Calverbühl",
+    "natural": "volcano",
+    "tourism": "viewpoint",
+    "volcano:status": "extinct",
+    "wikidata": "Q22691538"
+  }
+},
+{
+  "type": "node",
+  "id": 372616264,
+  "lat": 48.6045085,
+  "lon": 9.5362040,
+  "tags": {
+    "ele": "598",
+    "name": "Limburg",
+    "natural": "volcano",
+    "volcano:status": "extinct",
+    "wikidata": "Q1825384"
+  }
+},
+{
+  "type": "node",
+  "id": 372616267,
+  "lat": 48.6064195,
+  "lon": 9.5049028,
+  "tags": {
+    "ele": "433",
+    "name": "Dachsbühl",
+    "natural": "volcano",
+    "volcano:status": "extinct",
+    "volcano:type": "scoria"
+  }
+},
+{
+  "type": "node",
+  "id": 386005508,
+  "lat": 49.7314957,
+  "lon": 12.0699526,
+  "tags": {
+    "ele": "595",
+    "name": "Parkstein",
+    "natural": "volcano",
+    "tourism": "viewpoint",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 410668643,
+  "lat": 48.5935114,
+  "lon": 9.4650199,
+  "tags": {
+    "ele": "602",
+    "name": "Hohenbol",
+    "natural": "volcano",
+    "volcano:status": "extinct",
+    "volcano:type": "scoria",
+    "wikidata": "Q1623641"
+  }
+},
+{
+  "type": "node",
+  "id": 857254214,
+  "lat": 47.9256493,
+  "lon": 8.6179780,
+  "tags": {
+    "condition": "extinct",
+    "ele": "844.4",
+    "name": "Wartenberg",
+    "natural": "volcano",
+    "volcano:status": "extinct"
+  }
+},
+{
+  "type": "node",
+  "id": 1020488449,
+  "lat": 47.8357047,
+  "lon": 8.7472672,
+  "tags": {
+    "condition": "extinct",
+    "ele": "844",
+    "name": "Hohenhewen",
+    "natural": "volcano"
+  }
+},
+{
+  "type": "node",
+  "id": 1238258143,
+  "lat": 47.8788896,
+  "lon": 8.7175383,
+  "tags": {
+    "condition": "extinct",
+    "ele": "867",
+    "name": "Neuhewen",
+    "natural": "volcano",
+    "wikidata": "Q1980659",
+    "wikipedia": "de:Neuhewen"
+  }
+},
+{
+  "type": "node",
+  "id": 1276918209,
+  "lat": 47.7987422,
+  "lon": 8.8202084,
+  "tags": {
+    "condition": "extinct",
+    "ele": "644",
+    "name": "Hohenkrähen",
+    "natural": "volcano",
+    "wikidata": "Q1623742",
+    "wikipedia": "de:Hohenkrähen"
+  }
+},
+{
+  "type": "node",
+  "id": 1276923068,
+  "lat": 47.8056797,
+  "lon": 8.7974308,
+  "tags": {
+    "condition": "extinct",
+    "ele": "664",
+    "name": "Mägdeberg",
+    "natural": "volcano",
+    "wikidata": "Q1243466",
+    "wikipedia": "de:Mägdeberg"
+  }
+},
+{
+  "type": "node",
+  "id": 1366173854,
+  "lat": 48.5749443,
+  "lon": 9.5257607,
+  "tags": {
+    "condition": "extinct",
+    "name": "Randecker Maar",
+    "natural": "volcano",
+    "volcano:status": "extinct",
+    "volcano:type": "maar",
+    "wikidata": "Q1730511",
+    "wikipedia": "de:Randecker Maar"
+  }
+},
+{
+  "type": "node",
+  "id": 1634250767,
+  "lat": 49.9915490,
+  "lon": 12.4445705,
+  "tags": {
+    "ele": "591",
+    "name": "Železná hůrka / Eisenbühl",
+    "name:cs": "Železná hůrka",
+    "name:de": "Eisenbühl",
+    "natural": "volcano"
+  }
+},
+{
+  "type": "node",
+  "id": 1743401119,
+  "lat": 47.9123281,
+  "lon": 8.7391480,
+  "tags": {
+    "condition": "extinct",
+    "ele": "798",
+    "name": "Höwenegg",
+    "natural": "volcano"
+  }
+},
+{
+  "type": "node",
+  "id": 2090781600,
+  "lat": 48.4272963,
+  "lon": 6.4540947,
+  "tags": {
+    "description": "manifestation volcanique",
+    "ele": "360",
+    "name": "La Molotte",
+    "natural": "volcano",
+    "wikipedia": "fr:Essey-la-Côte#Volcan éteint d'Essey-la-Côte"
+  }
+},
+{
+  "type": "node",
+  "id": 2483641402,
+  "lat": 48.5523234,
+  "lon": 6.0415695,
+  "tags": {
+    "natural": "volcano",
+    "source": "survey"
+  }
+},
+{
+  "type": "node",
+  "id": 3136382938,
+  "lat": 49.8242128,
+  "lon": 11.8672546,
+  "tags": {
+    "name": "Vogelherd",
+    "natural": "volcano",
+    "volcano:status": "extinct"
+  }
+},
+{
+  "type": "node",
+  "id": 3136382939,
+  "lat": 49.8284396,
+  "lon": 11.8689167,
+  "tags": {
+    "name": "Kühhübel",
+    "natural": "volcano",
+    "volcano:status": "extinct",
+    "wikidata": "Q1796904"
+  }
+},
+{
+  "type": "node",
+  "id": 3859514963,
+  "lat": 47.7953034,
+  "lon": 8.7500045,
+  "tags": {
+    "condition": "extinct",
+    "ele": "842",
+    "name": "Hohenstoffeln",
+    "natural": "volcano",
+    "volcano:status": "extinct"
+  }
+},
+{
+  "type": "node",
+  "id": 6219652223,
+  "lat": 48.5975750,
+  "lon": 9.4745707,
+  "tags": {
+    "name": "Hörnle",
+    "natural": "volcano",
+    "volcano:status": "extinct",
+    "volcano:type": "scoria"
+  }
+}
+
+  ]
+}

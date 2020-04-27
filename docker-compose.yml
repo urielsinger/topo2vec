@@ -5,20 +5,19 @@ services:
       context: "."
       dockerfile: "Dockerfile"
     image: 'base_anaconda'
-
-  web_api:
-    build:
-      context: "docker/web_api"
-      dockerfile: "Dockerfile"
-    image: 'web_api'
-    ports:
-      - "8765:8765"
-      - "8888:8888"
-      - "7777:7777"
-#  web_gui:
+#  web_api:
 #    build:
-#      context: "docker/web_gui"
+#      context: "docker/web_api"
 #      dockerfile: "Dockerfile"
-#    image: 'web_gui'
+#    image: 'web_api'
 #    ports:
-#      - "5432:5432"
+#      - "8765:8765"
+#      - "8888:8888"
+#      - "7777:7777"
+  web_gui:
+    build:
+      context: "docker/web_gui"
+      dockerfile: "Dockerfile"
+    image: 'web_gui'
+    ports:
+      - "5432:5432"

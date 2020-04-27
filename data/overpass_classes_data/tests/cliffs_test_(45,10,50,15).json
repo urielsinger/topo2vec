@@ -1,0 +1,366 @@
+{
+  "version": 0.6,
+  "generator": "Jonathan Kavitzky",
+  "osm3s": {
+    "timestamp_osm_base": "2020-03-22T21:58:02Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+{
+	"type": "node",
+	"lat": 47.0851164,
+	"lon": 9.5658811,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 45.9392727,
+	"lon": 9.3401856,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 46.1517914,
+	"lon": 6.1861597,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 46.9874911,
+	"lon": 7.9756772,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 48.7667291,
+	"lon": 8.4153111,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 46.3283187,
+	"lon": 6.0022876,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 49.4628056,
+	"lon": 5.9661609,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 46.9874911,
+	"lon": 7.9756772,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 48.7667291,
+	"lon": 8.4153111,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 46.3283187,
+	"lon": 6.0022876,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 49.4628056,
+	"lon": 5.9661609,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+    {
+	"type": "node",
+	"lat": 45.7396002,
+	"lon": 5.5209249,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 45.5404396,
+	"lon": 7.2408591,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 49.6710612,
+	"lon": 6.061534,
+	"tags": {
+		"natural": "cliff"
+	}
+},{
+	"type": "node",
+	"lat": 47.2844861,
+	"lon": 9.7623793,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 46.8974678,
+	"lon": 8.5696363,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 49.7978738,
+	"lon": 6.3185227,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+    {
+	"type": "node",
+	"lat": 49.0755452,
+	"lon": 7.6789894,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 46.0809619,
+	"lon": 5.9131136,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+    {
+	"type": "node",
+	"lat": 46.1316227,
+	"lon": 6.7583125,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 45.7985123,
+	"lon": 6.9429991,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 46.8930617,
+	"lon": 9.2152548,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 46.1079631,
+	"lon": 6.7931272,
+	"tags": {
+		"natural": "cliff"
+	}
+}, {
+	"type": "node",
+	"lat": 47.3506372,
+	"lon": 8.9215282,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 48.0385405,
+	"lon": 8.9211237,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 46.2285034,
+	"lon": 5.7529253,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 49.7787694,
+	"lon": 8.0439215,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 47.0282108,
+	"lon": 6.999835,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 45.7437442,
+	"lon": 5.7274936,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 45.4799261,
+	"lon": 5.7926635,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 45.7109139,
+	"lon": 6.1976904,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 48.4053432,
+	"lon": 9.7775842,
+	"tags": {
+		"natural": "cliff"
+	}
+},{
+	"type": "node",
+	"lat": 49.2367181,
+	"lon": 7.823765,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 46.053533,
+	"lon": 8.054853,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 46.4574411,
+	"lon": 5.3800486,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 46.0217614,
+	"lon": 7.3151983,
+	"tags": {
+		"natural": "cliff"
+	}
+},{
+	"type": "node",
+	"lat": 46.0516893,
+	"lon": 5.9455511,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 47.0157159,
+	"lon": 9.8573835,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 47.9210187,
+	"lon": 8.0024728,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 46.2797709,
+	"lon": 6.5607828,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 47.0861611,
+	"lon": 6.7326316,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 45.9583513,
+	"lon": 5.5215794,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 45.801685,
+	"lon": 5.471862,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 46.0250376,
+	"lon": 7.3138701,
+	"tags": {
+		"natural": "cliff"
+	}
+},
+{
+	"type": "node",
+	"lat": 45.9601109,
+	"lon": 9.3680388,
+	"tags": {
+		"natural": "cliff"
+	}
+}
+  ]
+}

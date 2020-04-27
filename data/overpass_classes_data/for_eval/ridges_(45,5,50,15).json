@@ -1,0 +1,94 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.56.2 b688b00f",
+  "osm3s": {
+    "timestamp_osm_base": "2020-04-05T07:39:02Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "node",
+  "id": 2667085103,
+  "lat": 47.0993543,
+  "lon": 12.6417077,
+  "tags": {
+    "name": "Kastengrat",
+    "natural": "ridge"
+  }
+},
+{
+  "type": "node",
+  "id": 2667085163,
+  "lat": 47.0691908,
+  "lon": 12.6875703,
+  "tags": {
+    "name": "Stüdlgrat",
+    "natural": "ridge"
+  }
+},
+{
+  "type": "node",
+  "id": 2676984874,
+  "lat": 47.1072347,
+  "lon": 12.3253090,
+  "tags": {
+    "name": "Venediger Westgrat",
+    "natural": "ridge"
+  }
+},
+{
+  "type": "node",
+  "id": 2961399029,
+  "lat": 47.4438779,
+  "lon": 7.3600446,
+  "tags": {
+    "name": "Blauenberg",
+    "natural": "ridge",
+    "source": "cadastre-dgi-fr source : Direction Générale des Impôts - Cadastre. Mise à jour : 2014"
+  }
+},
+{
+  "type": "node",
+  "id": 3998053036,
+  "lat": 45.2668268,
+  "lon": 5.8144068,
+  "tags": {
+    "description": "ravin",
+    "natural": "ridge"
+  }
+},
+{
+  "type": "node",
+  "id": 3998054609,
+  "lat": 45.2713428,
+  "lon": 5.8194279,
+  "tags": {
+    "description": "ravin",
+    "natural": "ridge"
+  }
+},
+{
+  "type": "node",
+  "id": 4300008244,
+  "lat": 49.2494087,
+  "lon": 6.0780263,
+  "tags": {
+    "name": "Côte de Choque",
+    "natural": "ridge"
+  }
+},
+{
+  "type": "node",
+  "id": 6883775272,
+  "lat": 46.6813609,
+  "lon": 9.7920650,
+  "tags": {
+    "ele": "2309",
+    "name": "Nidellöffel",
+    "natural": "ridge"
+  }
+}
+
+  ]
+}
