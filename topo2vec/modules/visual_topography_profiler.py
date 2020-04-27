@@ -67,15 +67,27 @@ class TopoMap:
     A class for building a folium map containing th topography profiler data.
     '''
 
-    def __init__(self, polygon_of_interest: Polygon = None):
+    def __init__(self, polygon_of_interest: Polygon = None, draw_polygon = True):
         self.version = 0
         self.polygon_of_interest = polygon_of_interest
         if self.polygon_of_interest is not None:
             self.center = point_to_location(self.polygon_of_interest.centroid)[::-1]
         else:
             self.center = _get_working_polygon_center()
-
         self.init_basic_map()
+
+        if self.polygon_of_interest is not None and draw_polygon:
+            folium.GeoJson(self.polygon_of_interest).add_to(self.map)
+
+            #folium.vector_layers.Polygon([[point.y, point.x] for point in self.polygon_of_interest])
+
+    def get_all_available_classes(self) -> List[str]:
+        '''
+
+        Returns: all available classes for the classifier
+
+        '''
+        return tp.get_available_class_names()
 
     def get_folium_map(self):
         '''
@@ -93,8 +105,8 @@ class TopoMap:
         )
         self.map = geo_map
 
-    def add_points_with_text(self, points: List[Point], color: str = 'red', text: str = 'None', tooltip='Click me!'
-                                      ):
+    def add_points_with_text(self, points: List[Point], color: str = 'red',
+                             text: str = 'None', tooltip='Click me!'):
         '''
 
         Args:
@@ -111,8 +123,8 @@ class TopoMap:
             folium.Marker(point[::-1], popup=f'<i>{text}</i>', tooltip=tooltip,
                           icon=folium.Icon(color=color)).add_to(self.map)
 
-    def add_points_as_lists_with_text(self, points: List[List[int]], color: str = 'red', text: str = 'None', tooltip='Click me!'
-                             ):
+    def add_points_as_lists_with_text(self, points: List[List[int]], color: str = 'red',
+                                      text: str = 'None'):
         '''
 
         Args:
@@ -125,11 +137,11 @@ class TopoMap:
 
         '''
         for point in points:
-            folium.Marker(point[::-1], popup=f'<i>{text}</i>', tooltip=tooltip,
+            folium.Marker(point[::-1], popup=f'<i>{text}</i>',
                           icon=folium.Icon(color=color)).add_to(self.map)
 
     def add_points_with_images(self, points: List[Point], images: np.ndarray, color: str = 'red',
-                               resolution=100, tooltip = 'Click me!'):
+                               resolution=100, tooltip='Click me!'):
         '''
         add points with images.
         Args:

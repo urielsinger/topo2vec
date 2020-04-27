@@ -55,8 +55,8 @@ np.random.seed(FINAL_SEED)
 ################################################################################
 FINAL_MODEL_DIR = BASE_LOCATION + 'data/final_model'
 FINAL_HPARAMS = Classifier.get_args_parser().parse_args(
-    ['--total_dataset_size', '1000',
-     '--arch', 'AdvancedConvNetLatent',
+    ['--total_dataset_size', '2500',
+     '--arch', 'BasicConvNetLatent',
      '--name', 'final_model',
      '--pytorch_module', 'Classifier',
      '--latent_space_size', '35',
@@ -116,6 +116,15 @@ def get_features(points: List[Point], class_name: str = 'no_name') -> np.ndarray
     np_latent_features = np.concatenate(latent_features_list, axis=0)
 
     return np_latent_features
+
+
+def get_available_class_names() -> str:
+    '''
+
+    Returns: a string list of the available class names in the final model classifier
+
+    '''
+    return final_model_classifier.class_names
 
 
 def get_all_class_points_in_polygon(polygon: Polygon, meters_step: float, class_name: str) -> \
