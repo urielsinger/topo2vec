@@ -60,7 +60,7 @@ FINAL_HPARAMS = Classifier.get_args_parser().parse_args(
      '--name', 'final_model',
      '--pytorch_module', 'Classifier',
      '--latent_space_size', '35',
-     '--num_classes', '5',
+     '--num_classes', '4',
      ]
 )
 

@@ -1,5 +1,5 @@
 # define the container itself: all installations etc.
-FROM pytorch/pytorch:1.4-cuda10.1-cudnn7-runtime
+FROM pytorch/pytorch:latest
 
 # Set up environment and renderer user
 ENV TZ=UTC
@@ -8,10 +8,12 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 # Install useful commands
 RUN apt-get update
 RUN apt-get install software-properties-common -y
+RUN apt install -y curl
 
 # Install topo2vec environment
 WORKDIR /home/root
-RUN curl https://gist.githubusercontent.com/johnnyrunner/9c0ab0ffd24301ea2fcc5a377b9b9448/raw/886f1e5b39423a62f12660251c3a3d9ff83442ba/topo_envffile.yml > environment.yml
+RUN curl https://gist.githubusercontent.com/johnnyrunner/9c0ab0ffd24301ea2fcc5a377b9b9448/raw/35b9711ca7fbef899d7ba4e91312dcc2a2e2b37a/topo_envffile.yml > environment.yml
+RUN conda update -y -n base -c defaults conda
 RUN conda env create -f environment.yml
 RUN conda init bash
 
@@ -35,7 +37,7 @@ RUN /bin/bash -c "mkdir -p topo2vec"
 
 COPY . .
 
-EXPOSE 80 443
+EXPOSE 5522 80
 
 
 #run tensorboard in the right place

@@ -1,4 +1,4 @@
-name: topo2vec
+name: topo2vec2
 channels:
 - pytorch
 - conda-forge
@@ -9,7 +9,6 @@ dependencies:
 - pip
 
 # Web app / visualization
-- bokeh
 
 - pip:
     - numpy

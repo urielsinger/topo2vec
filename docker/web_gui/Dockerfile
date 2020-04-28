@@ -3,11 +3,23 @@ FROM base_anaconda
 
 USER root
 WORKDIR /home/root
-EXPOSE 5432
+
+EXPOSE 5432 22
+
+#configure ssh
+RUN apt-get update
+RUN apt-get install -y openssh-server gedit
+
+RUN echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config
+RUN echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
+RUN echo 'root:Docker!' | chpasswd
+
+RUN service ssh restart
+
 
 #run the bokeh server for using the GUI
-CMD ["bash", "/home/root/docker/web_gui/web_gui_startup.sh"]
-
+#CMD ["bash", "/home/root/docker/web_gui/web_gui_startup.sh"]
+CMD ["bash"]
 
 #run tensorboard in the right place
 

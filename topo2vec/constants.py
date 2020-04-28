@@ -2,9 +2,9 @@ from pathlib import Path
 BASE_LOCATION = '/home/topo2vec_kavitzky/topo2vec/'
 
 # run in background - the service for getting visualizations of lon, lats
-ELEVATION_BASE_DIR1 = BASE_LOCATION + 'data/elevation/45,5,50,15'
+ELEVATION_BASE_DIR1 = BASE_LOCATION + 'data/elevation/big_europe'
 
-MASK_BASE_DIR = BASE_LOCATION + 'data/elevation/45,5,50,15'
+MASK_BASE_DIR = BASE_LOCATION + 'data/elevation/big_europe'
 equatorial_circumference_of_earth = 40075016.686 #m
 from shapely.geometry import Polygon, Point
 

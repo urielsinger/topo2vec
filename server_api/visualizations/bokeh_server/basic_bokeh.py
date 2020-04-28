@@ -10,12 +10,10 @@ in your browser.
 import os
 
 import folium
-import numpy as np
 import time
 
 from bokeh.layouts import column, row
-from bokeh.models import ColumnDataSource, Slider, TextInput, Div, Select, Button, Text, Dropdown
-from bokeh.plotting import figure
+from bokeh.models import Slider, TextInput, Div, Select, Button
 from shapely.geometry import Polygon, Point
 
 import sys

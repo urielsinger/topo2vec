@@ -8,13 +8,13 @@ from topo2vec.constants import N45_50_E5_15_CLIFFS, N45_50_E5_15_RIVERS, N45_50_
 from pathlib import Path
 
 # run in background - the service for getting visualizations of lon, lats
-ELEVATION_BASE_DIR1 = BASE_LOCATION + 'data/elevation/45,5,50,15'
+ELEVATION_BASE_DIR1 = BASE_LOCATION + 'data/elevation/big_europe'
 ELEVATION_BASE_DIR2 = BASE_LOCATION + 'data/elevation'
 
 MASK_BASE_DIR = BASE_LOCATION + 'data/elevation/45,5,50,15'
-data_visualizer = DataFromFileHandler([ELEVATION_BASE_DIR1], [(5, 45, 15, 50), (10, -45, 20, -50)])
+data_visualizer = DataFromFileHandler([ELEVATION_BASE_DIR1], [(5, 45, 15, 50)])
 visualizer = data_visualizer
-mask_visualizer = DataFromFileHandler([MASK_BASE_DIR])
+#mask_visualizer = DataFromFileHandler([MASK_BASE_DIR])
 
 # True to use the large area in europe data
 # False for the certain place:

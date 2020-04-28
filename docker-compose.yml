@@ -1,10 +1,10 @@
 version: "3.8"
 services:
-  base_anaconda:
-    build:
-      context: "."
-      dockerfile: "Dockerfile"
-    image: 'base_anaconda'
+#  base_anaconda:
+#    build:
+#      context: "."
+#      dockerfile: "Dockerfile"
+#    image: 'base_anaconda'
 #  web_api:
 #    build:
 #      context: "docker/web_api"
@@ -21,3 +21,4 @@ services:
     image: 'web_gui'
     ports:
       - "5432:5432"
+      - "5522:22"
