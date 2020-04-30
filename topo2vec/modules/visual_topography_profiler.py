@@ -77,7 +77,14 @@ class TopoMap:
         self.init_basic_map()
 
         if self.polygon_of_interest is not None and draw_polygon:
-            folium.GeoJson(self.polygon_of_interest).add_to(self.map)
+            #draw points on the polygon
+            exterior = self.polygon_of_interest.exterior.coords.xy
+            lons = exterior[1]
+            lats = exterior[0]
+            for lon, lat in zip(lons, lats):
+                folium.Marker([lon, lat], icon=folium.Icon(color='orange', prefix='fa', icon='flag')).add_to(self.map)
+            # draw an actual polygon
+            # folium.GeoJson(self.polygon_of_interest).add_to(self.map)
 
             #folium.vector_layers.Polygon([[point.y, point.x] for point in self.polygon_of_interest])
 
@@ -157,6 +164,8 @@ class TopoMap:
         _, height, width = images.shape
         scale = 10
         for point, image in zip(points, images):
+            if type(point) is Point:
+                point = [point.x, point.y]
             html = '<img src="data:image/png;base64,{}">'.format
             encoded = self.get_encoded_image(image, resolution=resolution, scale=scale)
             iframe = IFrame(html(encoded), width=(width * scale) + 20, height=(height * scale) + 20)

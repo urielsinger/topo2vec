@@ -155,6 +155,19 @@ def convert_multi_radius_ndarray_to_printable(array: np.ndarray, dir = True) -> 
         printable_ndarray = array.transpose((0,1,3,2)).reshape(num_samples_in_dataset, -1, h).transpose((0,2,1))
     return printable_ndarray
 
+def convert_multi_radius_list_to_printable(images_list:List[np.ndarray], dir = True) -> np.ndarray:
+    '''
+
+    Args:
+        tensor: The tensor of the multi-radiii examples
+        with shape: (num_lines, len(radii), h, w)
+        dir = True -> vertically
+        dir = False -> horizontally
+
+    Returns: a vector of shape (num_lines, 1, len(radii)*h, w)
+
+    '''
+    return convert_multi_radius_ndarray_to_printable(np.stack(images_list), dir)
 
 def plot_confusion_matrix(cm: object,
                           target_names: object,

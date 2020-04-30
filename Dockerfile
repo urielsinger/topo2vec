@@ -17,6 +17,10 @@ RUN conda update -y -n base -c defaults conda
 RUN conda env create -f environment.yml
 RUN conda init bash
 
+#fix stuff about the usage of opencv
+RUN apt-get install -y libsm6 libxext6 libxrender-dev
+RUN pip install opencv-python
+
 # Init topo2vec environment
 ENV PATH /opt/conda/envs/topo2vec/bin:$PATH
 RUN /bin/bash -c "source activate topo2vec"

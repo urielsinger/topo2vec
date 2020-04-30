@@ -9,12 +9,19 @@ from pathlib import Path
 
 # run in background - the service for getting visualizations of lon, lats
 ELEVATION_BASE_DIR1 = BASE_LOCATION + 'data/elevation/big_europe'
-ELEVATION_BASE_DIR2 = BASE_LOCATION + 'data/elevation'
+ELEVATION_BASE_DIR2 = BASE_LOCATION + 'data/elevation/mid_east'
 
 MASK_BASE_DIR = BASE_LOCATION + 'data/elevation/45,5,50,15'
-data_visualizer = DataFromFileHandler([ELEVATION_BASE_DIR1], [(5, 45, 15, 50)])
+
+boxes = [(5, 45, 15, 50), (33, 30, 37, 32)]
+boxes = [(33, 30, 37, 32)]
+
+base_dirs = [ELEVATION_BASE_DIR1, ELEVATION_BASE_DIR2]
+base_dirs = [ELEVATION_BASE_DIR2]
+
+data_visualizer = DataFromFileHandler(base_dirs, boxes)
 visualizer = data_visualizer
-#mask_visualizer = DataFromFileHandler([MASK_BASE_DIR])
+# mask_visualizer = DataFromFileHandler([MASK_BASE_DIR])
 
 # True to use the large area in europe data
 # False for the certain place:
@@ -54,7 +61,6 @@ if LOAD_CLASSES_LARGE:
     CLASS_PATHS_SPECIAL = [str(join(SPECIAL_CLASSES_POINTS_FOLDER, f)) for f
                            in listdir(SPECIAL_CLASSES_POINTS_FOLDER)
                            if isfile(join(SPECIAL_CLASSES_POINTS_FOLDER, f))]
-
 
     CLASS_NAMES_SPECIAL = ['_'.join(f.split('_')[:-1]) for f
                            in listdir(SPECIAL_CLASSES_POINTS_FOLDER)

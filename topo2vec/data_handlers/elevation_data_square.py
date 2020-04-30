@@ -22,10 +22,13 @@ class ElevationDataSquare:
             this_lon_images = []
             for min_lat in range(self.min_lat, self.max_lat, 1):
                 #im_name = self.lon_lat_to_string(min_lon, min_lat) + '_AVE_DSM.tif'
-                im_name = 'ALPSMLC30_' + self.lon_lat_to_string(min_lon, min_lat) + '_DSM.tif'
-                print(im_name)
-                im = self.load_image(os.path.join(elevation_base_dir, im_name))
-                this_lon_images.append(im)
+                try:
+                    im_name = 'ALPSMLC30_' + self.lon_lat_to_string(min_lon, min_lat) + '_DSM.tif'
+                    print(im_name)
+                    im = self.load_image(os.path.join(elevation_base_dir, im_name))
+                    this_lon_images.append(im)
+                except:
+                    print(f'min lon: {min_lon}, min lat: {min_lat}, is not in the files in {elevation_base_dir}')
             this_lon_images = np.concatenate(list(reversed(this_lon_images)), axis=0)
             images.append(this_lon_images)
         self.im = np.concatenate(images, axis=1)

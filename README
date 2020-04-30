@@ -1,0 +1,12 @@
+
+initial setup of the project:
+1. put "BASE_FOLDER" in topo2vec/constants.
+2. docker-compose up --build -d
+
+For the bokeh server uploading:
+1. docker run -it --name bokeh_server -p 5522:22 -p 5432:5432 web_gui
+2. inside the bokeh server run "service ssh restart"
+
+3. in your local machine ssh & port forward:
+ssh -L 5432:127.0.0.1:5432 root@159.122.160.134
+4. browse 127.0.0.1:5432

@@ -4,7 +4,8 @@ FROM base_anaconda
 USER root
 WORKDIR /home/root
 
-EXPOSE 5432 22
+# expose for the bokeh server
+EXPOSE 5432
 
 #configure ssh
 RUN apt-get update
@@ -14,6 +15,7 @@ RUN echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config
 RUN echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
 RUN echo 'root:Docker!' | chpasswd
 
+RUN service ssh restart
 RUN service ssh restart
 
 

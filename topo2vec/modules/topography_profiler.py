@@ -27,6 +27,15 @@ default_working_polygon = Polygon([Point(5, 45), Point(5, 50), Point(10, 50),
                                    Point(10, 45), Point(5, 45)])
 
 
+def build_polygon(low_lon, low_lat, high_lon, high_lat):
+    poly = Polygon([Point(low_lon, low_lat), Point(low_lon, high_lat), Point(high_lon, high_lat),
+                    Point(high_lon, low_lat), Point(low_lon, low_lat)])
+    return poly
+
+
+another_polygon = build_polygon(34.7, 31.3, 34.9, 31.43)
+
+
 def set_working_polygon(polygon: Polygon):
     '''
     the working polygon is the polygon which is assumed to contain all the data the user wants
@@ -40,7 +49,7 @@ def set_working_polygon(polygon: Polygon):
     WORKING_POLYGON = polygon
 
 
-set_working_polygon(default_working_polygon)
+set_working_polygon(another_polygon)
 
 FINAL_SEED = 665
 

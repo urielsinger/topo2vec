@@ -1,5 +1,9 @@
 from pathlib import Path
-BASE_LOCATION = '/home/topo2vec_kavitzky/topo2vec/'
+
+#when on server itself
+#BASE_LOCATION = '/home/topo2vec_kavitzky/topo2vec/'
+#when inside the docker
+BASE_LOCATION = '/home/root/'
 
 # run in background - the service for getting visualizations of lon, lats
 ELEVATION_BASE_DIR1 = BASE_LOCATION + 'data/elevation/big_europe'
@@ -8,7 +12,6 @@ MASK_BASE_DIR = BASE_LOCATION + 'data/elevation/big_europe'
 equatorial_circumference_of_earth = 40075016.686 #m
 from shapely.geometry import Polygon, Point
 
-BASE_LOCATION = '/home/topo2vec_kavitzky/topo2vec/'
 N49_E05_STREAMS = BASE_LOCATION + 'data/N049E005/classes/streams.geojson'
 N49_E05_CLIFFS = BASE_LOCATION + 'data/N049E005/classes/cliffs.geojson'
 N49_E05_PEAKS = BASE_LOCATION + 'data/N049E005/classes/rivers.geojson'
@@ -58,4 +61,4 @@ NONE_STR = 'None'
 
 #server routes
 GET_CLASS_POINTS_ROUTE = '/get_class'
-GET_SIMILAR_POINTS_ROUTE =  '/get_similar'
+GET_SIMILAR_POINTS_ROUTE = '/get_similar'

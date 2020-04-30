@@ -10,14 +10,21 @@ in your browser.
 import os
 
 import folium
+import numpy as np
 import time
 
 from bokeh.layouts import column, row
-from bokeh.models import Slider, TextInput, Div, Select, Button
+from bokeh.models import ColumnDataSource, Slider, TextInput, Div, Select, Button, Text, Dropdown
+from bokeh.plotting import figure
 from shapely.geometry import Polygon, Point
 
 import sys
 from pathlib import Path
+
+from topo2vec import visualizer
+from topo2vec.common.visualizations import convert_multi_radius_ndarray_to_printable, \
+    convert_multi_radius_list_to_printable
+from topo2vec.modules import visual_topography_profiler
 
 my_path = os.path.abspath(__file__)
 parent_path = Path(my_path).parent.parent.parent.parent
@@ -25,26 +32,25 @@ sys.path.append(str(parent_path))
 
 from topo2vec.modules.visual_topography_profiler import TopoMap
 
-BASIC_POLYGON = Polygon([Point(5, 45.4), Point(5, 45.5), Point(5.3, 45.5),
-                         Point(5.3, 45.4), Point(5, 45.4)])
-
 points_inside = [Point(5.0658811, 45.0851164),
                  Point(5.058811, 45.01164)]
 
+WORKING_POLYGON = visual_topography_profiler._get_working_polygon()
+
 
 class BasicBokeh:
-    start_location = [5.05, 45.05]
+    start_location = visual_topography_profiler._get_working_polygon_center()
 
     def __init__(self):
         self.zoom = 12
-        self.center = self.start_location[::-1]
-        # Set up map
+        self.center = self.start_location
 
+        # Set up map
         lon_text = TextInput(value='', title='lon:')
         lat_text = TextInput(value='', title='lat:')
         self.lonlat_text_inputs = [lon_text, lat_text]
 
-        self.topo_map = TopoMap(BASIC_POLYGON)
+        self.topo_map = TopoMap(WORKING_POLYGON)
         self.folium_fig = self.bokeh_new_class_folium(lonlat_text_inputs=self.lonlat_text_inputs)
 
         # self.plot.line('x', 'y', source=self.source, line_width=3, line_alpha=0.6)
@@ -71,7 +77,8 @@ class BasicBokeh:
 
         # Set up layouts and add to document
         inputs = row(
-            column(Div(text='get similar points'), lon_text, lat_text, get_points_button, clean_all_buttun, clean_text_buttun),
+            column(Div(text='get similar points'), lon_text, lat_text, get_points_button, clean_all_buttun,
+                   clean_text_buttun),
             column(Div(text='get top points of class'), self.select, get_class_button),
             column(Div(text='search parameters'), self.meters_step, self.number_of_points_to_show))
         self.main_panel = row(inputs, self.folium_fig, width=800)
@@ -91,7 +98,6 @@ class BasicBokeh:
         os.makedirs(static_folder, exist_ok=True)
         file_name_hash = hash(f'{file_name}{time.time()}')
         file_name = f'{file_name_hash}.html'
-        # self.topo_map.add_all_class_points(BASIC_POLYGON, 500, 'peaks')
         filePath = os.path.join(static_folder, file_name)
 
         if os.path.exists(filePath):
@@ -106,7 +112,7 @@ class BasicBokeh:
                         ff = document.getElementById('{file_name_hash}');
                         popup = ff.contentWindow.document.getElementsByClassName('leaflet-popup-content')[0];
                         popup_text = popup.innerHTML
-                        if(popup_text.length==38){{
+                        if(popup_text.length==38||popup_text.length==39){{
                         popup_words = popup_text.split(' ')
                         longtitude = popup_words[2]
                         latitude = popup_words[1].split('<br>')[0]
@@ -136,12 +142,15 @@ class BasicBokeh:
         return fig
 
     def get_points_and_update(self):
-        self.topo_map = TopoMap(BASIC_POLYGON)
+        self.topo_map = TopoMap(WORKING_POLYGON)
         points_chosen = self.get_click_lonlat_points_list()
-        self.topo_map.add_similar_points(points_chosen, polygon=BASIC_POLYGON,
+        self.topo_map.add_similar_points(points_chosen, polygon=WORKING_POLYGON,
                                          meters_step=int(self.meters_step.value),
                                          n=int(self.number_of_points_to_show.value), color='red')
-        self.topo_map.add_points_with_text(points_chosen, color='green', text='chosen')
+        images, _ = visualizer.get_points_as_list_of_np_arrays(points_chosen, [8, 16, 24]) #TODO: change the const!!
+        points_images = convert_multi_radius_list_to_printable(images, dir=False)
+        self.topo_map.add_points_with_images(points_chosen, points_images, color='green')
+        # self.topo_map.add_points_with_text(points_chosen, color='green', text='chosen')
         fig = self.bokeh_new_class_folium(lonlat_text_inputs=self.lonlat_text_inputs)
         self.main_panel.children[-1] = fig
 
@@ -150,11 +159,11 @@ class BasicBokeh:
         # self.importance_and_val_column.children[-1] = importance_figure
 
     def get_points_and_update_for_class(self):
-        self.topo_map = TopoMap(BASIC_POLYGON)
+        self.topo_map = TopoMap(WORKING_POLYGON)
         class_chosen = self.select.value
-        self.topo_map.add_random_class_points(polygon=BASIC_POLYGON,
-                                           meters_step=int(self.meters_step.value), class_name=class_chosen,
-                                           color='red', max_num=int(self.number_of_points_to_show.value))
+        self.topo_map.add_random_class_points(polygon=WORKING_POLYGON,
+                                              meters_step=int(self.meters_step.value), class_name=class_chosen,
+                                              color='red', max_num=int(self.number_of_points_to_show.value))
 
         fig = self.bokeh_new_class_folium(lonlat_text_inputs=self.lonlat_text_inputs)
         self.main_panel.children[-1] = fig
@@ -164,7 +173,7 @@ class BasicBokeh:
         # self.importance_and_val_column.children[-1] = importance_figure
 
     def clean_all(self):
-        self.topo_map = TopoMap(BASIC_POLYGON)
+        self.topo_map = TopoMap(WORKING_POLYGON)
         fig = self.bokeh_new_class_folium(lonlat_text_inputs=self.lonlat_text_inputs)
         self.main_panel.children[-1] = fig
         self.lonlat_text_inputs[0].value = ''
