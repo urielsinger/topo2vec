@@ -1,18 +1,11 @@
 # define the container itself: all installations etc.
 FROM base_anaconda
 
-# Init coord2vec environment
-#RUN echo "conda activate coord2vec" >> ~/.basrhc
-#ENV PATH /opt/conda/envs/coord2vec/bin:$PATH
-#RUN /bin/bash -c "source activate coord2vec"
-#RUN conda init bash
-#RUN conda activate coord2vec
-#ENTRYPOINT ["/bin/bash"]
-#CMD ["bash"]
+RUN apt-get update
 CMD ["bash", "/home/root/docker/web_api/web_api_startup.sh"]
 
 
-EXPOSE 80 443
+EXPOSE 8765 6622
 
 
 #run tensorboard in the right place

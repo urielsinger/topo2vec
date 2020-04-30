@@ -28,20 +28,21 @@ RUN /bin/bash -c "source activate topo2vec"
 # Start running
 USER root
 WORKDIR /home/root
-# Init coord2vec environment
-#RUN echo "conda activate coord2vec" >> ~/.basrhc
-#ENV PATH /opt/conda/envs/coord2vec/bin:$PATH
-#RUN /bin/bash -c "source activate coord2vec"
-#RUN conda init bash
-#RUN conda activate coord2vec
-#ENTRYPOINT ["/bin/bash"]
-#CMD ["bash"]
 
 RUN /bin/bash -c "mkdir -p topo2vec"
 
 COPY . .
 
-EXPOSE 5522 80
+EXPOSE 80
+
+#configure ssh
+RUN apt-get update
+RUN apt-get install -y openssh-server gedit gnome-terminal
+
+RUN echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config
+RUN echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
+RUN echo 'root:Docker!' | chpasswd
+
 
 
 #run tensorboard in the right place

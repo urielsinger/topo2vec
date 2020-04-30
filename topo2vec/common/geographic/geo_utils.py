@@ -17,6 +17,7 @@ from tqdm import tqdm
 import geopandas as gpd
 
 
+
 def check_if_point_in_polygon(point:Point, polygon: Polygon) -> bool:
     '''
     Returns True iff the point is in range (roughly)
