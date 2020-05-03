@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
+
+echo 'starting'
 service ssh restart
-bash /opt/conda/etc/profile.d/conda.sh init
-cd /home/root/server_api/visualizations
-bash conda activate topo2vec && conda info
-bokeh serve bokeh_server --port=6543 --address=0.0.0.0 --allow-websocket-origin=127.0.0.1:6543
+service ssh restart
+
+#cd /home/root/server_api/visualizations
+echo 'starting bokeh'
+#bokeh serve bokeh_server --port=8765 --address=0.0.0.0 --allow-websocket-origin=127.0.0.1:8765 --allow-websocket-origin=159.122.160.130:8765
+/opt/conda/envs/topo2vec/bin/bokeh serve /home/root/server_api/visualizations/bokeh_server \
+        --port=8765 --address=0.0.0.0 --allow-websocket-origin=159.122.160.134:8765  --allow-websocket-origin=127.0.0.1:8765

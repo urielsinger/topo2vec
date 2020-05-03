@@ -23,7 +23,6 @@ def get_class_points(polygon, meters_step, class_name):
                     'class_name': class_name}
     url = f'{ADDRESS}/get_class'
     response = requests.post(url=url, json=request_dict)
-    print(response)
     json_dictionary_in = response.json()
     class_points_jsoned = json_dictionary_in['class_points']
     class_patches_jsoned = json_dictionary_in['class_patches']
@@ -32,17 +31,29 @@ def get_class_points(polygon, meters_step, class_name):
     return np.array(class_points), np.array(class_patches)
 
 def get_top_n_similar_points_in_polygon(points, n, polygon, meters_step):
-    request_dict = {'points': json.dumps(points_list_to_floats_list(points)),
+    points_to_send = json.dumps(points_list_to_floats_list(points))
+    request_dict = {'points': points_to_send,
                     'polygon': polygon.wkt,
                     'meters_step': meters_step,
                     'n': n}
     url = f'{ADDRESS}/get_similar'
     response = requests.post(url=url, json=request_dict)
-    print(response)
     json_dictionary_in = response.json()
     class_points_jsoned = json_dictionary_in['class_points']
     class_patches_jsoned = json_dictionary_in['class_patches']
     class_points = json.loads(class_points_jsoned)
     class_patches = json.loads(class_patches_jsoned)
     return np.array(class_points), np.array(class_patches)
+
+def get_latent_for_points(points):
+    points_to_send = json.dumps(points_list_to_floats_list(points))
+    request_dict = {'points': points_to_send}
+    url = f'{ADDRESS}/get_features'
+    response = requests.post(url=url, json=request_dict)
+    json_dictionary_in = response.json()
+    features_jsoned = json_dictionary_in['features']
+    points_jsoned = json_dictionary_in['points']
+    features = json.loads(features_jsoned)
+    points = json.loads(points_jsoned)
+    return np.array(points), np.array(features)
 

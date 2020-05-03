@@ -36,6 +36,12 @@ def points_list_to_floats_list(points_list):
         floats_list.append(point.y)
     return floats_list
 
+def points_list_to_lists_list(points_list):
+    lists_list = []
+    for point in points_list:
+        lists_list.append([point.x, point.y])
+    return lists_list
+
 
 def floats_list_to_points_list_till_size(floats_list: object, size: int) -> object:
     assert len(floats_list) % 2 == 0

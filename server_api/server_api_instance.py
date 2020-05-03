@@ -8,7 +8,7 @@ import sys
 from flask import Flask, request
 from pathlib import Path
 
-from topo2vec.common.other_scripts import floats_list_to_points_list
+from topo2vec.common.other_scripts import floats_list_to_points_list, points_list_to_lists_list
 from topo2vec.constants import GET_SIMILAR_POINTS_ROUTE
 
 my_path = os.path.abspath(__file__)
@@ -45,22 +45,37 @@ def get_top_n_similar_points_in_polygon():
         polygon = shapely.wkt.loads(json_dictionary_in['polygon'])
         meters_step = int(json_dictionary_in['meters_step'])
         n = int(json_dictionary_in['n'])
-        points_list = floats_list_to_points_list(json_dictionary_in['points'])
-        points = json.loads(points_list)
-        class_points, class_patches = tp.get_top_n_similar_points_in_polygon(points, n, polygon, meters_step)
-        class_points_jsoned = json.dumps(class_points.tolist())
-        class_patches_jsoned = json.dumps(class_patches.tolist())
+        points_got = json.loads(json_dictionary_in['points'])
+        points = floats_list_to_points_list(points_got)
+        class_patches, class_points = tp.get_top_n_similar_points_in_polygon(points, n, polygon, meters_step)
+        class_points_jsoned = json.dumps(points_list_to_lists_list(class_points))
+        class_patches_jsoned = json.dumps(class_patches.numpy().tolist())
         json_dictionary_out = {
             'class_points': class_points_jsoned,
             'class_patches': class_patches_jsoned
         }
         data = json.dumps(json_dictionary_out)
-    return data
+        return data
+    return None
 
 
-@app.route('/get_latent', methods=['POST'])
-def hello_world():
-    return 'Hello World!'
+@app.route('/get_features', methods=['POST'])
+def get_features():
+    if request.is_json:
+        json_dictionary_in = request.get_json()
+        points_got = json.loads(json_dictionary_in['points'])
+        points = floats_list_to_points_list(points_got)
+        features_np = tp.get_features(points)
+        features_jsoned = json.dumps(features_np.tolist())
+        points_as_list_lists_jsoned = json.dumps(points_list_to_lists_list(points))
+
+        json_dictionary_out = {
+            'features': features_jsoned,
+            'points': points_as_list_lists_jsoned
+        }
+        data = json.dumps(json_dictionary_out)
+        return data
+    return None
 
 
 if __name__ == '__main__':
