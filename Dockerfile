@@ -37,7 +37,7 @@ EXPOSE 80
 
 #configure ssh
 RUN apt-get update
-RUN apt-get install -y openssh-server gedit gnome-terminal
+RUN apt-get install -y openssh-server gedit gnome-terminal tmux
 
 RUN echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config
 RUN echo "PermitRootLogin yes" >> /etc/ssh/sshd_config

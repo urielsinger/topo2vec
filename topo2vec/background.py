@@ -14,10 +14,10 @@ ELEVATION_BASE_DIR2 = BASE_LOCATION + 'data/elevation/mid_east'
 MASK_BASE_DIR = BASE_LOCATION + 'data/elevation/45,5,50,15'
 
 boxes = [(5, 45, 15, 50), (33, 30, 37, 32)]
-boxes = [(33, 30, 37, 32)]
+#boxes = [(33, 30, 37, 32)]
 
 base_dirs = [ELEVATION_BASE_DIR1, ELEVATION_BASE_DIR2]
-base_dirs = [ELEVATION_BASE_DIR2]
+#base_dirs = [ELEVATION_BASE_DIR2]
 
 data_visualizer = DataFromFileHandler(base_dirs, boxes)
 visualizer = data_visualizer

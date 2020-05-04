@@ -78,5 +78,27 @@ def get_features():
     return None
 
 
+@app.route('/get_working_polygon', methods=['POST', 'GET'])
+def get_working_polygon():
+    polygon = tp.get_working_polygon()
+    polygon_wkt = polygon.wkt
+    json_dictionary_out = {
+        'polygon': polygon_wkt
+    }
+    data = json.dumps(json_dictionary_out)
+    return data
+
+
+@app.route('/get_available_class_names', methods=['POST', 'GET'])
+def get_available_class_names():
+    class_names = tp.get_available_class_names()
+    class_names_jsoned = json.dumps(class_names)
+    json_dictionary_out = {
+        'class_names': class_names_jsoned
+    }
+    data = json.dumps(json_dictionary_out)
+    return data
+
+
 if __name__ == '__main__':
     app.run()

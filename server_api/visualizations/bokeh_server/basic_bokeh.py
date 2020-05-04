@@ -10,38 +10,39 @@ in your browser.
 import os
 
 import folium
-import numpy as np
 import time
 
 from bokeh.layouts import column, row
 from bokeh.models import ColumnDataSource, Slider, TextInput, Div, Select, Button, Text, Dropdown
-from bokeh.plotting import figure
 from shapely.geometry import Polygon, Point
 
 import sys
 from pathlib import Path
 
 from topo2vec import visualizer
-from topo2vec.common.visualizations import convert_multi_radius_ndarray_to_printable, \
-    convert_multi_radius_list_to_printable
+
+from topo2vec.common.visualizations import convert_multi_radius_list_to_printable
 from topo2vec.modules import visual_topography_profiler
 
 my_path = os.path.abspath(__file__)
 parent_path = Path(my_path).parent.parent.parent.parent
 sys.path.append(str(parent_path))
 
+print('asfd')
 from topo2vec.modules.visual_topography_profiler import TopoMap
 
 points_inside = [Point(5.0658811, 45.0851164),
                  Point(5.058811, 45.01164)]
 
 WORKING_POLYGON = visual_topography_profiler._get_working_polygon()
+print('adsfasdf')
 
 
 class BasicBokeh:
     start_location = visual_topography_profiler._get_working_polygon_center()
 
     def __init__(self):
+        print('alalal')
         self.zoom = 12
         self.center = self.start_location
 

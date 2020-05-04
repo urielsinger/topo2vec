@@ -200,6 +200,9 @@ def get_top_n_similar_points_in_polygon(points: List[Point], n: int, polygon: Po
 
     return closest_images_list_latent_space[0], closest_points_list_latent_space[0]
 
+
+def get_working_polygon():
+    return WORKING_POLYGON
 # polygon_to_search_in = Polygon([Point(5, 45), Point(5, 45.1), Point(5.1, 45.1),
 #                                 Point(5.1, 45.1), Point(5, 45)])
 #

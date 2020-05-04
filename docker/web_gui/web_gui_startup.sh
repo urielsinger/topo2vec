@@ -5,7 +5,7 @@ service ssh restart
 service ssh restart
 
 #cd /home/root/server_api/visualizations
-echo 'starting bokeh'
+echo 'starting bokeh in port '$1
 #bokeh serve bokeh_server --port=8765 --address=0.0.0.0 --allow-websocket-origin=127.0.0.1:8765 --allow-websocket-origin=159.122.160.130:8765
 /opt/conda/envs/topo2vec/bin/bokeh serve /home/root/server_api/visualizations/bokeh_server \
-        --port=8765 --address=0.0.0.0 --allow-websocket-origin=159.122.160.134:8765  --allow-websocket-origin=127.0.0.1:8765
+        --port=$1 --address=0.0.0.0 --allow-websocket-origin=159.122.160.134:$1  --allow-websocket-origin=127.0.0.1:$1

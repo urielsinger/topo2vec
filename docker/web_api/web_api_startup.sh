@@ -3,12 +3,10 @@ service ssh restart
 service ssh restart
 #run flask
 export FLASK_APP=server_api_instance.py
-#gnome-terminal --tab -- 'flask run --port=8765 --address=0.0.0.0'
-/opt/conda/envs/topo2vec/bin/flask run --port=6543 --host=0.0.0.0
-
-#cd /home/root/scripts
 #run tensorboard
-#gnome-terminal -- 'tensorboard.sh 7777'
+#tmux new-session 'cd /home/root/scripts && tensorboard.sh 7777'
+
+/opt/conda/envs/topo2vec/bin/flask run --port=$1 --host=0.0.0.0
 
 #run jupyter
 #gnome-terminal -- 'jupyter.sh 8888'

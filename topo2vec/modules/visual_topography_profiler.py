@@ -2,10 +2,11 @@ from typing import List
 
 from shapely.geometry import Point, Polygon
 
-import topo2vec.modules.topography_profiler as tp
 import folium
 import base64
 import matplotlib
+
+from server_api.client import client_lib
 
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -42,7 +43,7 @@ def _get_working_polygon():
     Returns:
 
     '''
-    return tp.WORKING_POLYGON
+    return client_lib.get_working_polygon()
 
 
 def point_to_location(point: Point) -> List:
@@ -58,6 +59,7 @@ def point_to_location(point: Point) -> List:
 
 
 def _get_working_polygon_center():
+    print('asdfa')
     center_point = _get_working_polygon().centroid
     return point_to_location(center_point)[::-1]
 
@@ -94,7 +96,7 @@ class TopoMap:
         Returns: all available classes for the classifier
 
         '''
-        return tp.get_available_class_names()
+        return client_lib.get_available_class_names()
 
     def get_folium_map(self):
         '''
@@ -204,7 +206,7 @@ class TopoMap:
         Returns:
 
         '''
-        points_used, np_points_patches_used = tp.get_all_class_points_in_polygon(polygon, meters_step, class_name)
+        points_used, np_points_patches_used = client_lib.get_all_class_points_in_polygon(polygon, meters_step, class_name)
         np_points_patches_used = convert_multi_radius_ndarray_to_printable(np_points_patches_used, dir=False)
         self.add_points_with_images(points_used, np_points_patches_used, color)
 
@@ -221,9 +223,7 @@ class TopoMap:
         Returns:
 
         '''
-        closest_images, closest_points = tp.get_top_n_similar_points_in_polygon(points, n, polygon, meters_step)
-        closest_images = closest_images.numpy()
-        closest_points = [point_to_location(point) for point in closest_points]
+        closest_points, closest_images = client_lib.get_top_n_similar_points_in_polygon(points, n, polygon, meters_step)
         closest_images = convert_multi_radius_ndarray_to_printable(closest_images, dir=False)
         self.add_points_with_images(closest_points, closest_images, color)
 
@@ -241,7 +241,7 @@ class TopoMap:
         Returns:
 
         '''
-        np_points_used, np_points_patches_used = tp.get_all_class_points_in_polygon(polygon, meters_step, class_name)
+        np_points_used, np_points_patches_used = client_lib.get_all_class_points_in_polygon(polygon, meters_step, class_name)
         assert len(np_points_used) == len(np_points_patches_used)
         picked_indices = np.random.choice(list(range(len(np_points_used))), max_num)
         points_used_picked = np_points_used[picked_indices]

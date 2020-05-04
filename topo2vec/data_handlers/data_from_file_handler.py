@@ -18,10 +18,7 @@ class DataFromFileHandler(DataHandler):
         super().__init__()
         self.elevation_data_squares = {}
         for base_dir, bounding_box in zip(elevation_base_dirs, bounding_boxs):
-            print('why' +str(base_dir))
             self.elevation_data_squares[str(bounding_box)] = ElevationDataSquare(base_dir, bounding_box)
-            print('hi')
-
 
 
     def get_points_as_np_array(self, center_points: List[Point], radii: List[int]) -> np.ndarray:

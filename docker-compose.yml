@@ -5,21 +5,23 @@ services:
       context: "."
       dockerfile: "Dockerfile"
     image: 'base_anaconda'
-  web_api:
+  web_api2:
     build:
       context: "docker/web_api"
       dockerfile: "Dockerfile"
+    env_file: .env
     image: 'web_api'
     ports:
-      - "6543:6543"
-      - "8888:8888"
-      - "7777:7777"
-      - "7722:22"
-  web_gui:
+      - "${FLASK_PORT}:${FLASK_PORT}"
+      - "${API_SSH_PORT}:22"
+
+  web_gui2:
     build:
       context: "docker/web_gui"
       dockerfile: "Dockerfile"
+    env_file: .env
     image: 'web_gui'
     ports:
-      - "8765:8765"
-      - "6622:22"
+      - "${BOKEH_PORT}:${BOKEH_PORT}"
+      - "${GUI_SSH_PORT}:22"
+

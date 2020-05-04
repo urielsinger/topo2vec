@@ -1,9 +1,9 @@
 from pathlib import Path
 
 #when on server itself
-#BASE_LOCATION = '/home/topo2vec_kavitzky/topo2vec/'
+BASE_LOCATION = '/home/topo2vec_kavitzky/topo2vec/'
 #when inside the docker
-BASE_LOCATION = '/home/root/'
+#BASE_LOCATION = '/home/root/'
 
 # run in background - the service for getting visualizations of lon, lats
 ELEVATION_BASE_DIR1 = BASE_LOCATION + 'data/elevation/big_europe'

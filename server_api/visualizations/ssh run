@@ -1,3 +1,0 @@
-ssh -L 5010:127.0.0.1:5010 root@159.122.160.134
-
-bokeh serve bokeh_server --port=5007 --address=0.0.0.0 --allow-websocket-origin=127.0.0.1:5007

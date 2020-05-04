@@ -80,11 +80,11 @@ class Classifier(LightningModule):
         return DataLoader(self.train_dataset, shuffle=True, num_workers=0, batch_size=64)
 
     def val_dataloader(self):
-        return DataLoader(self.validation_dataset, shuffle=True, num_workers=0, batch_size=64)
+        return DataLoader(self.validation_dataset, shuffle=False, num_workers=0, batch_size=64)
 
     def test_dataloader(self):
         if self.test_dataset is not None:
-            return DataLoader(self.test_dataset, shuffle=True, num_workers=0, batch_size=16)
+            return DataLoader(self.test_dataset, shuffle=False, num_workers=0, batch_size=16)
 
     def training_step(self, batch: Tensor, batch_idx: int) -> Dict:
         x, y = batch
@@ -190,6 +190,7 @@ class Classifier(LightningModule):
             if 'test_acc' in basic_dict['log']:
                 self.final_test_accuracy = basic_dict['log']['test_acc']
 
+            #TODO: put svm outside
             svm_classifier_ordinary_classes_test_log_dict = self._svm_classifier_test(CLASS_PATHS, CLASS_NAMES,
                                                                                       'ordinary', self.test_dataset,
                                                                                       self.hparams.random_set_size_for_svm)
@@ -336,7 +337,7 @@ class Classifier(LightningModule):
         parser.add_argument('--size_test', type=int, default=55)
         parser.add_argument('--knn_method_for_typical_choosing', type=str, default='group_from_file',
                             help='"regular" or "group_from_file"')
-        parser.add_argument('--special_classes_for_validation', type=str, default='["alpine_huts", "power_towers"]',
+        parser.add_argument('--special_classes_for_validation', type=str, default='["alpine_huts", "waterfalls"]',
                             help='"regular" or "group_from_file"')
         parser.add_argument('--test_set_size_for_svm', type=int, default=100,
                             help='"regular" or "group_from_file"')

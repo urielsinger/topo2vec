@@ -4,25 +4,6 @@ from topo2vec.modules import Classifier
 
 classifier_parser = Classifier.get_args_parser()
 
-classifier_check_args = classifier_parser.parse_args(['--save_model',
-                                                      '--learning_rate', '1e-4',
-                                                      '--max_epochs', '1',
-                                                      '--total_dataset_size', '100',
-                                                      '--arch', 'BasicConvNetLatent',
-                                                      '--svm_classify_latent_space',
-                                                      '--name', 'classifier',
-                                                      '--pytorch_module', 'Classifier',
-                                                      '--random_set_size_for_svm', '100',
-                                                      '--test_set_size_for_svm', '38',
-                                                      '--random_set_size', '100',
-                                                      '--latent_space_size', '50',
-                                                      '--knn_method_for_typical_choosing', 'group_from_file',
-                                                      '--random_set_size_for_svm_special', '1000',
-                                                      '--test_knn',
-                                                      '--svm_classify_latent_space',
-                                                      '--save_to_final',
-                                                      ])
-
 if not LOAD_CLASSES_LARGE:
     classifier_regular_args = classifier_parser.parse_args(['--save_model',
                                                             '--learning_rate', '1e-2',
