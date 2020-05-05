@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from topo2vec.common.other_scripts import str_to_int_list
+from common.list_conversions_utils import str_to_int_list
 
 __all__ = ['BasicAmphibAutoencoder']
 

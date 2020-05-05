@@ -1,24 +1,28 @@
 version: "3.8"
 services:
-  base_anaconda:
+#  base_anaconda:
+#    build:
+#      context: "."
+#      dockerfile: "Dockerfile"
+#    image: 'base_anaconda'
+  web_api4:
     build:
-      context: "."
+      context: "api_server"
       dockerfile: "Dockerfile"
-    image: 'base_anaconda'
-  web_api2:
-    build:
-      context: "docker/web_api"
-      dockerfile: "Dockerfile"
+    volumes:
+      - .:/home/root/.
     env_file: .env
     image: 'web_api'
     ports:
       - "${FLASK_PORT}:${FLASK_PORT}"
       - "${API_SSH_PORT}:22"
 
-  web_gui2:
+  web_gui4:
     build:
-      context: "docker/web_gui"
+      context: "gui_server"
       dockerfile: "Dockerfile"
+    volumes:
+      - .:/home/root/.
     env_file: .env
     image: 'web_gui'
     ports:

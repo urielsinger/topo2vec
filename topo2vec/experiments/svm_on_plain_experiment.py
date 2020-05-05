@@ -2,8 +2,7 @@ from sklearn import svm
 from sklearn.metrics import accuracy_score
 
 from topo2vec.background import TRAIN_HALF, CLASS_PATHS, CLASS_NAMES, VALIDATION_HALF, CLASS_PATHS_TEST
-from topo2vec.common import visualizations
-from topo2vec.common.other_scripts import get_dataset_as_tensor
+from common.pytorch.pytorch_lightning_utilities import get_dataset_as_tensor
 from topo2vec.datasets.several_classes_datasets import SeveralClassesDataset
 
 radii = [8, 16, 24]

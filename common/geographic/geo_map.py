@@ -12,8 +12,8 @@ from pandas import DataFrame
 from shapely import wkt
 from shapely.wkt import loads
 
-from topo2vec.common.geographic.folium_extensions import NoClickGeoJson
-from topo2vec.common.geographic.geo_utils import geoms2bbox, geom2image_projection, meters2degrees
+from common.geographic import NoClickGeoJson
+from common.geographic import geoms2bbox, geom2image_projection, meters2degrees
 
 
 @cached(cache=LRUCache(maxsize=256), key=lambda *a: hash(hash(tuple(p)) for p in a))

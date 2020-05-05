@@ -8,14 +8,13 @@ from bokeh.io import curdoc
 from pathlib import Path
 
 my_path = os.path.abspath(__file__)
-parent_path = Path(my_path).parent.parent.parent.parent
+parent_path = Path(my_path).parent.parent.parent
 sys.path.append(str(parent_path))
 
-from server_api.visualizations.bokeh_server.basic_bokeh import BasicBokeh
+from gui_server.bokeh_server.basic_bokeh import BasicBokeh
 
 
 def main():
-    print('papapa')
     random.seed(42)
     numpy.random.seed(42)
     task = None

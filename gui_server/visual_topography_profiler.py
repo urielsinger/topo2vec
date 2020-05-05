@@ -6,7 +6,7 @@ import folium
 import base64
 import matplotlib
 
-from server_api.client import client_lib
+from api_client import client_lib
 
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from folium import IFrame
 
-from topo2vec.common.visualizations import convert_multi_radius_ndarray_to_printable
+from common.pytorch.visualizations import convert_multi_radius_ndarray_to_printable
 
 FOLIUM_COLORS = [
     'red',
@@ -59,7 +59,6 @@ def point_to_location(point: Point) -> List:
 
 
 def _get_working_polygon_center():
-    print('asdfa')
     center_point = _get_working_polygon().centroid
     return point_to_location(center_point)[::-1]
 

@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from topo2vec.common.other_scripts import points_list_to_floats_list, floats_list_to_points_list
+from common.list_conversions_utils import points_list_to_floats_list, floats_list_to_points_list
 
 
 class TestFloats_list_to_points_list(TestCase):

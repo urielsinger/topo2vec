@@ -8,7 +8,7 @@ import pytorch_lightning as pl
 from torch.backends import cudnn
 
 from topo2vec import modules
-from topo2vec.common.other_scripts import str_to_int_list
+from common.list_conversions_utils import str_to_int_list
 from topo2vec.constants import LOGS_PATH, FINAL_MODEL_DIR
 from topo2vec.modules.knearestneighbourstester import KNearestNeighboursTester
 

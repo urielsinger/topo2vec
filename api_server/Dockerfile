@@ -3,7 +3,7 @@ FROM base_anaconda
 ENV FLASK_PORT 6543
 EXPOSE ${FLASK_PORT} 6622
 RUN echo 'building with port' ${FLASK_PORT}
-ENTRYPOINT bash /home/root/docker/web_api/web_api_startup.sh ${FLASK_PORT}
+ENTRYPOINT bash /home/root/api_server/web_api_startup.sh ${FLASK_PORT}
 #run tensorboard in the right place
 
 #run jupyter notebook in the right place

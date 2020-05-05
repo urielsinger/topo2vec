@@ -2,15 +2,13 @@ from typing import List
 
 import torch
 import torchvision
-from shapely.geometry import Polygon
 from sklearn.neighbors import NearestNeighbors
 from torch import Tensor
 from torch.utils.data import ConcatDataset
 
 from topo2vec.background import VALIDATION_HALF, POINT_TO_SEARCH_SIMILAR
-from topo2vec.common.other_scripts import get_dataset_as_tensor
-from topo2vec.common.visualizations import get_grid_sample_images_at_indexes, \
-    convert_multi_radius_tensor_to_printable, get_grid_sample_images
+from common.pytorch.pytorch_lightning_utilities import get_dataset_as_tensor
+from common.pytorch.visualizations import convert_multi_radius_tensor_to_printable, get_grid_sample_images
 from topo2vec.constants import GROUP_TO_SEARCH_SIMILAR_LONGS_LARGE
 from topo2vec.datasets.class_dataset import ClassDataset
 from topo2vec.datasets.random_dataset import RandomDataset

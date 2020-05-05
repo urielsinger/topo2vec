@@ -2,8 +2,8 @@ from unittest import TestCase
 
 from shapely.geometry import Point, Polygon
 
-from topo2vec.constants import N49_E05_RIVERS, N45_50_E5_15_PEAKS
-from topo2vec.common.geographic.geo_utils import check_if_point_in_polygon
+from topo2vec.constants import N45_50_E5_15_PEAKS
+from common.geographic.geo_utils import check_if_point_in_polygon
 from topo2vec.datasets.class_dataset import ClassDataset
 
 

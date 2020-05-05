@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from shapely.geometry import Point
 
-from server_api.client.client_lib import get_latent_for_points
+from api_client.client_lib import get_latent_for_points
 
 
 class TestGet_latent_for_points(TestCase):

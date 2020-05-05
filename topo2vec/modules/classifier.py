@@ -15,9 +15,10 @@ from torch.utils.data import DataLoader, Dataset
 import topo2vec.models as models
 from topo2vec.background import TRAIN_HALF, VALIDATION_HALF, CLASS_PATHS, CLASS_NAMES, LOAD_CLASSES_LARGE, \
     CLASS_PATHS_TEST, CLASS_NAMES_TEST, CLASS_NAMES_SPECIAL, CLASS_PATHS_SPECIAL
-from topo2vec.common.other_scripts import str_to_int_list, get_random_part_of_dataset, get_dataset_as_tensor, \
-    get_paths_and_names_wanted, svm_accuracy_on_dataset_in_latent_space
-from topo2vec.common.visualizations import convert_multi_radius_tensor_to_printable, get_grid_sample_images_at_indexes, \
+from topo2vec.helper_functions import get_paths_and_names_wanted, svm_accuracy_on_dataset_in_latent_space
+from common.pytorch.pytorch_lightning_utilities import get_dataset_as_tensor, get_random_part_of_dataset
+from common.list_conversions_utils import str_to_int_list
+from common.pytorch.visualizations import convert_multi_radius_tensor_to_printable, get_grid_sample_images_at_indexes, \
     plot_to_image, plot_confusion_matrix
 from topo2vec.constants import SAVE_PATH, GROUP_TO_SEARCH_SIMILAR_LONGS_LARGE, LOGS_PATH
 from topo2vec.datasets.several_classes_datasets import SeveralClassesDataset

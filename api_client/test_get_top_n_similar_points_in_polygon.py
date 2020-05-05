@@ -2,8 +2,8 @@ from unittest import TestCase
 
 from shapely.geometry import Point
 
-from server_api.client import client_lib
-from server_api.client.client_lib import get_top_n_similar_points_in_polygon
+from api_client import client_lib
+from api_client.client_lib import get_top_n_similar_points_in_polygon
 
 
 class TestGet_top_n_similar_points_in_polygon(TestCase):

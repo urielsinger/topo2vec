@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from shapely.geometry import Polygon
 
-from server_api.client.client_lib import get_working_polygon
+from api_client.client_lib import get_working_polygon
 
 
 class TestGet_working_polygon(TestCase):

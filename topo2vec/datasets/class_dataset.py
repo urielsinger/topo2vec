@@ -5,8 +5,9 @@ from typing import List, Tuple
 from torch import tensor
 
 from topo2vec.background import classes_data_handlers
-from topo2vec.common.other_scripts import floats_list_to_points_list, load_list_from_file, \
-    save_list_to_file, points_list_to_floats_list, full_path_name_to_full_path
+from topo2vec.helper_functions import full_path_name_to_full_path
+from common.list_conversions_utils import points_list_to_floats_list, floats_list_to_points_list, load_list_from_file, \
+    save_list_to_file
 from topo2vec.constants import CACHE_BASE_DIR
 from topo2vec.data_handlers.classes_data_file_handler import ClassesDataFileHadler
 from topo2vec.datasets.multi_radius_dataset import MultiRadiusDataset

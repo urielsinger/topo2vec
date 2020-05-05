@@ -4,12 +4,13 @@ from shapely.geometry import Point, Polygon
 from torch import Tensor
 from torch.utils.data import Dataset
 
-from topo2vec import visualizer
+from visualization_server import visualizer
 import numpy as np
 
-from topo2vec.common.geographic.geo_utils import check_if_point_in_polygon
-from topo2vec.common.other_scripts import load_list_from_file, save_list_to_file, \
-    points_list_to_floats_list, floats_list_to_points_list, full_path_name_to_full_path
+from common.geographic.geo_utils import check_if_point_in_polygon
+from topo2vec.helper_functions import full_path_name_to_full_path
+from common.list_conversions_utils import points_list_to_floats_list, floats_list_to_points_list, load_list_from_file, \
+    save_list_to_file
 
 
 class MultiRadiusDataset(Dataset):

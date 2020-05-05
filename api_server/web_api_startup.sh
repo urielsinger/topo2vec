@@ -1,4 +1,4 @@
-cd /home/root/server_api/
+cd /home/root/api_server/
 service ssh restart
 service ssh restart
 #run flask

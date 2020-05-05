@@ -3,10 +3,10 @@ from typing import Dict
 import torchvision
 from torch import Tensor
 
-from topo2vec.background import TRAIN_HALF, VALIDATION_HALF, LOAD_CLASSES_LARGE, CLASS_NAMES, CLASS_PATHS_TEST, \
+from topo2vec.background import TRAIN_HALF, VALIDATION_HALF, LOAD_CLASSES_LARGE, CLASS_PATHS_TEST, \
     CLASS_NAMES_TEST
-from topo2vec.common.other_scripts import get_random_part_of_dataset
-from topo2vec.common.visualizations import convert_multi_radius_tensor_to_printable
+from common.pytorch.pytorch_lightning_utilities import get_random_part_of_dataset
+from common.pytorch.visualizations import convert_multi_radius_tensor_to_printable
 from topo2vec.datasets.random_dataset import RandomDataset
 from topo2vec.datasets.several_classes_datasets import SeveralClassesDataset
 from topo2vec.modules.classifier import Classifier

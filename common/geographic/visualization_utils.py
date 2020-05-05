@@ -13,8 +13,7 @@ from shapely.wkt import loads
 import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
 
-from topo2vec.common.geographic.folium_extensions import TimeSliderPolygonHeatmap, TimeSliderDynamicMap
-from topo2vec.common.geographic.geo_utils import meters2degrees
+from common.geographic import meters2degrees
 
 VIS_AGG_TIME = 'VIS_AGG_TIME'
 VIS_GEO_SHP = 'VIS_GEO_SHP'

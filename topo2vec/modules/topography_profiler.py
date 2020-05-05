@@ -11,8 +11,9 @@ import numpy as np
 from torch.backends import cudnn
 from torch.utils.data import DataLoader
 
-from topo2vec.common.geographic.geo_utils import sample_grid_in_poly
-from topo2vec.common.other_scripts import save_points_to_json_file, str_to_int_list
+from common.geographic.geo_utils import sample_grid_in_poly
+from common.other_scripts import save_points_to_json_file
+from common.list_conversions_utils import str_to_int_list
 from topo2vec.constants import BASE_LOCATION
 from topo2vec.datasets.class_dataset import ClassDataset
 from topo2vec.modules import Classifier
@@ -33,7 +34,8 @@ def build_polygon(low_lon, low_lat, high_lon, high_lat):
     return poly
 
 
-another_polygon = build_polygon(34.7, 31.3, 34.9, 31.43)
+goral_hights = build_polygon(34.7, 31.3, 34.9, 31.43)
+goral_hights = build_polygon(34.7, 31.3, 34.9, 31.43)
 
 
 def set_working_polygon(polygon: Polygon):
@@ -49,7 +51,7 @@ def set_working_polygon(polygon: Polygon):
     WORKING_POLYGON = polygon
 
 
-set_working_polygon(another_polygon)
+set_working_polygon(goral_hights)
 
 FINAL_SEED = 665
 

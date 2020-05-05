@@ -1,14 +1,14 @@
 import requests
 import json
 import numpy as np
-import shapely
+from shapely import wkt
 from shapely.geometry import Polygon, Point
 
-from topo2vec.common.other_scripts import points_list_to_floats_list
+from common.list_conversions_utils import points_list_to_floats_list
 
 PROTOCOL = 'http'
 IP = '159.122.160.134'
-PORT = '8888'
+PORT = '9876'
 
 ADDRESS = f'{PROTOCOL}://{IP}:{PORT}'
 
@@ -70,8 +70,8 @@ def get_working_polygon():
     print(f'waiting for {url}')
     response = requests.post(url=url)
     json_dictionary_in = response.json()
-    polygon_string = json_dictionary_in['polygon']
-    Polygon = shapely.wkt.loads(polygon_string)
+    polygon_wkt = json_dictionary_in['polygon']
+    Polygon = wkt.loads(polygon_wkt)
     return Polygon
 
 def get_available_class_names():

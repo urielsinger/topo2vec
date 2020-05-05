@@ -5,7 +5,7 @@ from typing import List
 from shapely.geometry import Polygon
 from torch import tensor
 
-from topo2vec.common.geographic import geo_utils
+from common.geographic import geo_utils
 from topo2vec.constants import CACHE_BASE_DIR
 from topo2vec.datasets.multi_radius_dataset import MultiRadiusDataset
 

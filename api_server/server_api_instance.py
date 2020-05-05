@@ -1,6 +1,5 @@
 import json
 import os
-import pickle
 
 import shapely
 import sys
@@ -8,8 +7,7 @@ import sys
 from flask import Flask, request
 from pathlib import Path
 
-from topo2vec.common.other_scripts import floats_list_to_points_list, points_list_to_lists_list
-from topo2vec.constants import GET_SIMILAR_POINTS_ROUTE
+from common.list_conversions_utils import points_list_to_lists_list, floats_list_to_points_list
 
 my_path = os.path.abspath(__file__)
 parent_path = Path(my_path).parent.parent
@@ -82,7 +80,6 @@ def get_features():
 def get_working_polygon():
     polygon = tp.get_working_polygon()
     polygon_wkt = polygon.wkt
-    print(polygon_wkt)
     json_dictionary_out = {
         'polygon': polygon_wkt
     }

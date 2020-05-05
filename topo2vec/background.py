@@ -1,28 +1,9 @@
 from topo2vec.data_handlers.classes_data_file_handler import ClassesDataFileHadler
-from topo2vec.data_handlers.data_from_file_handler import DataFromFileHandler
-from topo2vec.constants import N45_50_E5_15_CLIFFS, N45_50_E5_15_RIVERS, N45_50_E5_15_PEAKS, N45_50_E5_15_STREAMS, \
-    N49_E05_CLIFFS, N49_E05_RIVERS, N49_E05_PEAKS, N49_E05_STREAMS, TRAIN_HALF_LARGE, VALIDATION_HALF_LARGE, \
+from topo2vec.constants import N49_E05_CLIFFS, N49_E05_RIVERS, N49_E05_PEAKS, N49_E05_STREAMS, TRAIN_HALF_LARGE, VALIDATION_HALF_LARGE, \
     VALIDATION_HALF_SMALL, TRAIN_HALF_SMALL, POINT_TO_SEARCH_SIMILAR_LARGE, POINT_TO_SEARCH_SIMILAR_SMALL, \
     CLASSES_TEST_POINTS_FOLDER, BASE_LOCATION
 
 from pathlib import Path
-
-# run in background - the service for getting visualizations of lon, lats
-ELEVATION_BASE_DIR1 = BASE_LOCATION + 'data/elevation/big_europe'
-ELEVATION_BASE_DIR2 = BASE_LOCATION + 'data/elevation/mid_east'
-
-MASK_BASE_DIR = BASE_LOCATION + 'data/elevation/45,5,50,15'
-
-boxes = [(5, 45, 15, 50), (33, 30, 37, 32)]
-#boxes = [(33, 30, 37, 32)]
-
-base_dirs = [ELEVATION_BASE_DIR1, ELEVATION_BASE_DIR2]
-#base_dirs = [ELEVATION_BASE_DIR2]
-
-data_visualizer = DataFromFileHandler(base_dirs, boxes)
-visualizer = data_visualizer
-# mask_visualizer = DataFromFileHandler([MASK_BASE_DIR])
-
 # True to use the large area in europe data
 # False for the certain place:
 LOAD_CLASSES_LARGE = True

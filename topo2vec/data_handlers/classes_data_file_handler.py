@@ -8,11 +8,11 @@ import numpy as np
 from shapely.geometry import Point, Polygon
 from typing import List, Tuple
 
-from topo2vec.common.other_scripts import points_list_to_floats_list, floats_list_to_points_list, load_list_from_file, \
-    cache_path_name_to_full_path, save_list_to_file, floats_list_to_points_list_till_size
+from topo2vec.helper_functions import cache_path_name_to_full_path
+from common.list_conversions_utils import floats_list_to_points_list_till_size, load_list_from_file, save_list_to_file
 from topo2vec.constants import CACHE_BASE_DIR
 from topo2vec.data_handlers.data_handler import DataHandler
-from topo2vec.common.geographic.geo_utils import check_if_point_in_polygon
+from common.geographic.geo_utils import check_if_point_in_polygon
 
 
 class ClassesDataFileHadler(DataHandler):
