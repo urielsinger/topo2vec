@@ -7,6 +7,9 @@ from shapely.geometry import Polygon, Point
 from common.list_conversions_utils import points_list_to_floats_list
 
 PROTOCOL = 'http'
+# inside docker:
+#IP = 'topo2vec_web_api4_1'
+#outside docker:
 IP = '159.122.160.134'
 PORT = '9876'
 
@@ -18,10 +21,11 @@ def build_polygon(low_lon, low_lat, high_lon, high_lat):
     return poly
 
 
-def get_all_class_points_in_polygon(polygon, meters_step, class_name):
+def get_all_class_points_in_polygon(polygon, meters_step, class_name, threshold):
     request_dict = {'polygon': polygon.wkt,
                     'meters_step': meters_step,
-                    'class_name': class_name}
+                    'class_name': class_name,
+                    'threshold': threshold}
     url = f'{ADDRESS}/get_class'
     print(f'waiting for {url}')
     response = requests.post(url=url, json=request_dict)
@@ -30,6 +34,7 @@ def get_all_class_points_in_polygon(polygon, meters_step, class_name):
     class_patches_jsoned = json_dictionary_in['class_patches']
     class_points = json.loads(class_points_jsoned)
     class_patches = json.loads(class_patches_jsoned)
+    print(f'retrieved{len(class_points)} points')
     return np.array(class_points), np.array(class_patches)
 
 def get_top_n_similar_points_in_polygon(points, n, polygon, meters_step):
@@ -74,6 +79,19 @@ def get_working_polygon():
     Polygon = wkt.loads(polygon_wkt)
     return Polygon
 
+def set_working_polygon(polygon: Polygon):
+    '''
+    Returns:
+
+    '''
+    polygon_wkt = polygon.wkt
+    request_dict = {'polygon': polygon_wkt}
+    url = f'{ADDRESS}/set_working_polygon'
+    print(f'waiting for {url}')
+    response = requests.post(url=url, json=request_dict)
+    print(response.content)
+    return response.status_code
+
 def get_available_class_names():
     '''
     Returns:
@@ -86,5 +104,6 @@ def get_available_class_names():
     class_names_jsoned = json_dictionary_in['class_names']
     class_names = json.loads(class_names_jsoned)
     return class_names
+
 
 

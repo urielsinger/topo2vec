@@ -58,7 +58,7 @@ def point_to_location(point: Point) -> List:
     return [point.x, point.y]
 
 
-def _get_working_polygon_center():
+def get_working_polygon_center():
     center_point = _get_working_polygon().centroid
     return point_to_location(center_point)[::-1]
 
@@ -68,17 +68,17 @@ class TopoMap:
     A class for building a folium map containing th topography profiler data.
     '''
 
-    def __init__(self, polygon_of_interest: Polygon = None, draw_polygon = True):
+    def __init__(self, polygon_of_interest: Polygon = None, draw_polygon=True):
         self.version = 0
         self.polygon_of_interest = polygon_of_interest
         if self.polygon_of_interest is not None:
             self.center = point_to_location(self.polygon_of_interest.centroid)[::-1]
         else:
-            self.center = _get_working_polygon_center()
+            self.center = get_working_polygon_center()
         self.init_basic_map()
 
         if self.polygon_of_interest is not None and draw_polygon:
-            #draw points on the polygon
+            # draw points on the polygon
             exterior = self.polygon_of_interest.exterior.coords.xy
             lons = exterior[1]
             lats = exterior[0]
@@ -87,7 +87,7 @@ class TopoMap:
             # draw an actual polygon
             # folium.GeoJson(self.polygon_of_interest).add_to(self.map)
 
-            #folium.vector_layers.Polygon([[point.y, point.x] for point in self.polygon_of_interest])
+            # folium.vector_layers.Polygon([[point.y, point.x] for point in self.polygon_of_interest])
 
     def get_all_available_classes(self) -> List[str]:
         '''
@@ -205,7 +205,8 @@ class TopoMap:
         Returns:
 
         '''
-        points_used, np_points_patches_used = client_lib.get_all_class_points_in_polygon(polygon, meters_step, class_name)
+        points_used, np_points_patches_used = client_lib.get_all_class_points_in_polygon(polygon, meters_step,
+                                                                                         class_name)
         np_points_patches_used = convert_multi_radius_ndarray_to_printable(np_points_patches_used, dir=False)
         self.add_points_with_images(points_used, np_points_patches_used, color)
 
@@ -227,7 +228,7 @@ class TopoMap:
         self.add_points_with_images(closest_points, closest_images, color)
 
     def add_random_class_points(self, polygon: Polygon, meters_step: float, class_name: str,
-                                color='red', max_num=25):
+                                color='red', max_num: int = 25, threshold: float = 0):
         '''
         add only a random portion of the class_points that were retrived.
         Args:
@@ -240,11 +241,16 @@ class TopoMap:
         Returns:
 
         '''
-        np_points_used, np_points_patches_used = client_lib.get_all_class_points_in_polygon(polygon, meters_step, class_name)
+        np_points_used, np_points_patches_used = client_lib.get_all_class_points_in_polygon(polygon, meters_step,
+                                                                                            class_name, threshold)
         assert len(np_points_used) == len(np_points_patches_used)
-        picked_indices = np.random.choice(list(range(len(np_points_used))), max_num)
-        points_used_picked = np_points_used[picked_indices]
-        points_patches_used_picked = np_points_patches_used[picked_indices]
+        if max_num != 100:
+            picked_indices = np.random.choice(list(range(len(np_points_used))), max_num)
+            points_used_picked = np_points_used[picked_indices]
+            points_patches_used_picked = np_points_patches_used[picked_indices]
+        else:
+            points_used_picked = np_points_used
+            points_patches_used_picked = np_points_patches_used
 
         points_patches_used_picked = convert_multi_radius_ndarray_to_printable(points_patches_used_picked, dir=False)
         self.add_points_with_images(points_used_picked, points_patches_used_picked, color)

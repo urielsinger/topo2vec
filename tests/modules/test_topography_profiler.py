@@ -1,8 +1,9 @@
 
 from unittest import TestCase
 
-from shapely.geometry import Point, Polygon
+from shapely.geometry import Point
 
+import common.geographic.geo_utils
 import topo2vec.modules.topography_profiler as tp
 
 class Test(TestCase):
@@ -11,7 +12,7 @@ class Test(TestCase):
         # actually checks almost everything...
         cls.points_inside = [Point(5.0658811, 45.0851164),
                       Point(5.058811, 45.01164)]
-        cls.polygon_to_search_in = tp.build_polygon(5, 45, 5.1, 45.1)
+        cls.polygon_to_search_in = common.geographic.geo_utils.build_polygon(5, 45, 5.1, 45.1)
         tp.set_working_polygon(cls.polygon_to_search_in)
 
     def test_get_features(self):
@@ -20,6 +21,11 @@ class Test(TestCase):
 
     def test_get_all_class_points_in_polygon(self):
         points, pathches_lis = tp.get_all_class_points_in_polygon(self.polygon_to_search_in, 100, 'peaks')
+        print(len(points))
+        self.assertTupleEqual(pathches_lis.shape, (len(points), 3, 17, 17))
+
+        points, pathches_lis = tp.get_all_class_points_in_polygon(self.polygon_to_search_in, 100, 'peaks', prob_threshold=0.9)
+        print(len(points))
         self.assertTupleEqual(pathches_lis.shape, (len(points), 3, 17, 17))
 
     def test_get_top_n_similar_points_in_polygon(self):

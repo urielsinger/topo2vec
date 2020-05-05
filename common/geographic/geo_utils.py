@@ -339,3 +339,9 @@ def get_closest_geo(point: Point, geos: List[BaseGeometry]) -> BaseGeometry:
     closest_geo = geos[closest_geo_index]
 
     return closest_geo
+
+
+def build_polygon(low_lon, low_lat, high_lon, high_lat):
+    poly = Polygon([Point(low_lon, low_lat), Point(low_lon, high_lat), Point(high_lon, high_lat),
+                    Point(high_lon, low_lat), Point(low_lon, low_lat)])
+    return poly

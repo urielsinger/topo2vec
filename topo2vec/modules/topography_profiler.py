@@ -11,7 +11,7 @@ import numpy as np
 from torch.backends import cudnn
 from torch.utils.data import DataLoader
 
-from common.geographic.geo_utils import sample_grid_in_poly
+from common.geographic.geo_utils import sample_grid_in_poly, build_polygon
 from common.other_scripts import save_points_to_json_file
 from common.list_conversions_utils import str_to_int_list
 from topo2vec.constants import BASE_LOCATION
@@ -27,14 +27,6 @@ USER_DEFINED = 'user_defined'
 default_working_polygon = Polygon([Point(5, 45), Point(5, 50), Point(10, 50),
                                    Point(10, 45), Point(5, 45)])
 
-
-def build_polygon(low_lon, low_lat, high_lon, high_lat):
-    poly = Polygon([Point(low_lon, low_lat), Point(low_lon, high_lat), Point(high_lon, high_lat),
-                    Point(high_lon, low_lat), Point(low_lon, low_lat)])
-    return poly
-
-
-goral_hights = build_polygon(34.7, 31.3, 34.9, 31.43)
 goral_hights = build_polygon(34.7, 31.3, 34.9, 31.43)
 
 
@@ -49,6 +41,10 @@ def set_working_polygon(polygon: Polygon):
     '''
     global WORKING_POLYGON
     WORKING_POLYGON = polygon
+
+
+def get_working_polygon():
+    return WORKING_POLYGON
 
 
 set_working_polygon(goral_hights)
@@ -93,6 +89,7 @@ def _build_new_dataset_for_query(points: List[Point], class_name: str = 'no_name
     queried_classes_path = os.path.join(FINAL_MODEL_DIR, 'queried_classes')
     Path(queried_classes_path).mkdir(parents=True, exist_ok=True)
     class_file_path = save_points_to_json_file(points, class_name, queried_classes_path)
+    # take only the points from the query which are in the WORKING_POLYGON
     points_dataset = ClassDataset(class_file_path, 0, FINAL_RADII,
                                   len(points), outer_polygon=WORKING_POLYGON,
                                   dataset_type_name=USER_DEFINED, return_point=True)
@@ -138,7 +135,8 @@ def get_available_class_names() -> str:
     return final_model_classifier.class_names
 
 
-def get_all_class_points_in_polygon(polygon: Polygon, meters_step: float, class_name: str) -> \
+def get_all_class_points_in_polygon(polygon: Polygon, meters_step: float, class_name: str,
+                                    prob_threshold: float = None) -> \
         Tuple[np.ndarray, np.ndarray]:
     '''
     get all the class points in a certain polygon.
@@ -147,6 +145,7 @@ def get_all_class_points_in_polygon(polygon: Polygon, meters_step: float, class_
         polygon: The polygon to search in
         meters_step: what is the x-y resolution to search inside the polygon (in degrees)
         class_name: the class to search for
+        prob_threshold: the threshold from which the points are accepted as part of the class.
 
     Returns: all the points in this area which are in the polygon and classified as
     the class_name using the classifier
@@ -164,8 +163,10 @@ def get_all_class_points_in_polygon(polygon: Polygon, meters_step: float, class_
     class_number = final_model_classifier.class_names.index(class_name)
     for batch in class_dataloader:
         X, _, points_used = batch
-        predicted = final_model_classifier.get_classifications(X.detach().float())
+        predicted, probability = final_model_classifier.get_classification_and_probability(X.detach().float())
         class_indexes = predicted.detach() == class_number
+        if prob_threshold is not None and prob_threshold > 0:
+            class_indexes = class_indexes * (probability > prob_threshold)
         patches_list.append(X[class_indexes, :])
         points_list.append(points_used[class_indexes, :])
 
@@ -202,9 +203,6 @@ def get_top_n_similar_points_in_polygon(points: List[Point], n: int, polygon: Po
 
     return closest_images_list_latent_space[0], closest_points_list_latent_space[0]
 
-
-def get_working_polygon():
-    return WORKING_POLYGON
 # polygon_to_search_in = Polygon([Point(5, 45), Point(5, 45.1), Point(5.1, 45.1),
 #                                 Point(5.1, 45.1), Point(5, 45)])
 #

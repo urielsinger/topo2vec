@@ -76,6 +76,11 @@ class Classifier(LightningModule):
         _, predicted = torch.max(outputs.data, 1)
         return predicted
 
+    def get_classification_and_probability(self, x: Tensor):
+        outputs, latent = self.forward(x)
+        probability, predicted = torch.max(outputs.data, 1)
+        return predicted, probability
+
 
     def train_dataloader(self):
         return DataLoader(self.train_dataset, shuffle=True, num_workers=0, batch_size=64)
