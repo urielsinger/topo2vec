@@ -82,6 +82,7 @@ def get_features():
 def get_working_polygon():
     polygon = tp.get_working_polygon()
     polygon_wkt = polygon.wkt
+    print(polygon_wkt)
     json_dictionary_out = {
         'polygon': polygon_wkt
     }

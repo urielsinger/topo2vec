@@ -2,17 +2,17 @@ from unittest import TestCase
 
 from shapely.geometry import Point, Polygon
 
-from topo2vec.constants import N49_E05_RIVERS
+from topo2vec.constants import N49_E05_RIVERS, N45_50_E5_15_PEAKS
 from topo2vec.common.geographic.geo_utils import check_if_point_in_polygon
 from topo2vec.datasets.class_dataset import ClassDataset
-from topo2vec.modules.topography_profiler import build_polygon
 
 
 class TestClassDataset(TestCase):
     def test_init(self):
-        outer_polygon = build_polygon(5, 6, 49.5, 50)
+        outer_polygon = Polygon([Point(5, 49.5), Point(5, 50), Point(6, 50),
+                                 Point(6, 49.5), Point(5, 49.5)])
         Radius = 10
-        classification_dataset = ClassDataset(N49_E05_RIVERS, 1, wanted_size=11,
+        classification_dataset = ClassDataset(N45_50_E5_15_PEAKS, 1, wanted_size=11,
                                               radii=[Radius],
                                               outer_polygon=outer_polygon)
         self.assertEqual(classification_dataset.actual_patches.shape[2], 2 * Radius + 1)

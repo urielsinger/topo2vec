@@ -41,8 +41,10 @@ class ClassesDataFileHadler(DataHandler):
             elif file_extension == '.geojson':
                 with open(file_path, encoding='utf-8') as bottom_peaks_file:
                     data = json.load(bottom_peaks_file)
-                #new_features = data['features']
-                new_features = data['elements']
+                if 'features' in data:
+                    new_features = data['features']
+                else:
+                    new_features = data['elements']
 
             elif file_extension == '.json':
                 with open(file_path, encoding='utf-8') as bottom_peaks_file:

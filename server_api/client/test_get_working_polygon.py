@@ -8,4 +8,5 @@ from server_api.client.client_lib import get_working_polygon
 class TestGet_working_polygon(TestCase):
     def test_get_working_polygon(self):
         poly = get_working_polygon()
+        print(type(poly))
         self.assertTrue(type(poly) is Polygon)
