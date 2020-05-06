@@ -20,6 +20,26 @@ from topo2vec.modules import topography_profiler as tp
 app = Flask(__name__)
 
 
+@app.route('/get_all_classifications', methods=['POST'])
+def get_all_classifications():
+    if request.is_json:
+        json_dictionary_in = request.get_json()
+        polygon = shapely.wkt.loads(json_dictionary_in['polygon'])
+        meters_step = int(json_dictionary_in['meters_step'])
+        class_names = json.loads(json_dictionary_in['class_names'])
+        thresholds = json.loads(json_dictionary_in['thresholds'])
+        _, locations, class_indices = tp.get_all_points_and_classes(polygon, meters_step, class_names, thresholds)
+        locations = locations.tolist()
+        locations_jsoned = json.dumps(locations)
+        class_indices_jsoned = json.dumps(class_indices)
+        json_dictionary_out = {
+            'locations': locations_jsoned,
+            'class_indices': class_indices_jsoned
+        }
+        data = json.dumps(json_dictionary_out)
+        return data
+    return None
+
 @app.route('/get_class', methods=['POST'])
 def get_class_points():
     if request.is_json:

@@ -11,10 +11,10 @@ from matplotlib import colors
 from pandas import DataFrame
 from shapely import wkt
 from shapely.wkt import loads
+from tqdm import tqdm
 
-from common.geographic import NoClickGeoJson
-from common.geographic import geoms2bbox, geom2image_projection, meters2degrees
-
+from common.geographic.folium_extensions import NoClickGeoJson
+from common.geographic.geo_utils import geoms2bbox, geom2image_projection, meters2degrees
 
 @cached(cache=LRUCache(maxsize=256), key=lambda *a: hash(hash(tuple(p)) for p in a))
 def build_image_overlay(wkt_array, color, fill_color, fill_alpha, line_alpha, step):
@@ -60,12 +60,6 @@ class GeoMap:
         self.start_zoom = start_zoom
         self.layer_control = layer_control
         self._get_folium_map()
-
-    def _get_folium_map(self):
-
-        # map_f = folium.Map(location=self.start_location, zoom_start=self.start_zoom, tiles=None)
-        self.map = folium.Map(location=self.start_location, zoom_start=self.start_zoom)
-
 
     def clear_map(self):
         """
@@ -253,7 +247,6 @@ class GeoMap:
         step = meters2degrees(step)
         # change all to tuples for LRU_CACHE to work.
         image = build_image_overlay(df[wkt_column_name], color, fill_color, fill_alpha, line_alpha, step)
-
         min_lon, min_lat, max_lon, max_lat = geoms2bbox(gds)
         image_overlay = folium.raster_layers.ImageOverlay(image,
                                                           bounds=[[min_lat, min_lon], [max_lat, max_lon]],

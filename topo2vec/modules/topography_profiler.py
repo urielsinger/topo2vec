@@ -135,6 +135,32 @@ def get_available_class_names() -> str:
     return final_model_classifier.class_names
 
 
+def get_all_points_and_classes(polygon: Polygon, meters_step: int,
+                               class_names: List[str], thresholds: List[int]):
+    points_list = []
+    patches_list = []
+    indices_list = []
+    class_numbers = [final_model_classifier.class_names.index(class_name) for class_name in class_names]
+    points_in_polygon = sample_grid_in_poly(polygon, meters_step)
+
+    for class_name, class_number, prob_threshold in zip(class_names, class_numbers, thresholds):
+        points_in_polygon_dataset, points_used = _build_new_dataset_for_query(points_in_polygon, class_name)
+        assert len(points_in_polygon_dataset) == len(points_used)
+
+        class_dataloader = DataLoader(points_in_polygon_dataset, FORWARD_BATCH_SIZE)
+        for batch in class_dataloader:
+            X, _, points_used = batch
+            predicted, probability = final_model_classifier.get_classification_and_probability(X.detach().float())
+            class_indexes = predicted.detach() == class_number
+            if prob_threshold is not None and prob_threshold > 0:
+                class_indexes = class_indexes * (probability > prob_threshold)
+            patches_list.append(X[class_indexes, :])
+            new_points = points_used[class_indexes, :]
+            points_list.append(new_points)
+            indices_list += ([class_number] * new_points.shape[0])
+    return np.concatenate(patches_list, axis=0), np.concatenate(points_list, axis=0), indices_list
+
+
 def get_all_class_points_in_polygon(polygon: Polygon, meters_step: float, class_name: str,
                                     prob_threshold: float = None) -> \
         Tuple[np.ndarray, np.ndarray]:
@@ -151,28 +177,11 @@ def get_all_class_points_in_polygon(polygon: Polygon, meters_step: float, class_
     the class_name using the classifier
 
     '''
-    points_in_polygon = sample_grid_in_poly(polygon, meters_step)
-
-    points_in_polygon_dataset, points_used = _build_new_dataset_for_query(points_in_polygon, class_name)
-    assert len(points_in_polygon_dataset) == len(points_used)
-
-    class_dataloader = DataLoader(points_in_polygon_dataset, FORWARD_BATCH_SIZE)
-
-    points_list = []
-    patches_list = []
-    class_number = final_model_classifier.class_names.index(class_name)
-    for batch in class_dataloader:
-        X, _, points_used = batch
-        predicted, probability = final_model_classifier.get_classification_and_probability(X.detach().float())
-        class_indexes = predicted.detach() == class_number
-        if prob_threshold is not None and prob_threshold > 0:
-            class_indexes = class_indexes * (probability > prob_threshold)
-        patches_list.append(X[class_indexes, :])
-        points_list.append(points_used[class_indexes, :])
-
-    np_points_patches_used = np.concatenate(patches_list, axis=0)
-    np_points_used = np.concatenate(points_list, axis=0)
-    return np_points_used, np_points_patches_used
+    patches_np, points_np, _ = get_all_points_and_classes(polygon=polygon,
+                                                          meters_step=meters_step,
+                                                          class_names=[class_name],
+                                                          thresholds=[prob_threshold])
+    return points_np, patches_np
 
 
 def get_top_n_similar_points_in_polygon(points: List[Point], n: int, polygon: Polygon,

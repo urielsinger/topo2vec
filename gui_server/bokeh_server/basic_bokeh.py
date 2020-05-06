@@ -36,6 +36,7 @@ points_inside = [Point(5.0658811, 45.0851164),
                  Point(5.058811, 45.01164)]
 
 leban = build_polygon(35.19, 33.11, 35.47, 33.25)
+small_polygon = build_polygon(35.3, 33.11, 35.35, 33.15)
 
 
 def set_working_polygon(polygon: Polygon):
@@ -45,6 +46,7 @@ def set_working_polygon(polygon: Polygon):
 
 
 set_working_polygon(leban)
+set_working_polygon(small_polygon)
 
 
 class BasicBokeh:
@@ -85,11 +87,15 @@ class BasicBokeh:
         get_class_button = Button(label='get_class')
         get_class_button.on_click(self.get_points_and_update_for_class)
 
+        set_working_polygon_button = Button(label='get segmentation map')
+        set_working_polygon_button.on_click(self.add_segmentation_map)
+
         # Set up layouts and add to document
         inputs = row(
-            column(Div(text='get similar points'), lon_text, lat_text, get_points_button, set_working_polygon_button, clean_all_buttun,
+            column(Div(text='get similar points'), lon_text, lat_text, get_points_button, set_working_polygon_button,
+                   clean_all_buttun,
                    clean_text_buttun),
-            column(Div(text='get top points of class'), self.select, get_class_button),
+            column(Div(text='get top points of class'), self.select, get_class_button, set_working_polygon_button),
             column(Div(text='search parameters'), self.meters_step, self.number_of_points_to_show, self.threshold))
         self.main_panel = row(inputs, self.folium_fig, width=800)
 
@@ -182,6 +188,15 @@ class BasicBokeh:
         fig = self.bokeh_new_class_folium(lonlat_text_inputs=self.lonlat_text_inputs)
         self.main_panel.children[-1] = fig
 
+    def add_segmentation_map(self):
+        thresholds_list = [0, 0, 0, 0]
+        class_names_list = client_lib.get_available_class_names()
+        self.topo_map.add_segmentation_map(polygon=WORKING_POLYGON, meters_step=int(self.meters_step.value),
+                                           class_names=class_names_list,
+                                           thresholds_list=thresholds_list)
+        fig = self.bokeh_new_class_folium(lonlat_text_inputs=self.lonlat_text_inputs)
+        self.main_panel.children[-1] = fig
+
 
     def get_points_and_update_for_class(self):
         self.topo_map = TopoMap(WORKING_POLYGON)
@@ -227,7 +242,3 @@ class BasicBokeh:
     #     lon = float(lon) if lon != "" else 0
     #     lat = float(lat) if lat != "" else 0
     #     return lat, lon
-
-    def update_title(self, attrname, old, new):
-        # Set up callbacks
-        self.plot.title.text = self.text.value

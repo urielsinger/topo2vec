@@ -1,12 +1,17 @@
 from typing import List
 
+import pandas
 from shapely.geometry import Point, Polygon
 
 import folium
 import base64
 import matplotlib
+from tqdm import tqdm
 
 from api_client import client_lib
+from api_client.client_lib import build_polygon
+from common.geographic.geo_map import GeoMap
+from common.geographic.geo_utils import meters2degrees
 
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -63,19 +68,28 @@ def get_working_polygon_center():
     return point_to_location(center_point)[::-1]
 
 
-class TopoMap:
+def points_list_to_polygons_wkt_list(points_list, meters_step):
+    polygon_radius = meters2degrees(meters_step) / 2
+    polygons_list = [build_polygon(point[0] - polygon_radius, point[1] - polygon_radius,
+                                   point[0] + polygon_radius, point[1] + polygon_radius).wkt for point in points_list]
+
+    return polygons_list
+
+
+class TopoMap(GeoMap):
     '''
     A class for building a folium map containing th topography profiler data.
     '''
 
-    def __init__(self, polygon_of_interest: Polygon = None, draw_polygon=True):
+    def __init__(self, polygon_of_interest: Polygon = None, draw_polygon=True, start_zoom=11, layer_control=True):
         self.version = 0
         self.polygon_of_interest = polygon_of_interest
         if self.polygon_of_interest is not None:
-            self.center = point_to_location(self.polygon_of_interest.centroid)[::-1]
+            center = point_to_location(self.polygon_of_interest.centroid)[::-1]
         else:
-            self.center = get_working_polygon_center()
-        self.init_basic_map()
+            center = get_working_polygon_center()
+
+        super().__init__(center, start_zoom, layer_control)
 
         if self.polygon_of_interest is not None and draw_polygon:
             # draw points on the polygon
@@ -97,18 +111,11 @@ class TopoMap:
         '''
         return client_lib.get_available_class_names()
 
-    def get_folium_map(self):
-        '''
-
-        Returns: The folium map that was built.
-
-        '''
-        return self.map
-
-    def init_basic_map(self, zoom: int = 11):
+    def _get_folium_map(self):
+        # map_f = folium.Map(location=self.start_location, zoom_start=self.start_zoom, tiles=None)
         geo_map = folium.Map(
-            location=self.center,
-            zoom_start=zoom,
+            location=self.start_location,
+            zoom_start=self.start_zoom,
             tiles='Stamen Terrain'
         )
         self.map = geo_map
@@ -254,3 +261,24 @@ class TopoMap:
 
         points_patches_used_picked = convert_multi_radius_ndarray_to_printable(points_patches_used_picked, dir=False)
         self.add_points_with_images(points_used_picked, points_patches_used_picked, color)
+
+    def add_segmentation_map(self, polygon: Polygon, meters_step: int, class_names: List[str], thresholds_list: List[float]):
+        points_list, indices_list = client_lib.get_all_classifications_in_polygon(polygon, meters_step,
+                                                                                  class_names, thresholds_list)
+        polygons_list = points_list_to_polygons_wkt_list(points_list, meters_step)
+        segmentation_dict = {'point': points_list, 'geoms': polygons_list, 'class_name': indices_list}
+        segmentation_dataframe = pandas.DataFrame(segmentation_dict)
+        colors = ['blue', 'blue', 'blue', 'blue']
+        # for j in tqdm(range(10), desc=f'sum length:{segmentation_dataframe}'):
+        #     pass
+        fill_colors = colors
+        # self.load_image_overlay_from_dataframe(df=segmentation_dataframe, wkt_column_name='geoms',
+        #                                        fill_color='red', color='red')
+        for row in segmentation_dataframe.iterrows():
+            self.load_image_overlay_from_dataframe(df=row, wkt_column_name='geoms',
+                                                   fill_color=fill_colors[row[2]], color=colors[row[2]])
+        for i, name in enumerate(class_names):
+            segmentation_dataframe_class = segmentation_dataframe.loc[segmentation_dataframe['class_name'] == i]
+            if len(segmentation_dataframe_class) != 0:
+                self.load_image_overlay_from_dataframe(df=segmentation_dataframe_class, wkt_column_name='geoms',
+                                                       fill_color=fill_colors[i], color=colors[i])

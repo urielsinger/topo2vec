@@ -3,6 +3,7 @@ import logging
 from functools import partial
 from typing import List, Union, Tuple, Iterable
 
+import cv2
 import geopy
 import geopy.distance
 import numpy as np
@@ -17,8 +18,7 @@ from tqdm import tqdm
 import geopandas as gpd
 
 
-
-def check_if_point_in_polygon(point:Point, polygon: Polygon) -> bool:
+def check_if_point_in_polygon(point: Point, polygon: Polygon) -> bool:
     '''
     Returns True iff the point is in range (roughly)
     Args:
@@ -29,6 +29,7 @@ def check_if_point_in_polygon(point:Point, polygon: Polygon) -> bool:
 
     '''
     return point.within(polygon)
+
 
 def area_in_m2(poly: Polygon) -> float:
     """
@@ -120,6 +121,7 @@ def distances_to_point(point: Point, geos: List[BaseGeometry]) -> np.array:
             raise AttributeError("not correct type")
     return distances
 
+
 def sample_point_in_range(min_lon: float, min_lat: float, max_lon: float, max_lat: float,
                           seed=None) -> Point:
     if seed is not None:
@@ -129,15 +131,18 @@ def sample_point_in_range(min_lon: float, min_lat: float, max_lon: float, max_la
     lon = np.random.uniform(min_lon, max_lon)
     return Point(lon, lat)
 
-def sample_points_in_range(min_lon: float, min_lat: float, max_lon: float, max_lat: float, number:int,
-                          seed=None) -> Point:
+
+def sample_points_in_range(min_lon: float, min_lat: float, max_lon: float, max_lat: float, number: int,
+                           seed=None) -> Point:
     points_list = [sample_point_in_range(min_lon, min_lat, max_lon, max_lat) for i in range(number)]
     return points_list
 
-def sample_points_in_polygon(outer_polygon: Polygon, number:int,
+
+def sample_points_in_polygon(outer_polygon: Polygon, number: int,
                              seed=None) -> Point:
     points_list = [sample_point_in_poly(outer_polygon) for i in range(number)]
     return points_list
+
 
 def sample_point_in_poly(poly: Polygon, seed=None) -> Point:
     if seed is not None:
@@ -323,6 +328,7 @@ def geom2image_projection(image: np.array, bbox: tuple, geom: shapely.geometry, 
     cv2.drawContours(image, [pts], -1, color, line_width)
 
     return image
+
 
 def get_closest_geo(point: Point, geos: List[BaseGeometry]) -> BaseGeometry:
     """
