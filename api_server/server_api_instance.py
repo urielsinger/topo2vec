@@ -8,6 +8,7 @@ from flask import Flask, request
 from pathlib import Path
 
 from shapely import wkt
+from tqdm import tqdm
 
 from common.list_conversions_utils import points_list_to_lists_list, floats_list_to_points_list
 

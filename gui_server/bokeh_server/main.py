@@ -22,6 +22,6 @@ def main():
     BokehData = BasicBokeh()
 
     curdoc().add_root(BokehData.main_panel)
-    curdoc().title = "bokeh for choosing points"
+    curdoc().title = "topography surfer"
 
 main()

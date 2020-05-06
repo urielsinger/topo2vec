@@ -19,6 +19,8 @@ from shapely.geometry import Point, Polygon
 import sys
 from pathlib import Path
 
+from tqdm import tqdm
+
 from api_client import client_lib
 from common.geographic.geo_utils import build_polygon
 from visualization_server import visualizer
@@ -44,9 +46,13 @@ def set_working_polygon(polygon: Polygon):
     global WORKING_POLYGON
     WORKING_POLYGON = visual_topography_profiler._get_working_polygon()
 
+goral_hights = build_polygon(34.7, 31.3, 34.9, 31.43)
+north_is = build_polygon(35.1782, 32.8877, 35.5092,  33.0524)
 
-set_working_polygon(leban)
-set_working_polygon(small_polygon)
+set_working_polygon(north_is)
+
+#set_working_polygon(leban)
+#set_working_polygon(small_polygon)
 
 
 class BasicBokeh:
@@ -65,7 +71,7 @@ class BasicBokeh:
         self.folium_fig = self.bokeh_new_class_folium(lonlat_text_inputs=self.lonlat_text_inputs)
 
         # Set up widgets
-        self.meters_step = Slider(title="meters_step", value=500, start=50, end=1000, step=10)
+        self.meters_step = Slider(title="meters_step", value=2500, start=10, end=2500, step=10)
         self.number_of_points_to_show = Slider(title="number of points to show", value=5, start=1, end=100)
         self.threshold = Slider(title="threshold for class", value=0, start=0, end=1, step=0.01)
 
@@ -87,16 +93,17 @@ class BasicBokeh:
         get_class_button = Button(label='get_class')
         get_class_button.on_click(self.get_points_and_update_for_class)
 
-        set_working_polygon_button = Button(label='get segmentation map')
-        set_working_polygon_button.on_click(self.add_segmentation_map)
+        get_segmentation_map_button = Button(label='get segmentation map')
+        get_segmentation_map_button.on_click(self.add_segmentation_map)
 
+        self.row_mid_column = column(Div(text='get top points of class'), self.select, get_class_button,
+                                     get_segmentation_map_button, Div(text=''))
         # Set up layouts and add to document
         inputs = row(
-            column(Div(text='get similar points'), lon_text, lat_text, get_points_button, set_working_polygon_button,
-                   clean_all_buttun,
-                   clean_text_buttun),
-            column(Div(text='get top points of class'), self.select, get_class_button, set_working_polygon_button),
+            column(Div(text='get similar points'), lon_text, lat_text, get_points_button, set_working_polygon_button, clean_all_buttun, clean_text_buttun),
+            self.row_mid_column,
             column(Div(text='search parameters'), self.meters_step, self.number_of_points_to_show, self.threshold))
+
         self.main_panel = row(inputs, self.folium_fig, width=800)
 
     def bokeh_new_class_folium(self, file_name: str = 'folium',
@@ -194,8 +201,16 @@ class BasicBokeh:
         self.topo_map.add_segmentation_map(polygon=WORKING_POLYGON, meters_step=int(self.meters_step.value),
                                            class_names=class_names_list,
                                            thresholds_list=thresholds_list)
+
         fig = self.bokeh_new_class_folium(lonlat_text_inputs=self.lonlat_text_inputs)
+        for j in tqdm(range(10), desc=f'8'):
+            pass
         self.main_panel.children[-1] = fig
+        for j in tqdm(range(10), desc=f'9'):
+            pass
+        #self.row_mid_column.children[-1] = Div(text=self.topo_map.colors_map) #TODO: very long
+        for j in tqdm(range(10), desc=f'10'):
+            pass
 
 
     def get_points_and_update_for_class(self):

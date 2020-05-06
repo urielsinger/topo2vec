@@ -5,6 +5,7 @@ import json
 import numpy as np
 from shapely import wkt
 from shapely.geometry import Polygon, Point
+from tqdm import tqdm
 
 from common.list_conversions_utils import points_list_to_floats_list
 

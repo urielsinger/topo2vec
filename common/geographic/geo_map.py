@@ -27,13 +27,13 @@ def build_image_overlay(wkt_array, color, fill_color, fill_alpha, line_alpha, st
     for index, geom in enumerate(gds):
         # fill color
         cur_color = fill_color[index] if type(fill_color) is not str else fill_color
-        cur_color = list(colors.to_rgb(cur_color)) + [fill_alpha]
+        cur_color = list(colors.to_rgb(cur_color)) + [0.2]
         image = geom2image_projection(image, bbox, geom, color=cur_color, fill=True)
 
         # edge color
         cur_color = color[index] if type(color) is not str else color
-        cur_color = list(colors.to_rgb(cur_color)) + [line_alpha]
-        image = geom2image_projection(image, bbox, geom, color=cur_color, fill=False)
+        cur_color = list(colors.to_rgb(cur_color)) + [1]
+        image = geom2image_projection(image, bbox, geom, color=cur_color, fill=False, line_width=0)
 
     return image
 
@@ -208,15 +208,15 @@ class GeoMap:
             object_to_add.add_to(self.map)
 
     def load_image_overlay_from_dataframe(self, df: DataFrame, wkt_column_name: str, step: float = 1,
-                                          color: Union[str, List[str]] = '#0078d7', line_alpha: float = 1,
-                                          fill_color: Union[str, List[str]] = '#0048a7',
-                                          fill_alpha: float = 0.2, name=None):
+                                          line_alpha: float = 1,
+                                          fill_alpha: float = 0.1, name=None):
         """
         loads additional layer to the map
 
         Args:
                 df (Pandas dataframe,default=False)
                     dataframe with at least one geographic column
+                    and a 'color' and 'fill_color' column to tell what color for each point
 
                 wkt_column_name (str,default=False)
                     the name of the geometry column to show
@@ -246,13 +246,64 @@ class GeoMap:
 
         step = meters2degrees(step)
         # change all to tuples for LRU_CACHE to work.
-        image = build_image_overlay(df[wkt_column_name], color, fill_color, fill_alpha, line_alpha, step)
+        image = build_image_overlay(df[wkt_column_name], df['color'], df['fill_color'], fill_alpha, line_alpha, step)
         min_lon, min_lat, max_lon, max_lat = geoms2bbox(gds)
         image_overlay = folium.raster_layers.ImageOverlay(image,
                                                           bounds=[[min_lat, min_lon], [max_lat, max_lon]],
                                                           origin='lower', name=name)
 
         image_overlay.add_to(self.map)
+
+    def load_image_overlay_from_lists(self, polygons_list:List, colors_list: List[str], fills_list:List[str],
+                                          step: float = 1,
+                                          line_alpha: float = 1,
+                                          fill_alpha: float = 0.1, name=None):
+        """
+        loads additional layer to the map
+
+        Args:
+                df (Pandas dataframe,default=False)
+                    dataframe with at least one geographic column
+                    and a 'color' and 'fill_color' column to tell what color for each point
+
+                wkt_column_name (str,default=False)
+                    the name of the geometry column to show
+                    the geometries should be in the format of wkt string
+                    if you are using oracle, select the sdo_geometry with the oracle function sdo_util.to_wktgeometry
+
+                step (float,default=1)
+                    resolution of sample in meters
+
+                color (str,default=True)
+                    the color to use when drawing the geoms on the map
+                    examples - blue,white,#0078d7, #9999d9
+
+                fill_color(str,default=True)
+                    the color to fill when its complex geometry as polygon
+
+                fill_alpha(float)
+                    the opacity of the fill color, between 0 and 1
+
+                name: (str,default=None)
+                    gives a specific name for the image_overlay
+
+                line_alpha:
+                    the opacity of the line color, between 0 and 1
+        """
+        gds = gpd.GeoSeries([wkt.loads(pol) for pol in polygons_list])
+        step = meters2degrees(step)
+        # change all to tuples for LRU_CACHE to work.
+        image = build_image_overlay(polygons_list, colors_list, fills_list, fill_alpha, line_alpha, step)
+        for j in tqdm(range(10), desc=f'3'):
+            pass
+        min_lon, min_lat, max_lon, max_lat = geoms2bbox(gds) #TODO: very long
+        for j in tqdm(range(10), desc=f'4'):
+            pass
+        image_overlay = folium.raster_layers.ImageOverlay(image,
+                                                          bounds=[[min_lat, min_lon], [max_lat, max_lon]],
+                                                          origin='lower', name=name)
+        image_overlay.add_to(self.map)
+
 
     def __call__(self, *args, **kwargs):
         """
