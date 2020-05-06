@@ -268,16 +268,18 @@ class TopoMap(GeoMap):
         polygons_list = points_list_to_polygons_wkt_list(points_list, meters_step)
         segmentation_dict = {'point': points_list, 'geoms': polygons_list, 'class_name': indices_list}
         segmentation_dataframe = pandas.DataFrame(segmentation_dict)
-        colors = ['blue', 'blue', 'blue', 'blue']
+        colors = ['red', 'blue', 'yellow', 'orange']
         # for j in tqdm(range(10), desc=f'sum length:{segmentation_dataframe}'):
         #     pass
         fill_colors = colors
         # self.load_image_overlay_from_dataframe(df=segmentation_dataframe, wkt_column_name='geoms',
         #                                        fill_color='red', color='red')
-        for row in segmentation_dataframe.iterrows():
-            self.load_image_overlay_from_dataframe(df=row, wkt_column_name='geoms',
-                                                   fill_color=fill_colors[row[2]], color=colors[row[2]])
-        for i, name in enumerate(class_names):
+        # for index, row in segmentation_dataframe.iterrows():
+        #     self.load_image_overlay_from_dataframe(df=row, wkt_column_name='geoms',
+        #                                            fill_color=fill_colors[row['class_name']], color=colors[row['class_name']])
+        # for i, name in enumerate(class_names):
+        for i in [2]:
+            name = class_names[i]
             segmentation_dataframe_class = segmentation_dataframe.loc[segmentation_dataframe['class_name'] == i]
             if len(segmentation_dataframe_class) != 0:
                 self.load_image_overlay_from_dataframe(df=segmentation_dataframe_class, wkt_column_name='geoms',

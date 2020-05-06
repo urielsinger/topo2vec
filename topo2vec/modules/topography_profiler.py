@@ -10,6 +10,7 @@ from shapely.geometry import Point, Polygon
 import numpy as np
 from torch.backends import cudnn
 from torch.utils.data import DataLoader
+from tqdm import tqdm
 
 from common.geographic.geo_utils import sample_grid_in_poly, build_polygon
 from common.other_scripts import save_points_to_json_file
@@ -158,6 +159,10 @@ def get_all_points_and_classes(polygon: Polygon, meters_step: int,
             new_points = points_used[class_indexes, :]
             points_list.append(new_points)
             indices_list += ([class_number] * new_points.shape[0])
+            for j in tqdm(range(10), desc=f'length:{len(X)}'):
+                pass
+            for j in tqdm(range(10), desc=f'length new:{new_points.shape[0]}'):
+                pass
     return np.concatenate(patches_list, axis=0), np.concatenate(points_list, axis=0), indices_list
 
 
