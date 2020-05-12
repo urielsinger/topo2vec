@@ -71,7 +71,7 @@ class BasicBokeh:
         self.folium_fig = self.bokeh_new_class_folium(lonlat_text_inputs=self.lonlat_text_inputs)
 
         # Set up widgets
-        self.meters_step = Slider(title="meters_step", value=2500, start=10, end=2500, step=10)
+        self.meters_step = Slider(title="meters_step", value=20000, start=10, end=20000, step=10)
         self.number_of_points_to_show = Slider(title="number of points to show", value=5, start=1, end=100)
         self.threshold = Slider(title="threshold for class", value=0, start=0, end=1, step=0.01)
 
@@ -208,7 +208,7 @@ class BasicBokeh:
         self.main_panel.children[-1] = fig
         for j in tqdm(range(10), desc=f'9'):
             pass
-        #self.row_mid_column.children[-1] = Div(text=self.topo_map.colors_map) #TODO: very long
+        self.row_mid_column.children[-1] = Div(text=self.topo_map.colors_map) #TODO: very long
         for j in tqdm(range(10), desc=f'10'):
             pass
 

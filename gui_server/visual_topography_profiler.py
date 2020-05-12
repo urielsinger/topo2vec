@@ -263,6 +263,17 @@ class TopoMap(GeoMap):
         self.add_points_with_images(points_used_picked, points_patches_used_picked, color)
 
     def add_segmentation_map(self, polygon: Polygon, meters_step: int, class_names: List[str], thresholds_list: List[float]):
+        '''
+        Add a segmentation map to the bokeh plot.
+        Args:
+            polygon:
+            meters_step:
+            class_names:
+            thresholds_list:
+
+        Returns:
+
+        '''
         points_list, indices_list = client_lib.get_all_classifications_in_polygon(polygon, meters_step,
                                                                                   class_names, thresholds_list)
         polygons_list = points_list_to_polygons_wkt_list(points_list, meters_step)

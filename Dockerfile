@@ -31,7 +31,7 @@ WORKDIR /home/root
 
 RUN /bin/bash -c "mkdir -p topo2vec"
 
-COPY . .
+# COPY . .
 
 EXPOSE 80
 

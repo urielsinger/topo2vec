@@ -7,13 +7,15 @@ QUERY_STREAMS='way[waterway=stream]'${EARTH_LOCATION}';(._;>;);out;'
 QUERY_RIVERS='way[waterway=river]'${EARTH_LOCATION}';(._;>;);out;'
 QUERY_CLIFFS='way[natural=cliff]'${EARTH_LOCATION}';(._;>;);out;'
 
-declare -a INDEXES=(0 1 2 3)
+declare -a INDEXES=(0 1 )
 declare -a QUERIES=('way[natural=cliff]'${EARTH_LOCATION}';(._;>;);out;'
  'node[natural=peak]'${EARTH_LOCATION}';(._;>;);out;'
  'way[waterway=stream]'${EARTH_LOCATION}';(._;>;);out;'
  'way[waterway=river]'${EARTH_LOCATION}';(._;>;);out;'
+ 'node[natural=saddle]'${EARTH_LOCATION}';(._;>;);out;'
 );
-declare -a QUERIES=('way[waterway=stream]'${EARTH_LOCATION}';(._;>;);out;'
+  declare -a QUERIES=('way[waterway=river]'${EARTH_LOCATION}';(._;>;);out;'
+ 'node[natural=saddle]'${EARTH_LOCATION}';(._;>;);out;'
 );
 
 QUERY_SADDLES='node[natural=saddle]'${EARTH_LOCATION}';(._;>;);out;'
@@ -40,15 +42,16 @@ declare -a QUERIES4=('node[man_made=antenna]'${EARTH_LOCATION}';(._;>;);out;'
  'node[tourism=alpine_hut]'${EARTH_LOCATION}';(._;>;);out;'
 );
 
-declare -a NAMES=("cliffs" "peaks" "streams" "rivers")
-declare -a NAMES=("streams")
+declare -a NAMES=("cliffs" "peaks" "streams" "rivers", "saddles")
+declare -a NAMES=("rivers", "saddles")
+
 declare -a NAMES2=("saddles" "rocks" "cave_entrances" "sinkholes")
 declare -a NAMES3=("ridges"  "airialway_stations" "volcanos" "power_towers")
 declare -a NAMES4=("antenas"  "communications_towers" "waterfalls" "alpine_huts")
 
 for i in "${INDEXES[@]}"
 do
-    SAVE_LOCATION='//home/topo2vec_kavitzky/topo2vec/data/overpass_classes_data/'${NAMES[i]}'_'${EARTH_LOCATION}'.json'
+    SAVE_LOCATION=${NAMES[i]}'_'${EARTH_LOCATION}'.json'
     echo ${SAVE_LOCATION}
     LINK='http://overpass-api.de/api/interpreter?data=[out:json];'${QUERIES[i]}
     echo ${LINK}
