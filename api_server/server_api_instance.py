@@ -1,5 +1,6 @@
 import json
 import os
+from typing import Dict
 
 import shapely
 import sys
@@ -22,7 +23,22 @@ app = Flask(__name__)
 
 
 @app.route('/get_all_classifications', methods=['POST'])
-def get_all_classifications():
+def get_all_classifications() -> Dict:
+    '''
+    the request should contain a json dictionary contains the following:
+    1. a WKT representing a polygon in the 'polygon' field
+    2. an int representing the wanted longtitugonal an lattitugonal resolution in the 'meters_step' field
+    3. a json representing a list of strings - the wanted names - in the 'class_names' field
+    4. a json representing a list of floats in [0,1] - the wanted classes' thresholds for probability to accept as
+    the class' instance - in the 'thresholds' field
+
+    an example of how to create an appropriate request is in the -
+    client_lib.get_all_classifications_in_polygon() function
+    Returns: a json dictionary of the data the user asked for, including:
+        a. the locations of all the points
+        b. the index of each point's class in the get_available_class_names() returned array.
+
+    '''
     if request.is_json:
         json_dictionary_in = request.get_json()
         polygon = shapely.wkt.loads(json_dictionary_in['polygon'])
@@ -43,6 +59,20 @@ def get_all_classifications():
 
 @app.route('/get_class', methods=['POST'])
 def get_class_points():
+    '''
+        the request should contain a json dictionary contains the following:
+    1. a WKT representing a polygon in the 'polygon' field
+    2. an int representing the wanted longtitugonal an lattitugonal resolution in the 'meters_step' field
+    3. a string representing the wanted class name - in the 'class_name' field
+    4. a float in [0,1] - the wanted class' threshold - in the 'thresholds' field
+
+    an example of how to create an appropriate request is in the -
+    client_lib.get_all_class_points_in_polygon() function
+    Returns: a json dictionary of the data the user asked for, including:
+        a. the locations of all the points
+        b.the tiles arround the point in the multiple Radii's format.
+
+    '''
     if request.is_json:
         json_dictionary_in = request.get_json()
         polygon = shapely.wkt.loads(json_dictionary_in['polygon'])
@@ -63,6 +93,20 @@ def get_class_points():
 
 @app.route('/get_similar', methods=['POST'])
 def get_top_n_similar_points_in_polygon():
+    '''
+        the request should contain a json dictionary contains the following:
+    1. a WKT representing a polygon in the 'polygon' field
+    2. an int representing the wanted longtitugonal an lattitugonal resolution in the 'meters_step' field
+    3. an int representing the number of wanted similar points to send back - in the 'n' field
+    4. json representing a list of points - the wanted points to search for anothers similar to it
+
+    an example of how to create an appropriate request is in the -
+    client_lib.get_top_n_similar_points_in_polygon() function
+    Returns: a json dictionary of the data the user asked for, including:
+        a. the locations of all the points
+        b.the tiles arround the point in the multiple Radii's format.
+
+    '''
     if request.is_json:
         json_dictionary_in = request.get_json()
         polygon = shapely.wkt.loads(json_dictionary_in['polygon'])
@@ -84,6 +128,17 @@ def get_top_n_similar_points_in_polygon():
 
 @app.route('/get_features', methods=['POST'])
 def get_features():
+    '''
+
+        the request should contain a json dictionary contains the following:
+    1. json representing a list of points - the wanted points to latent space / features.
+
+    an example of how to create an appropriate request is in the -
+    client_lib.get_latent_for_points() function
+    Returns: a json dictionary of the data the user asked for, including:
+        a. the features/ latent space of every point
+        b. the points that the user asked for.
+    '''
     if request.is_json:
         json_dictionary_in = request.get_json()
         points_got = json.loads(json_dictionary_in['points'])
@@ -103,6 +158,14 @@ def get_features():
 
 @app.route('/get_working_polygon', methods=['POST', 'GET'])
 def get_working_polygon():
+    '''
+    an example of how to create an appropriate request is in the -
+    client_lib.get_working_polygon() function
+    Returns: a json dictionary of the data the user asked for, including:
+        a. the polygon available currently to ask for.
+
+    '''
+
     polygon = tp.get_working_polygon()
     polygon_wkt = polygon.wkt
     json_dictionary_out = {
@@ -114,6 +177,15 @@ def get_working_polygon():
 
 @app.route('/set_working_polygon', methods=['POST', 'GET'])
 def set_working_polygon():
+    '''
+    set the working polygon in the topogrpahy_profiler in the good way.
+                the request should contain a json dictionary contains the following:
+    1. a WKT representing a polygon in the 'polygon' field
+        an example of how to create an appropriate request is in the -
+    client_lib.set_working_polygon() function
+    Returns:
+        an informative string
+    '''
     if request.is_json:
         json_dictionary_in = request.get_json()
         polygon_wkt = json_dictionary_in['polygon']
@@ -125,6 +197,14 @@ def set_working_polygon():
 
 @app.route('/get_available_class_names', methods=['POST', 'GET'])
 def get_available_class_names():
+    '''
+    an example of how to create an appropriate request is in the -
+    client_lib.get_available_class_names() function
+    Returns: a json dictionary of the data the user asked for, including:
+        a. a json object of the list of class names, according to the order in which the server's
+        classifier is dealing with them.
+
+    '''
     class_names = tp.get_available_class_names()
     class_names_jsoned = json.dumps(class_names)
     json_dictionary_out = {
