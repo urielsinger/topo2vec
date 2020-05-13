@@ -253,3 +253,20 @@ def np_array_to_png_list(np_array:np.ndarray) ->List:
         image = Image.fromarray(im_rescaled)
         images_list.append(image)
     return images_list
+
+def plot_list_to_tensorboard(feature_extractor, closest_images_list_image_space: List[Tensor], number_to_log: int,
+                             title: str):
+    '''
+
+    Args:
+        closest_images_list_image_space: the images
+        number_to_log:
+        title:
+
+    Returns:
+
+    '''
+    for i, images_per_point in enumerate(closest_images_list_image_space):
+        images_per_point = convert_multi_radius_tensor_to_printable(images_per_point)
+        grid = get_grid_sample_images(images_per_point, False, number_to_log)
+        feature_extractor.logger.experiment.add_image(f'{title}_{i}', grid, 0)

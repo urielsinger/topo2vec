@@ -1,7 +1,11 @@
-from topo2vec.constants import AUTOENCODEsvm_classifier_ordinary_classes_test_log_dictR_LOGS_PATH
-from topo2vec.experiments.task_handler import TaskHandler
+from topo2vec.constants import AUTOENCODER_LOGS_PATH
+from topo2vec.task_handler import TaskHandler
 from topo2vec.background import LOAD_CLASSES_LARGE
 from topo2vec.modules import Classifier
+
+####################################################################################################################
+# a hyperparams search for autoencoder experiment - change the "classifier_regular_args" to make other experiments #
+####################################################################################################################
 
 parser = Classifier.get_args_parser()
 autoencoder_check_args = parser.parse_args(['--save_model',

@@ -8,7 +8,7 @@ from visualization_server import visualizer
 import numpy as np
 
 from common.geographic.geo_utils import check_if_point_in_polygon
-from topo2vec.helper_functions import full_path_name_to_full_path
+from topo2vec.helper_functions import full_path_name_of_dataset_data_to_full_path
 from common.list_conversions_utils import points_list_to_floats_list, floats_list_to_points_list, load_list_from_file, \
     save_list_to_file
 
@@ -44,10 +44,10 @@ class MultiRadiusDataset(Dataset):
         actual_patches = None
         points_locations = None
         if self.full_base_dir is not None:
-            full_path_actual_patches = full_path_name_to_full_path(self.full_base_dir, 'actual_patches')
+            full_path_actual_patches = full_path_name_of_dataset_data_to_full_path(self.full_base_dir, 'actual_patches')
             actual_patches = load_list_from_file(full_path_actual_patches)
 
-            full_path_points_locations = full_path_name_to_full_path(self.full_base_dir, 'points_locations')
+            full_path_points_locations = full_path_name_of_dataset_data_to_full_path(self.full_base_dir, 'points_locations')
             points_locations = load_list_from_file(full_path_points_locations)
 
         if actual_patches is None or points_locations is None:

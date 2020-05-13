@@ -6,7 +6,6 @@ a. download the needed data:
 
 b. run the project:
 1. define the wanted ports for the project in the .env file
-2. update the gist file location in /Dockerfile - (put there the /environment.yml file)
 2. in the root folder run "docker-compose build --no-cache"
 3. in the root folder run "docker compose up"
 

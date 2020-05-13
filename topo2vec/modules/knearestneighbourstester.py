@@ -7,8 +7,9 @@ from torch import Tensor
 from torch.utils.data import ConcatDataset
 
 from topo2vec.background import VALIDATION_HALF, POINT_TO_SEARCH_SIMILAR
-from common.pytorch.pytorch_lightning_utilities import get_dataset_as_tensor
-from common.pytorch.visualizations import convert_multi_radius_tensor_to_printable, get_grid_sample_images
+from common.pytorch.pytorch_lightning_utilities import get_dataset_as_tensor, get_dataset_latent_space_as_np
+from common.pytorch.visualizations import convert_multi_radius_tensor_to_printable, get_grid_sample_images, \
+    plot_list_to_tensorboard
 from topo2vec.constants import GROUP_TO_SEARCH_SIMILAR_LONGS_LARGE
 from topo2vec.datasets.class_dataset import ClassDataset
 from topo2vec.datasets.random_dataset import RandomDataset
@@ -33,7 +34,12 @@ class KNearestNeighboursTester:
     def prepare_data(self):
         '''
 
-        prepare the self.random_dataset, and self.typical_images_dataset Datasets
+        init the:
+        self.random_dataset - dataset to search in
+        self.typical_images_dataset - Dataset
+        self.random_images_as_tensor - the dataset as tensor
+
+        according to the self.method method.
 
         '''
         random_dataset = RandomDataset(self.random_set_size,
@@ -79,8 +85,8 @@ class KNearestNeighboursTester:
         typical_images_as_np = typical_images_as_tensor.data.numpy()
 
         # images in latent space
-        random_images_latent_as_np = self._get_dataset_latent_space_as_np(self.random_images_as_tensor)
-        typical_images_latent_as_np = self._get_dataset_latent_space_as_np(typical_images_as_tensor)
+        random_images_latent_as_np = get_dataset_latent_space_as_np(self.feature_extractor, self.random_images_as_tensor)
+        typical_images_latent_as_np = get_dataset_latent_space_as_np(self.feature_extractor, typical_images_as_tensor)
 
         typical_images_set_to_show = convert_multi_radius_tensor_to_printable(typical_images_as_tensor)
 
@@ -94,6 +100,14 @@ class KNearestNeighboursTester:
             typical_images_latent_as_np,
             take_mean=(self.method == 'group_from_file'))
 
+        # the return is:
+        # closest images (in images space) list
+        # closest images (in latent space) list
+        # the latent of images that where the input,
+        # the "visual" way of the images that where the input
+        # number of images that were asked to be logged
+        # locations of the closest images (in latent space) list
+        # locations of the closest images (in latent space) list
         return closest_images_list_image_space, closest_images_list_latent_space, typical_images_latent_as_np, \
                typical_images_set_to_show, number_to_log, closest_points_list_latent_space
 
@@ -135,46 +149,35 @@ class KNearestNeighboursTester:
         return images_list, points_list
 
     def test_and_plot_via_feature_extractor_tensorboard(self):
+        '''
+
+        plot the knn examples patches to the tensorboard:
+            'closest_samples_images' - the samples that are closest in th L2 norm on the original images
+            in the regular case:
+            'closest_samples_latent' - the samples that are closest in the L2 norm in the latent space
+            'knn_example images_{i}' - the original images
+
+            in the group case:
+            'group_of_example_images' - the images that are in the group.
+            'closest_samples_latent_group_mean' -  the samples that are closest in the L2 norm in the
+                                                    latent space to the mean of the example images
+
+        '''
         closest_images_list_image_space, closest_images_list_latent_space, typical_images_latent_as_np, \
         typical_images_set_to_show, number_to_log, _ = self.test()
 
-        self.plot_list_to_tensorboard(closest_images_list_image_space, number_to_log, 'closest_samples_images')
+        plot_list_to_tensorboard(self.feature_extractor, closest_images_list_image_space, number_to_log, 'closest_samples_images')
         if self.method == 'regular':
-            self.plot_list_to_tensorboard(closest_images_list_latent_space, number_to_log, 'closest_samples_latent')
+            plot_list_to_tensorboard(self.feature_extractor, closest_images_list_latent_space, number_to_log, 'closest_samples_latent')
 
             for i in range(len(typical_images_latent_as_np)):
                 grid = torchvision.utils.make_grid(typical_images_set_to_show[i])
-                self.feature_extractor.logger.experiment.add_image(f'knn_example images_{i}', grid, 0)
+                self.feature_extractor.logger.experiment.add_image(f'knn_example_images_{i}', grid, 0)
 
         if self.method == 'group_from_file':
-            self.plot_list_to_tensorboard(closest_images_list_latent_space, number_to_log,
+            plot_list_to_tensorboard(self.feature_extractor, closest_images_list_latent_space, number_to_log,
                                           'closest_samples_latent_group_mean')
 
             grid = torchvision.utils.make_grid(typical_images_set_to_show)
             self.feature_extractor.logger.experiment.add_image(f'group_of_example_images', grid, 0)
 
-    def plot_list_to_tensorboard(self, closest_images_list_image_space, number_to_log,
-                                 title):
-        for i, images_per_point in enumerate(closest_images_list_image_space):
-            images_per_point = convert_multi_radius_tensor_to_printable(images_per_point)
-            grid = get_grid_sample_images(images_per_point, False, number_to_log)
-            self.feature_extractor.logger.experiment.add_image(f'{title}_{i}', grid, 0)
-
-    def _get_dataset_latent_space_as_np(self, images_as_tensor: Tensor) -> Tensor:
-        '''
-
-        Args:
-            images_as_tensor: the images to put in the feature_extractor
-
-        Returns:
-
-        '''
-        images_as_tensor = images_as_tensor.float()
-        if self.feature_extractor.hparams.use_gpu:
-            images_as_tensor = images_as_tensor.cuda()
-        _, images_latent_as_tensor = self.feature_extractor.forward(images_as_tensor)
-        images_latent_as_np = images_latent_as_tensor.data
-        if self.feature_extractor.hparams.use_gpu:
-            images_latent_as_np = images_latent_as_np.cpu()
-        images_latent_as_np = images_latent_as_np.numpy()
-        return images_latent_as_np

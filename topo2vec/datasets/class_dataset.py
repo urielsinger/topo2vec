@@ -5,7 +5,7 @@ from typing import List, Tuple
 from torch import tensor
 
 from topo2vec.background import classes_data_handlers
-from topo2vec.helper_functions import full_path_name_to_full_path
+from topo2vec.helper_functions import full_path_name_of_dataset_data_to_full_path
 from common.list_conversions_utils import points_list_to_floats_list, floats_list_to_points_list, load_list_from_file, \
     save_list_to_file
 from topo2vec.constants import CACHE_BASE_DIR
@@ -75,7 +75,7 @@ class ClassDataset(MultiRadiusDataset):
 
         points_list = None
         if self.full_base_dir is not None:
-            full_path_points_list = full_path_name_to_full_path(self.full_base_dir, 'points')
+            full_path_points_list = full_path_name_of_dataset_data_to_full_path(self.full_base_dir, 'points')
             points_list = load_list_from_file(full_path_points_list)
 
         if points_list is None:
@@ -91,7 +91,7 @@ class ClassDataset(MultiRadiusDataset):
             points_list = floats_list_to_points_list(points_list)
 
         self.add_points_as_patches_to_actual_patches(points_list, file_path)
-        full_path_labels = full_path_name_to_full_path(self.full_base_dir, 'labels')
+        full_path_labels = full_path_name_of_dataset_data_to_full_path(self.full_base_dir, 'labels')
         labels = load_list_from_file(full_path_labels)
         if labels is None:
             self.labels += [label] * len(self.actual_patches)

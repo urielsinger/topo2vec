@@ -1,6 +1,12 @@
-from topo2vec.experiments.task_handler import TaskHandler
+from topo2vec.task_handler import TaskHandler
 from topo2vec.background import LOAD_CLASSES_LARGE
 from topo2vec.modules import Classifier
+
+######################################################################################################
+# an ordinary autoencoder experiment - change the "classifier_regular_args" to make other experiments #
+######################################################################################################
+
+parser = Classifier.get_args_parser()
 if LOAD_CLASSES_LARGE:
     autoencoder_regular_args = parser.parse_args(['--save_model',
                                                   '--learning_rate', '0.0008',
@@ -45,5 +51,5 @@ lab.run()
 #                                                   '--name', 'autoencoder',
 #                                                   '--pytorch_module', 'Autoencoder',
 #                                                   '--total_dataset_size', '10',
-#                                                   '--random_set_size', '100',
+#                                                   '--random_set_size_for_knn', '100',
 #                                                   '--random_set_size_for_svm', '2000'])

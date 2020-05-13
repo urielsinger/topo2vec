@@ -27,7 +27,7 @@ class TaskHandler:
         '''
         runs an experiment
         Args:
-            hparams:
+            hparams: the hparams for the training, the model, and the architecture.
 
         Returns: the accuracy of the experiment on the validation
 
@@ -66,7 +66,6 @@ class TaskHandler:
             else:
                 trainer = pl.Trainer(max_epochs=hparams.max_epochs, logger=logger)
 
-
         if len(list(model.parameters())) != 0:
             trainer.fit(model)
 
@@ -75,7 +74,7 @@ class TaskHandler:
             trainer.test()
 
         if hparams.test_knn:
-            knn = KNearestNeighboursTester(random_set_size=hparams.random_set_size,
+            knn = KNearestNeighboursTester(random_set_size=hparams.random_set_size_for_knn,
                                            radii=str_to_int_list(hparams.radii),
                                            feature_extractor=model, k=hparams.k,
                                            method=hparams.knn_method_for_typical_choosing,
@@ -93,7 +92,7 @@ class TaskHandler:
             save_path = os.path.join(FINAL_MODEL_DIR, 'final_model.pt')
             torch.save(model.state_dict(), save_path)
 
-        return float(model.get_hyperparams_value())
+        return float(model.get_hyperparams_value_for_maximizing())
 
 
     def _build_hparams_and_run_experiment(self, trial):

@@ -57,8 +57,9 @@ def get_all_classifications() -> Dict:
         return data
     return None
 
+
 @app.route('/get_class', methods=['POST'])
-def get_class_points():
+def get_class_points() -> Dict:
     '''
         the request should contain a json dictionary contains the following:
     1. a WKT representing a polygon in the 'polygon' field
@@ -92,7 +93,7 @@ def get_class_points():
 
 
 @app.route('/get_similar', methods=['POST'])
-def get_top_n_similar_points_in_polygon():
+def get_top_n_similar_points_in_polygon() -> Dict:
     '''
         the request should contain a json dictionary contains the following:
     1. a WKT representing a polygon in the 'polygon' field
@@ -127,7 +128,7 @@ def get_top_n_similar_points_in_polygon():
 
 
 @app.route('/get_features', methods=['POST'])
-def get_features():
+def get_features() -> Dict:
     '''
 
         the request should contain a json dictionary contains the following:
@@ -157,7 +158,7 @@ def get_features():
 
 
 @app.route('/get_working_polygon', methods=['POST', 'GET'])
-def get_working_polygon():
+def get_working_polygon() -> Dict:
     '''
     an example of how to create an appropriate request is in the -
     client_lib.get_working_polygon() function
@@ -176,7 +177,7 @@ def get_working_polygon():
 
 
 @app.route('/set_working_polygon', methods=['POST', 'GET'])
-def set_working_polygon():
+def set_working_polygon() -> str:
     '''
     set the working polygon in the topogrpahy_profiler in the good way.
                 the request should contain a json dictionary contains the following:
@@ -196,7 +197,7 @@ def set_working_polygon():
 
 
 @app.route('/get_available_class_names', methods=['POST', 'GET'])
-def get_available_class_names():
+def get_available_class_names() -> Dict:
     '''
     an example of how to create an appropriate request is in the -
     client_lib.get_available_class_names() function

@@ -15,13 +15,14 @@ from torch.utils.data import DataLoader, Dataset
 import topo2vec.models as models
 from topo2vec.background import TRAIN_HALF, VALIDATION_HALF, CLASS_PATHS, CLASS_NAMES, LOAD_CLASSES_LARGE, \
     CLASS_PATHS_TEST, CLASS_NAMES_TEST, CLASS_NAMES_SPECIAL, CLASS_PATHS_SPECIAL
-from topo2vec.helper_functions import get_paths_and_names_wanted, svm_accuracy_on_dataset_in_latent_space
+from topo2vec.helper_functions import get_paths_and_names_wanted
 from common.pytorch.pytorch_lightning_utilities import get_dataset_as_tensor, get_random_part_of_dataset
 from common.list_conversions_utils import str_to_int_list
 from common.pytorch.visualizations import convert_multi_radius_tensor_to_printable, get_grid_sample_images_at_indexes, \
     plot_to_image, plot_confusion_matrix
 from topo2vec.constants import SAVE_PATH, GROUP_TO_SEARCH_SIMILAR_LONGS_LARGE, LOGS_PATH
 from topo2vec.datasets.several_classes_datasets import SeveralClassesDataset
+from topo2vec.modules.svm_on_latent_tester import svm_classifier_test, svm_accuracy_on_dataset_in_latent_space
 
 
 class Classifier(LightningModule):
@@ -32,7 +33,6 @@ class Classifier(LightningModule):
         using hparams, containing:
         arch - the architecture of the classifier
         and all other params defined in the "multi_class_experiment" script.
-
         """
         super(Classifier, self).__init__()
         self.hparams = hparams
@@ -52,6 +52,11 @@ class Classifier(LightningModule):
         self.class_paths = CLASS_PATHS
 
     def prepare_data(self):
+        '''
+
+        a pytorch-lightning function.
+
+        '''
         size_train = int(self.train_portion * self.total_dataset_size)
         size_val = int((1 - self.train_portion) * self.total_dataset_size)
 
@@ -111,6 +116,17 @@ class Classifier(LightningModule):
         return self._evaluation_step(batch, 'validation')
 
     def _evaluation_step(self, batch: Tensor, name: str) -> Dict:
+        '''
+        all the things needed to be done in each of both validation and test steps
+        this is the part that will be overriden by sub-classes.
+
+        Args:
+            batch:
+            name:
+
+        Returns:
+
+        '''
         x, y = batch
         outputs, _ = self.forward(x.float())
         _, predicted = torch.max(outputs.data, 1)
@@ -125,6 +141,7 @@ class Classifier(LightningModule):
 
         loss = self.loss_fn(outputs.float(), y.squeeze().long())
 
+        # a TP_TN_FP_FN is only relevant in 2 classes. the confusion matrix is better in every other case.
         if self.num_classes == 2:
             self._run_images_TP_TN_FP_FN_evaluation(predicted, x, y)
 
@@ -171,6 +188,16 @@ class Classifier(LightningModule):
         self.logger.experiment.add_image('example images', grid, 0)
 
     def log_confusion_matrix(self, y_true, y_pred, labels):
+        '''
+         log the confusion matrix of the classes trained on
+        Args:
+            y_true:
+            y_pred:
+            labels:
+
+        Returns:
+
+        '''
         confusion_matrix = sklearn.metrics.confusion_matrix(y_true, y_pred, normalize='pred')
         ax, fig = plot_confusion_matrix(cm=confusion_matrix,
                               normalize=False,
@@ -190,14 +217,21 @@ class Classifier(LightningModule):
             self.logger.experiment.add_image(title, grid, 0)
 
     def test_epoch_end(self, outputs: list) -> Dict:
+        '''
+        a function consisting of all the operations needed after the test epoch
+        Args:
+            outputs:
+
+        Returns:
+
+        '''
         if self.test_dataset is not None:
             self._log_embedding_visualization()
             basic_dict = self._evaluation_epoch_end(outputs, 'test')
             if 'test_acc' in basic_dict['log']:
                 self.final_test_accuracy = basic_dict['log']['test_acc']
 
-            #TODO: put svm outside
-            svm_classifier_ordinary_classes_test_log_dict = self._svm_classifier_test(CLASS_PATHS, CLASS_NAMES,
+            svm_classifier_ordinary_classes_test_log_dict = svm_classifier_test(self, CLASS_PATHS, CLASS_NAMES,
                                                                                       'ordinary', self.test_dataset,
                                                                                       self.hparams.random_set_size_for_svm)
 
@@ -210,7 +244,7 @@ class Classifier(LightningModule):
                                                              'test_svm_special')
 
             svm_classifier_special_classes_test_log_dict = \
-                self._svm_classifier_test(class_paths_special, class_names_special,
+                svm_classifier_test(self, class_paths_special, class_names_special,
                                           'special', svm_special_test_dataset,
                                           self.hparams.random_set_size_for_svm_special)
 
@@ -221,48 +255,17 @@ class Classifier(LightningModule):
             return basic_dict
         return {}
 
-    def _svm_classifier_test(self, class_paths_to_test: str, class_names_to_test: str, name: str,
-                             test_dataset: Dataset, train_dataset_size):
-        if self.hparams.svm_classify_latent_space:
-            svm_train_dataset = SeveralClassesDataset(self.radii, TRAIN_HALF, train_dataset_size,
-                                                      class_paths_to_test, class_names_to_test, 'train_svm_' + name)
-            svm_validation_dataset = SeveralClassesDataset(self.radii, VALIDATION_HALF, train_dataset_size,
-                                                           class_paths_to_test, class_names_to_test,
-                                                           'train_svm_' + name)
 
-            X_train, y_train = get_dataset_as_tensor(svm_train_dataset)
-            if self.hparams.use_gpu:
-                X_train = X_train.cuda()
 
-            _, latent_train = self.forward(X_train)
-            SVMClassifier = svm.SVC()
+    def validation_epoch_end(self, outputs: list) -> Dict:
+        '''
+        a function consisting of all the operations needed after each validation epoch
+        Args:
+            outputs:
 
-            if self.hparams.use_gpu:
-                latent_train = latent_train.cpu()
-                y_train = y_train.cpu()
+        Returns:
 
-            latent_train_numpy = latent_train.numpy()
-            y_train_numpy = y_train.numpy()
-
-            SVMClassifier.fit(latent_train_numpy, y_train_numpy)
-
-            train_accuracy = svm_accuracy_on_dataset_in_latent_space(SVMClassifier,
-                                                                     svm_train_dataset, self)
-
-            validation_accuracy = svm_accuracy_on_dataset_in_latent_space(SVMClassifier,
-                                                                          svm_validation_dataset, self)
-
-            test_accuracy = svm_accuracy_on_dataset_in_latent_space(SVMClassifier,
-                                                                    test_dataset, self)
-            self.svm_validation_accuracy = validation_accuracy
-            self.svm_test_accuracy = test_accuracy
-
-            return {f'svm_train_{name}_accuracy': train_accuracy,
-                    f'svm_validation_{name}_accuracy': validation_accuracy,
-                    f'svm_test_{name}_accuracy': test_accuracy}
-        return {}
-
-    def validation_epoch_end(self, outputs: list) -> Tensor:
+        '''
         basic_dict = self._evaluation_epoch_end(outputs, 'validation')
         if 'validation_acc' in basic_dict['log']:
             self.final_validation_accuracy = basic_dict['log']['validation_acc']
@@ -271,6 +274,16 @@ class Classifier(LightningModule):
         return basic_dict
 
     def _evaluation_epoch_end(self, outputs: list, name: str) -> Dict:
+        '''
+        a function consisting of all the operations needed after evaluation epoch, both validation and test epochs
+        this is the part that will be overriden by sub-classes.
+        Args:
+            outputs:
+            name: whether it is the test or validation evaluation epoch end
+
+        Returns:
+
+        '''
         avg_loss = torch.stack([x[name + '_loss'] for x in outputs]).mean()
         avg_accuracy = torch.stack([x[name + '_acc'] for x in outputs]).mean()
         avg_accuracies = {}
@@ -284,6 +297,9 @@ class Classifier(LightningModule):
         return {'avg_' + name + '_loss': avg_loss, 'log': tensorboard_logs}
 
     def _log_embedding_visualization(self):
+        '''
+        log the embedding space of the latent to the tensorboard
+        '''
         x, y = get_random_part_of_dataset(self.test_dataset,
                                                self.embedding_visualization_size)
         x = x.float()
@@ -296,66 +312,115 @@ class Classifier(LightningModule):
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.hparams.learning_rate)
         # weight_decay=self.hparams.weight_decay
-        # )
         return [optimizer]
 
-    def get_hyperparams_value(self):
+    def get_hyperparams_value_for_maximizing(self):
+        '''
+
+        Returns: the value we want to maximize when running an optuna hyper-params search for classifiers
+
+
+        '''
         return self.max_validation_accuracy
 
     @staticmethod
     def get_args_parser():
         parser = argparse.ArgumentParser(add_help=False)
-        parser.add_argument('--embedding_visualization_size', type=list, default=100)
+
+        # general / saving constants #
+        ##############################
+
+        parser.add_argument('--name', type=str,
+                            help='a special name for the current model running')
+        parser.add_argument('--save_model', dest='save_model', action='store_true',
+                            help='asked to save the model in save_path location')
+        parser.add_argument('--save_path', metavar='DIR', default=SAVE_PATH, type=str,
+                            help='path to save model')
+        parser.add_argument('--pretrained', dest='pretrained', action='store_true',
+                            help='use pre-trained model, stored in save_path/{name}.pt')
+
+        parser.add_argument('--save_to_final', dest='save_to_final', action='store_true',
+                            help='save the model to the location of the "final" model - the one used in the server_api'
+                                 ' itself')
+        parser.add_argument('--logs_path', default=LOGS_PATH, type=str,
+                            help='tensorboard logs poath')
+
+
+        parser.add_argument('--seed', type=int, default=42,
+                            help='seed for initializing training. ')
+        parser.add_argument('--use_gpu', dest='use_gpu', action='store_true',
+                            help='put for using a gpu, if you have one and cuda configured properly')
+
+        # the model #
+        #############
+
         parser.add_argument('--radii', type=str, default='[8, 16, 24]')
         parser.add_argument('--arch', type=str)
+        parser.add_argument('--num_classes', type=int, default=len(CLASS_PATHS),
+                            help='number of the classes in the dataset. ')
+        parser.add_argument('--pytorch_module', type=str,
+                            help='choose what pytorch modelu to use: classsifier / autoencoder')
+        parser.add_argument('--latent_space_size', type=int, default=50,
+                            help='size of the desired latent space of the autoencoder.')
+
+
+        # the classes data #
+        ####################
+
+        parser.add_argument('--train_portion', type=float, default=0.8,
+                            help='portion of the total_dataset_Size to put into training.')
+        parser.add_argument('--size_test', type=int, default=55,
+                            help='what is the total size of the wanted test data (from data/overpass_classes_Data/tests)')
+
+        # training constants #
+        ######################
+
         parser.add_argument('--lr', '--learning_rate', default=1e-4, type=float,
                             metavar='LR', help='initial learning rate', dest='learning_rate')
         parser.add_argument('--total_dataset_size', type=int, default=75000)
         parser.add_argument('--max_epochs', default=100, type=int, metavar='N',
                             help='number of total epochs to run')
-        parser.add_argument('--num_classes', type=int, default=len(CLASS_PATHS),
-                            help='number of the classes in the dataset. ')
-        parser.add_argument('--name', type=str,
-                            help='number of the classes in the dataset. ')
-        parser.add_argument('--pytorch_module', type=str)
-        parser.add_argument('--seed', type=int, default=42,
-                            help='seed for initializing training. ')
-        parser.add_argument('--pretrained', dest='pretrained', action='store_true',
-                            help='use pre-trained model')
-        parser.add_argument('--save_model', dest='save_model', action='store_true',
-                            help='use pre-trained model')
-        parser.add_argument('--save_path', metavar='DIR', default=SAVE_PATH, type=str,
-                            help='path to save model')
-        parser.add_argument('--random_set_size', type=int, default=10000,
-                            help='seed for initializing training. ')
-        parser.add_argument('--k', type=int, default=5,
-                            help='seed for initializing training. ')
-        parser.add_argument('--train_portion', type=float, default=0.8,
-                            help='portion of the total_dataset_Size to put into training.')
-        parser.add_argument('--latent_space_size', type=int, default=50,
-                            help='size of the desired latent space of the autoencoder.')
-        parser.add_argument('--test_knn', dest='test_knn', action='store_true',
-                            help='test the latent space to find the knn of the main things')
-        parser.add_argument('--svm_classify_latent_space', dest='svm_classify_latent_space', action='store_true',
-                            help='classify the latent space using one linear layer to check if it is good')
-        parser.add_argument('--random_set_size_for_svm', type=int, default=1000)
-        parser.add_argument('--random_set_size_for_svm_special', type=int, default=1000)
-        parser.add_argument('--size_test', type=int, default=55)
-        parser.add_argument('--knn_method_for_typical_choosing', type=str, default='group_from_file',
-                            help='"regular" or "group_from_file"')
-        parser.add_argument('--special_classes_for_validation', type=str, default='["alpine_huts", "waterfalls"]',
-                            help='"regular" or "group_from_file"')
-        parser.add_argument('--test_set_size_for_svm', type=int, default=100,
-                            help='"regular" or "group_from_file"')
-        parser.add_argument('--json_file_of_group_for_knn', type=str, default=GROUP_TO_SEARCH_SIMILAR_LONGS_LARGE)
         parser.add_argument('--wd', '--weight-decay', default=1e-4, type=float,
                             metavar='W', help='weight decay (default: 1e-4)',
                             dest='weight_decay')
-        parser.add_argument('--use_gpu', dest='use_gpu', action='store_true',
-                            help='put for using a gpu')
-        parser.add_argument('--save_to_final', dest='save_to_final', action='store_true',
-                            help='save the model to the final place')
-        parser.add_argument('--logs_path', default=LOGS_PATH, type=str,
-                            help='tensorboard logs poath')
+
+
+        # evealuation / Tensorboard constants #
+        #######################################
+
+        # embeding #
+
+        # how many points we want to put in the embedding space
+        parser.add_argument('--embedding_visualization_size', type=list, default=100)
+
+        # knn #
+
+        # knn_test for the latent space - search for points similar in latent space and
+        # find out what the latent space is actually about.
+        parser.add_argument('--test_knn', dest='test_knn', action='store_true',
+                            help='test the latent space to find the knn of the main things')
+        parser.add_argument('--random_set_size_for_knn', type=int, default=10000,
+                            help='the random set size for the knn evaluation')
+        parser.add_argument('--k', type=int, default=5,
+                            help='the number of neerest neighbours for the knn ebvaluation')
+
+        # regular is just choosing points from file and getting similar to them
+        # group_from_file is taking all the points from the file saved in --json_file_of_group_for_knn
+        parser.add_argument('--knn_method_for_typical_choosing', type=str, default='group_from_file',
+                            help='"regular" or "group_from_file"')
+        parser.add_argument('--json_file_of_group_for_knn', type=str, default=GROUP_TO_SEARCH_SIMILAR_LONGS_LARGE)
+
+        # svm on latent #
+
+        # svm classification on top of the model - for ecaluation only
+        parser.add_argument('--svm_classify_latent_space', dest='svm_classify_latent_space', action='store_true',
+                            help='classify the latent space using one linear layer to check if it is good')
+        parser.add_argument('--random_set_size_for_svm', type=int, default=1000)
+        parser.add_argument('--random_set_size_for_svm_special', type=int, default=1000,
+                            help='svm special is trying to differ between classes not trained on (e.g. alpine_huts, antennas, etc. -'
+                                 'saved in --special_classes_for_validation')
+        parser.add_argument('--special_classes_for_validation', type=str, default='["alpine_huts", "waterfalls"]',
+                            help='a list of the names of the names of the classes where the svm_special is stored')
+        parser.add_argument('--test_set_size_for_svm', type=int, default=100)
 
         return parser

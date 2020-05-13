@@ -5,6 +5,10 @@ from topo2vec.background import TRAIN_HALF, CLASS_PATHS, CLASS_NAMES, VALIDATION
 from common.pytorch.pytorch_lightning_utilities import get_dataset_as_tensor
 from topo2vec.datasets.several_classes_datasets import SeveralClassesDataset
 
+######################################################################
+# an svm baseline - check if all this deep learning essential at all #
+######################################################################
+
 radii = [8, 16, 24]
 radius = min(radii)
 h_w = 2 * radius + 1
@@ -32,5 +36,5 @@ predicted_test = SVMClassifier.predict(latent_test.numpy())
 train_accuracy = accuracy_score(y_train.numpy(), predicted_train)
 test_accuracy = accuracy_score(y_test.numpy(), predicted_test)
 
-print(f'train accuracy:{train_accuracy}')
-print(f'test accuracy:{test_accuracy}')
+print(f'svm train accuracy:{train_accuracy}')
+print(f'svm test accuracy:{test_accuracy}')

@@ -1,10 +1,6 @@
 from unittest import TestCase
-from topo2vec.experiments.task_handler import TaskHandler
-from topo2vec.background import LOAD_CLASSES_LARGE
-from topo2vec.modules import Classifier
 
-from topo2vec.background import LOAD_CLASSES_LARGE
-from topo2vec.experiments.task_handler import TaskHandler
+from topo2vec.task_handler import TaskHandler
 from topo2vec.modules import Classifier
 
 class TestTaskHandler(TestCase):
@@ -52,7 +48,7 @@ class TestTaskHandler(TestCase):
                                                               '--pytorch_module', 'Classifier',
                                                               '--random_set_size_for_svm', '100',
                                                               '--test_set_size_for_svm', '38',
-                                                              '--random_set_size', '100',
+                                                              '--random_set_size_for_knn', '100',
                                                               '--latent_space_size', '50',
                                                               '--knn_method_for_typical_choosing', 'group_from_file',
                                                               '--random_set_size_for_svm_special', '1000',

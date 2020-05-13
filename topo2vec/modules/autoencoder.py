@@ -66,12 +66,31 @@ class Autoencoder(Classifier):
         return {'loss': loss, 'log': tensorboard_logs}
 
     def _evaluation_step(self, batch: Tensor, name: str) -> Dict:
+        '''
+        the autoencoder does much less "evaluation step" operations because it is not about classifying.
+
+        Args:
+            batch:
+            name: validation / test
+
+        Returns:
+
+        '''
         x, y = batch
         decoded, latent = self.forward(x.float())
         loss = self.loss_fn(decoded.float(), x.float())
         return {name + '_loss': loss}
 
     def plot_before_after(self, dataset_name: str, number_to_plot: int = 5):
+        '''
+        adds to the ternsorboard the before and after autoencoder images.
+        Args:
+            dataset_name: the dataset to plot from
+            number_to_plot: number of images we want to plot
+
+        Returns:
+
+        '''
         random_images_as_tensor, y = get_random_part_of_dataset(self.datasets[dataset_name], number_to_plot)
         random_images_as_tensor = random_images_as_tensor.float()
         if self.hparams.use_gpu:
@@ -86,11 +105,25 @@ class Autoencoder(Classifier):
         self.logger.experiment.add_image(f'{dataset_name}_after autoencoder', grid_after, 0)
 
     def _evaluation_epoch_end(self, outputs: list, name: str) -> Dict:
+        '''
+        the autoencoder does much less "evaluation epoch end" operations because it is not about classifying.
+        Args:
+            outputs:
+            name: validation / test
+
+        Returns:
+
+        '''
         avg_loss = torch.stack([x[name + '_loss'] for x in outputs]).mean()
         tensorboard_logs = {name + '_loss': avg_loss}
         self.plot_before_after(name)
         self.plot_before_after('train')
         return {'avg_' + name + '_loss': avg_loss, 'log': tensorboard_logs}
 
-    def get_hyperparams_value(self):
+    def get_hyperparams_value_for_maximizing(self):
+        '''
+
+        Returns: the value we want to maximize when running an optuna hyper-params search for autoencoders
+
+        '''
         return self.svm_validation_accuracy
