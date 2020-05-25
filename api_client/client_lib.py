@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List
 
 import requests
 import json
@@ -19,44 +19,18 @@ ADDRESS = f'{PROTOCOL}://{IP}:{PORT}'
 
 
 def build_polygon(low_lon, low_lat, high_lon, high_lat):
-    '''
-
-    Args:
-        low_lon:
-        low_lat:
-        high_lon:
-        high_lat:
-
-    Returns: a rectangular polygon with the corners according to the input
-
-    '''
     poly = Polygon([Point(low_lon, low_lat), Point(low_lon, high_lat), Point(high_lon, high_lat),
                     Point(high_lon, low_lat), Point(low_lon, low_lat)])
     return poly
 
 
 def get_all_classifications_in_polygon(polygon: Polygon, meters_step: int, class_names: List[str],
-                                       thresholds: List[float]) -> Tuple[List[Point], List[int]]:
-    '''
-    get the list of all points of the certain class_name.
-    (according to topo2vec.topography_profiler.get_all_points_and_classes())
-
-    Uses the server_api_instance.get_all_classifications() function
-
-    Args:
-        polygon: the polygon to earch in. should be inside the get_working_polygon()
-        meters_step: the resolution to build the grid we search on
-        class_names: the classes i want to get the data about.
-        thresholds: list of thresholds for the probability that the points are of the corresponding class,
-        according to the server's classifier
-
-    Returns: get the points, and the indices of each of them
-
-    '''
+                                       thresholds: List[float], test_radius:int):
     request_dict = {'polygon': polygon.wkt,
                     'meters_step': meters_step,
                     'class_names': json.dumps(class_names),
-                    'thresholds': json.dumps(thresholds)}
+                    'thresholds': json.dumps(thresholds),
+                    'test_radius': test_radius}
     url = f'{ADDRESS}/get_all_classifications'
     print(f'waiting for {url}')
     response = requests.post(url=url, json=request_dict)
@@ -69,29 +43,12 @@ def get_all_classifications_in_polygon(polygon: Polygon, meters_step: int, class
     return locations, class_indices
 
 
-def get_all_class_points_in_polygon(polygon: Polygon, meters_step: int, class_name: str,
-                                    threshold: float) -> Tuple[np.ndarray, np.ndarray]:
-    '''
-    get the list of all points of the certain class_name.
-    (according to topo2vec.topography_profiler.get_all_class_points_in_polygon())
-
-    Uses the server_api_instance.get_class_points() function
-    Args:
-        points: the list of Points
-        polygon: the polygon to earch in. should be inside the get_working_polygon()
-        meters_step: the resolution to build the grid we search on
-        thresholds: a threshold for the probability that the points are of the corresponding class,
-        according to the server's classifier
-
-
-    Returns: a tuple: the points, the 3-layers patches (in dims according to the radii)
-
-    '''
-
+def get_all_class_points_in_polygon(polygon, meters_step, class_name, threshold, test_radius):
     request_dict = {'polygon': polygon.wkt,
                     'meters_step': meters_step,
                     'class_name': class_name,
-                    'threshold': threshold}
+                    'threshold': threshold,
+                    'test_radius': test_radius}
     url = f'{ADDRESS}/get_class'
     print(f'waiting for {url}')
     response = requests.post(url=url, json=request_dict)
@@ -104,27 +61,13 @@ def get_all_class_points_in_polygon(polygon: Polygon, meters_step: int, class_na
     return np.array(class_points), np.array(class_patches)
 
 
-def get_top_n_similar_points_in_polygon(points: List[Point], n: int,
-                                        polygon: Polygon, meters_step: int) -> List[Point]:
-    '''
-    get the list of most similar points to the average of the points in the latent space
-    (according to topo2vec.topography_profiler. get_top_n_similar_points_in_polygon)
-
-    Uses the server_api_instance.get_top_n_similar_points_in_polygon() function
-    Args:
-        points: the list of Points
-        n: number of points to get
-        polygon: the polygon to earch in. should be inside the get_working_polygon()
-        meters_step: the resolution to build the grid we search on
-
-    Returns: a tuple: the points, the 3-layers patches (in dims according to the radii)
-
-    '''
+def get_top_n_similar_points_in_polygon(points, n, polygon, meters_step, test_radius):
     points_to_send = json.dumps(points_list_to_floats_list(points))
     request_dict = {'points': points_to_send,
                     'polygon': polygon.wkt,
                     'meters_step': meters_step,
-                    'n': n}
+                    'n': n,
+                    'test_radius': test_radius}
     url = f'{ADDRESS}/get_similar'
     print(f'waiting for {url}')
     response = requests.post(url=url, json=request_dict)
@@ -136,19 +79,10 @@ def get_top_n_similar_points_in_polygon(points: List[Point], n: int,
     return np.array(class_points), np.array(class_patches)
 
 
-def get_latent_for_points(points: List[Point]) -> Tuple[np.ndarray, np.ndarray]:
-    '''
-    according to topo2vec.topography_profiler.get_features()
-
-    Uses the server_api_instance.get_features() function
-    Args:
-        points: a list of the points to get the latent
-
-    Returns: the latent for each point, row per point
-
-    '''
+def get_latent_for_points(points, test_radius):
     points_to_send = json.dumps(points_list_to_floats_list(points))
-    request_dict = {'points': points_to_send}
+    request_dict = {'points': points_to_send,
+                    'test_radius': test_radius}
     url = f'{ADDRESS}/get_features'
     print(f'waiting for {url}')
     response = requests.post(url=url, json=request_dict)
@@ -160,12 +94,10 @@ def get_latent_for_points(points: List[Point]) -> Tuple[np.ndarray, np.ndarray]:
     return np.array(points), np.array(features)
 
 
-def get_working_polygon() -> Polygon:
+def get_working_polygon():
     '''
-    according to topo2vec.topography_profiler.get_working_polygon()
-            Uses the server_api_instance.get_working_polygon() function
+    Returns:
 
-    Returns: the polygon in which the server is able to work now
     '''
     url = f'{ADDRESS}/get_working_polygon'
     print(f'waiting for {url}')
@@ -176,12 +108,9 @@ def get_working_polygon() -> Polygon:
     return Polygon
 
 
-def set_working_polygon(polygon: Polygon) -> str:
+def set_working_polygon(polygon: Polygon):
     '''
-    according to topo2vec.topography_profiler.set_working_polygon()
-        Uses the server_api_instance.set_working_polygon() function
-
-    Returns: The response status code
+    Returns:
 
     '''
     polygon_wkt = polygon.wkt
@@ -193,11 +122,9 @@ def set_working_polygon(polygon: Polygon) -> str:
     return response.status_code
 
 
-def get_available_class_names() -> List[str]:
+def get_available_class_names():
     '''
-    according to topo2vec.topography_profiler.get_available_class_names()
-        Uses the server_api_instance.get_available_class_names() function
-    Returns:  a list of string names of the classes the classifier is classifying to
+    Returns:
 
     '''
     url = f'{ADDRESS}/get_available_class_names'
@@ -207,3 +134,29 @@ def get_available_class_names() -> List[str]:
     class_names_jsoned = json_dictionary_in['class_names']
     class_names = json.loads(class_names_jsoned)
     return class_names
+
+def get_available_final_model_file_names():
+    '''
+    Returns:
+
+    '''
+    url = f'{ADDRESS}/get_final_model_file_names'
+    print(f'waiting for {url}')
+    response = requests.post(url=url)
+    json_dictionary_in = response.json()
+    class_names_jsoned = json_dictionary_in['file_names']
+    class_names = json.loads(class_names_jsoned)
+    return class_names
+
+def set_final_model(file_name: str):
+    '''
+    Returns:
+
+    '''
+    request_dict = {'final_model_name': file_name}
+    url = f'{ADDRESS}/load_final_model'
+    print(f'waiting for {url}')
+    response = requests.post(url=url, json=request_dict)
+    print(response.content)
+    return response.status_code
+

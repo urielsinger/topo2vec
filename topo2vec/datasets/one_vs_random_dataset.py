@@ -14,14 +14,14 @@ class OneVsRandomDataset:
         '''
         init a dataset for the one class vs all task.
         Args:
-            radii: radii list
+            radii: original_radiis list
             size: max size of the wanted dataset
             outer_polygon: the polygon to keep the points from
             class_path:
             class_label:
         '''
         classification_dataset = ClassDataset(class_path, class_label,
-                                              radii=radii, wanted_size=int(size),
+                                              original_radiis=radii, wanted_size=int(size),
                                               outer_polygon=outer_polygon)
 
         wanted_indices = list(range(0, int(size / 2), 1))

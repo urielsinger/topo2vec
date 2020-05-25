@@ -13,21 +13,27 @@ from common.list_conversions_utils import points_list_to_floats_list, floats_lis
     save_list_to_file
 
 
-class MultiRadiusDataset(Dataset):
+class MultiRadiiDataset(Dataset):
     '''
     A dataset that supports the making of a point to an 3-dim ndarray
-    of the neighbourhood of the point in different radii.
+    of the neighbourhood of the point in different original_radiis.
     '''
 
-    def __init__(self, radii: List[int], outer_polygon: Polygon = None):
+    def __init__(self, original_radiis: List[List[int]], radii: List[int],
+                 outer_polygon: Polygon = None):
         '''
 
         Args:
-            radii: the radii of the neighbourhoods.
+            original_radiis: the original_radiis of the neighbourhoods.
+            radii: if None - the size will be of the first of original radiis
             outer_polygon: if None - ignore, otherwise - take only
             points that are inside it.
         '''
-        self.radii = radii
+        self.original_radiis = original_radiis
+        if radii is not None:
+            self.radii = radii[0]
+        else:
+            self.radii = original_radiis[0][0]
         self.actual_patches = None  # the actual data of the dataset.
         self.mask_patches = None
         self.use_masks = False
@@ -46,7 +52,6 @@ class MultiRadiusDataset(Dataset):
         if self.full_base_dir is not None:
             full_path_actual_patches = full_path_name_of_dataset_data_to_full_path(self.full_base_dir, 'actual_patches')
             actual_patches = load_list_from_file(full_path_actual_patches)
-
             full_path_points_locations = full_path_name_of_dataset_data_to_full_path(self.full_base_dir, 'points_locations')
             points_locations = load_list_from_file(full_path_points_locations)
 
@@ -55,7 +60,15 @@ class MultiRadiusDataset(Dataset):
                 points = [point for point in points if
                           check_if_point_in_polygon(point, self.outer_polygon)]
 
-            new_patches, points_locations_list = visualizer.get_points_as_np_array(points, self.radii)
+            new_patches_list = []
+            all_points_locations_list = []
+            for original_radii in self.original_radiis:
+                new_patches, points_locations_list = visualizer.get_points_as_np_array(points, original_radii,
+                                                                                       self.radii)
+                new_patches_list.append(new_patches)
+                all_points_locations_list += points_locations_list
+            points_locations_list = all_points_locations_list
+            new_patches = np.concatenate(new_patches_list)
             self.points_locations = points_locations_list
             if self.actual_patches is not None:
                 all_patches = [self.actual_patches, new_patches]

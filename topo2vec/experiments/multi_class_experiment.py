@@ -39,6 +39,8 @@ else:
                                                             '--special_classes_for_validation',
                                                             '["cliffs", "peaks"]',
                                                             '--save_to_final',
+                                                            '--original_radiis', '[[12,24,36]]',
+                                                            '--final_file_name', 'final_model_big122436.pt'
                                                             ])
 lab = TaskHandler(classifier_regular_args)
 lab.run()

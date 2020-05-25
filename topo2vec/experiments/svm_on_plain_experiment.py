@@ -9,7 +9,7 @@ from topo2vec.datasets.several_classes_datasets import SeveralClassesDataset
 # an svm baseline - check if all this deep learning essential at all #
 ######################################################################
 
-radii = [8, 16, 24]
+radii = [[8, 16, 24]]
 radius = min(radii)
 h_w = 2 * radius + 1
 im_size = h_w * h_w * len(radii)

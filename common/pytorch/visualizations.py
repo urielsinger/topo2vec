@@ -126,9 +126,9 @@ def convert_multi_radius_tensor_to_printable(tensor: Tensor) -> Tensor:
 
     Args:
         tensor: The tensor of the multi-radiii examples
-        with shape: (num_lines, len(radii), h, w)
+        with shape: (num_lines, len(original_radiis), h, w)
 
-    Returns: a vector of shape (num_lines, 1, len(radii)*h, w)
+    Returns: a vector of shape (num_lines, 1, len(original_radiis)*h, w)
 
     '''
     num_samples_in_dataset, _, _, w = tensor.shape
@@ -140,11 +140,11 @@ def convert_multi_radius_ndarray_to_printable(array: np.ndarray, dir = True) -> 
 
     Args:
         tensor: The tensor of the multi-radiii examples
-        with shape: (num_lines, len(radii), h, w)
+        with shape: (num_lines, len(original_radiis), h, w)
         dir = True -> vertically
         dir = False -> horizontally
 
-    Returns: a vector of shape (num_lines, 1, len(radii)*h, w)
+    Returns: a vector of shape (num_lines, 1, len(original_radiis)*h, w)
 
     '''
     num_samples_in_dataset, _, h, w = array.shape
@@ -160,11 +160,11 @@ def convert_multi_radius_list_to_printable(images_list:List[np.ndarray], dir = T
 
     Args:
         tensor: The tensor of the multi-radiii examples
-        with shape: (num_lines, len(radii), h, w)
+        with shape: (num_lines, len(original_radiis), h, w)
         dir = True -> vertically
         dir = False -> horizontally
 
-    Returns: a vector of shape (num_lines, 1, len(radii)*h, w)
+    Returns: a vector of shape (num_lines, 1, len(original_radiis)*h, w)
 
     '''
     return convert_multi_radius_ndarray_to_printable(np.stack(images_list), dir)

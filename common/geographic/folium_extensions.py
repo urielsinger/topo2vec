@@ -99,7 +99,7 @@ class TimeSliderPolygonHeatmap(TimeSliderChoropleth):
                 var current_timestamp = timestamps[0];
 
                 // insert time polyheatmap_slider
-                d3.select("body").insert("p", ":first-child").append("input")
+                d3.select_class("body").insert("p", ":first-child").append("input")
                     .attr("type", "range")
                     .attr("width", "100px")
                     .attr("min", 0)
@@ -110,7 +110,7 @@ class TimeSliderPolygonHeatmap(TimeSliderChoropleth):
                     .style('align', 'center');
 
                 // insert time polyheatmap_slider output BEFORE time polyheatmap_slider (text on top of polyheatmap_slider)
-                d3.select("body").insert("p", ":first-child").append("output")
+                d3.select_class("body").insert("p", ":first-child").append("output")
                     .attr("width", "100")
                     .attr("id", "polyheatmap_slider-value")
                     .style('font-size', '18px')
@@ -118,7 +118,7 @@ class TimeSliderPolygonHeatmap(TimeSliderChoropleth):
                     .style('font-weight', '500%');
 
                 var datestring = new Date(parseInt(current_timestamp)*1000).toISOString();
-                d3.select("output#polyheatmap_slider-value").text(datestring);
+                d3.select_class("output#polyheatmap_slider-value").text(datestring);
 
                 fill_map = function(){
                     for (var feature_id in styledict){
@@ -140,10 +140,10 @@ class TimeSliderPolygonHeatmap(TimeSliderChoropleth):
                     }
                 }
 
-                d3.select("#polyheatmap_slider").on("input", function() {
+                d3.select_class("#polyheatmap_slider").on("input", function() {
                     current_timestamp = timestamps[this.value];
                     var datestring = new Date(parseInt(current_timestamp)*1000).toISOString();
-                    d3.select("output#polyheatmap_slider-value").text(datestring);
+                    d3.select_class("output#polyheatmap_slider-value").text(datestring);
                 fill_map();
                 });
 
@@ -216,7 +216,7 @@ class TimeSliderDynamicMap(TimeSliderChoropleth):
                     var current_timestamp = timestamps[0];
 
                     // insert time dynmap_slider
-                    d3.select("body").insert("p", ":first-child").append("input")
+                    d3.select_class("body").insert("p", ":first-child").append("input")
                         .attr("type", "range")
                         .attr("width", "100px")
                         .attr("min", 0)
@@ -227,7 +227,7 @@ class TimeSliderDynamicMap(TimeSliderChoropleth):
                         .style('align', 'center');
 
                     // insert time dynmap_slider output BEFORE time dynmap_slider (text on top of dynmap_slider)
-                    d3.select("body").insert("p", ":first-child").append("output")
+                    d3.select_class("body").insert("p", ":first-child").append("output")
                         .attr("width", "100")
                         .attr("id", "dynmap_slider-value")
                         .style('font-size', '18px')
@@ -235,7 +235,7 @@ class TimeSliderDynamicMap(TimeSliderChoropleth):
                         .style('font-weight', '500%');
 
                     var datestring = new Date(parseInt(current_timestamp)*1000).toISOString();
-                    d3.select("output#dynmap_slider-value").text(datestring);
+                    d3.select_class("output#dynmap_slider-value").text(datestring);
 
                     fill_map = function(){
                         for (var feature_id in styledict){
@@ -258,10 +258,10 @@ class TimeSliderDynamicMap(TimeSliderChoropleth):
                     }
 
 
-                    d3.select("#dynmap_slider").on("input", function() {
+                    d3.select_class("#dynmap_slider").on("input", function() {
                         current_timestamp = timestamps[this.value];
                         var datestring = new Date(parseInt(current_timestamp)*1000).toISOString();
-                        d3.select("output#dynmap_slider-value").text(datestring);
+                        d3.select_class("output#dynmap_slider-value").text(datestring);
                         fill_map();
                     });
 

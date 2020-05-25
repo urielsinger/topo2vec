@@ -19,8 +19,6 @@ from shapely.geometry import Point, Polygon
 import sys
 from pathlib import Path
 
-from tqdm import tqdm
-
 from api_client import client_lib
 from common.geographic.geo_utils import build_polygon
 from visualization_server import visualizer
@@ -37,7 +35,6 @@ from gui_server.visual_topography_profiler import TopoMap
 points_inside = [Point(5.0658811, 45.0851164),
                  Point(5.058811, 45.01164)]
 
-leban = build_polygon(35.19, 33.11, 35.47, 33.25)
 small_polygon = build_polygon(35.3, 33.11, 35.35, 33.15)
 
 
@@ -48,11 +45,9 @@ def set_working_polygon(polygon: Polygon):
 
 goral_hights = build_polygon(34.7, 31.3, 34.9, 31.43)
 north_is = build_polygon(35.1782, 32.8877, 35.5092,  33.0524)
+north_is_small = build_polygon(35.3782, 32.9877, 35.4092,  33.0000)
 
-set_working_polygon(north_is)
-
-#set_working_polygon(leban)
-#set_working_polygon(small_polygon)
+set_working_polygon(north_is_small)
 
 
 class BasicBokeh:
@@ -71,9 +66,10 @@ class BasicBokeh:
         self.folium_fig = self.bokeh_new_class_folium(lonlat_text_inputs=self.lonlat_text_inputs)
 
         # Set up widgets
-        self.meters_step = Slider(title="meters_step", value=20000, start=10, end=20000, step=10)
+        self.meters_step = Slider(title="meters_step", value=200, start=10, end=2000, step=10)
         self.number_of_points_to_show = Slider(title="number of points to show", value=5, start=1, end=100)
         self.threshold = Slider(title="threshold for class", value=0, start=0, end=1, step=0.01)
+        self.test_minimal_resolution = Slider(title="minimal resolution", value=8, start=2, end=50)
 
         get_points_button = Button(label='Get desired points!')
         get_points_button.on_click(self.get_points_and_update)
@@ -88,21 +84,27 @@ class BasicBokeh:
         clean_text_buttun.on_click(self.clean_text)
 
         select_class_options = self.topo_map.get_all_available_classes()
-        self.select = Select(title="Option:", value=select_class_options[0], options=select_class_options)
+        self.select_class = Select(title="Option:", value=select_class_options[0], options=select_class_options)
 
         get_class_button = Button(label='get_class')
         get_class_button.on_click(self.get_points_and_update_for_class)
 
+        select_final_model_options = client_lib.get_available_final_model_file_names()
+        self.select_final_model = Select(title="Option:", value=select_final_model_options[0], options=select_final_model_options)
+
+        final_model_button = Button(label='select final model')
+        final_model_button.on_click(self.update_final_model)
+
         get_segmentation_map_button = Button(label='get segmentation map')
         get_segmentation_map_button.on_click(self.add_segmentation_map)
 
-        self.row_mid_column = column(Div(text='get top points of class'), self.select, get_class_button,
-                                     get_segmentation_map_button, Div(text=''))
+        self.row_mid_column = column(Div(text='get top points of class'), self.select_class, get_class_button,
+                                     get_segmentation_map_button, self.select_final_model, final_model_button, Div(text=''))
         # Set up layouts and add to document
         inputs = row(
             column(Div(text='get similar points'), lon_text, lat_text, get_points_button, set_working_polygon_button, clean_all_buttun, clean_text_buttun),
             self.row_mid_column,
-            column(Div(text='search parameters'), self.meters_step, self.number_of_points_to_show, self.threshold))
+            column(Div(text='search parameters'), self.meters_step, self.number_of_points_to_show, self.threshold, self.test_minimal_resolution))
 
         self.main_panel = row(inputs, self.folium_fig, width=800)
 
@@ -173,7 +175,8 @@ class BasicBokeh:
         points_chosen = self.get_click_lonlat_points_list()
         self.topo_map.add_similar_points(points_chosen, polygon=WORKING_POLYGON,
                                          meters_step=int(self.meters_step.value),
-                                         n=int(self.number_of_points_to_show.value), color='red')
+                                         n=int(self.number_of_points_to_show.value), color='red',
+                                         test_radius=int(self.test_minimal_resolution.value))
         images, _ = visualizer.get_points_as_list_of_np_arrays(points_chosen, [8, 16, 24])  # TODO: change the const!!
         points_images = convert_multi_radius_list_to_printable(images, dir=False)
         self.topo_map.add_points_with_images(points_chosen, points_images, color='green')
@@ -195,31 +198,36 @@ class BasicBokeh:
         fig = self.bokeh_new_class_folium(lonlat_text_inputs=self.lonlat_text_inputs)
         self.main_panel.children[-1] = fig
 
+    def set_test_radius(self):
+        resolution_decided=int(self.test_minimal_resolution.value)
+        #set_test_radius(three_resolutions)
+        self.topo_map = TopoMap(WORKING_POLYGON)
+        self.start_location = visual_topography_profiler.get_working_polygon_center()
+        self.center = self.start_location
+        fig = self.bokeh_new_class_folium(lonlat_text_inputs=self.lonlat_text_inputs)
+        self.main_panel.children[-1] = fig
+
     def add_segmentation_map(self):
         thresholds_list = [0, 0, 0, 0]
         class_names_list = client_lib.get_available_class_names()
         self.topo_map.add_segmentation_map(polygon=WORKING_POLYGON, meters_step=int(self.meters_step.value),
                                            class_names=class_names_list,
-                                           thresholds_list=thresholds_list)
+                                           thresholds_list=thresholds_list,
+                                           test_radius=int(self.test_minimal_resolution.value))
 
         fig = self.bokeh_new_class_folium(lonlat_text_inputs=self.lonlat_text_inputs)
-        for j in tqdm(range(10), desc=f'8'):
-            pass
         self.main_panel.children[-1] = fig
-        for j in tqdm(range(10), desc=f'9'):
-            pass
         self.row_mid_column.children[-1] = Div(text=self.topo_map.colors_map) #TODO: very long
-        for j in tqdm(range(10), desc=f'10'):
-            pass
 
 
     def get_points_and_update_for_class(self):
         self.topo_map = TopoMap(WORKING_POLYGON)
-        class_chosen = self.select.value
+        class_chosen = self.select_class.value
         self.topo_map.add_random_class_points(polygon=WORKING_POLYGON,
                                               meters_step=int(self.meters_step.value), class_name=class_chosen,
                                               color='red', max_num=int(self.number_of_points_to_show.value),
-                                              threshold=float(self.threshold.value))
+                                              threshold=float(self.threshold.value),
+                                              test_radius=int(self.test_minimal_resolution.value))
 
         fig = self.bokeh_new_class_folium(lonlat_text_inputs=self.lonlat_text_inputs)
         self.main_panel.children[-1] = fig
@@ -227,6 +235,10 @@ class BasicBokeh:
         # self.lonlat_text_inputs[0].value = str(round(closest_geo.centroid.x, 5))
         # self.lonlat_text_inputs[1].value = str(round(closest_geo.centroid.y, 5))
         # self.importance_and_val_column.children[-1] = importance_figure
+
+    def update_final_model(self):
+        model_chosen = self.select_final_model.value
+        client_lib.set_final_model(model_chosen)
 
     def clean_all(self):
         self.topo_map = TopoMap(WORKING_POLYGON)

@@ -21,45 +21,47 @@ class DataFromFileHandler(DataHandler):
             self.elevation_data_squares[str(bounding_box)] = ElevationDataSquare(base_dir, bounding_box)
 
 
-    def get_points_as_np_array(self, center_points: List[Point], radii: List[int]) -> np.ndarray:
+    def get_points_as_np_array(self, center_points: List[Point], original_radii: List[int]
+                               , radii: int = None) -> np.ndarray:
         '''
         Args:
             center_points: the points to get as np arrays, if possible
-            radii: the radii (L1 norm) to look in for the points
+            original_radii: the original_radiis (L1 norm) to look in for the points
 
         Returns: an np array of shape:
-         (num of possible points, len(radii) , 2*min(radii) + 1, 2*min(radii) + 1)
+         (num of possible points, len(original_radiis) , 2*min(original_radiis) + 1, 2*min(original_radiis) + 1)
         that is the actual elevation map in the neighbourhood of each point.
         '''
+        if radii is None:
+            radii = original_radii[0]
         point_multi_patches, points_used = \
-            self.get_points_as_list_of_np_arrays(center_points, radii)
+            self.get_points_as_list_of_np_arrays(center_points, original_radii, radii)
         point_multipatches_ndarray = np.stack(point_multi_patches)
         return point_multipatches_ndarray, points_used
 
     def get_points_as_list_of_np_arrays(self, center_points:
-    List[Point], radii: List[int]) -> List[Point]:
+    List[Point], original_radii: List[int], radii: int) -> List[Point]:
         '''
         Args:
             center_points: the points to get as np arrays, if possible
-            radii: the radii (L1 norm) to look in for the points
+            original_radii: the original_radiis (L1 norm) to look in for the points
 
         Returns: an np array of shape:
-         (num of possible points, len(radii) , 2*min(radii) + 1, 2*min(radii) + 1)
+         (num of possible points, len(original_radiis) , 2*min(original_radiis) + 1, 2*min(original_radiis) + 1)
         that is the actual elevation map in the neighbourhood of each point.
         '''
-        min_radius = min(radii)
         point_multi_patches = []
-        standard_size = (2 * min_radius + 1, 2 * min_radius + 1)
         points_used = []
+        resized_shape = (2 * radii + 1, 2 * radii + 1)
         for point in center_points:
             point_patches = []
-            for radius in radii:
-                patch = self.get_point_as_np_array(point, radius)
-                if radius != min_radius and patch.size != 0:
-                    patch = cv2.resize(patch, dsize=standard_size)
-                if patch.size != 0 and patch.shape == standard_size and np.min(patch) > -3000:
+            for original_radius in original_radii:
+                patch = self.get_point_as_np_array(point, original_radius)
+                if original_radius != radii and patch.size != 0:
+                    patch = cv2.resize(patch, dsize=resized_shape)
+                if patch.size != 0 and patch.shape == resized_shape and np.min(patch) > -3000:
                     point_patches.append(patch)
-            if len(point_patches) == len(radii):
+            if len(point_patches) == len(original_radii):
                 point_patches_ndarray = np.stack(point_patches)
                 point_multi_patches.append(point_patches_ndarray)
                 points_used.append(point)

@@ -58,8 +58,10 @@ FINAL_MODEL_DIR = BASE_LOCATION + 'data/final_model'
 Path(FINAL_MODEL_DIR).mkdir(parents=True, exist_ok=True)
 
 CLASSES_TEST_POINTS_FOLDER = BASE_LOCATION + 'data/overpass_classes_data/tests'
+Path(CLASSES_TEST_POINTS_FOLDER).mkdir(parents=True, exist_ok=True)
 
 CACHE_BASE_DIR = BASE_LOCATION + 'data/cache'
+Path(CACHE_BASE_DIR).mkdir(parents=True, exist_ok=True)
 
 NONE_STR = 'None'
 

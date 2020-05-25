@@ -10,5 +10,5 @@ class TestRandomDataset(TestCase):
         size = 10
         outer_polygon = Polygon([Point(5, 49.5), Point(5, 50), Point(6, 50),
                                  Point(6, 49.5), Point(5, 49.5)])
-        random_data_set = RandomDataset(size, [10], outer_polygon)
+        random_data_set = RandomDataset(size, [[10]], outer_polygon)
         self.assertEqual(random_data_set.actual_patches.shape[0], size)

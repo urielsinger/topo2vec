@@ -19,11 +19,13 @@ import numpy as np
 
 
 class KNearestNeighboursTester:
-    def __init__(self, radii: List[int], feature_extractor: Classifier, k: int, method: str,
+    def __init__(self, radii: List[int], original_radiis: List[List[int]],
+                 feature_extractor: Classifier, k: int, method: str,
                  random_set_size: int, json_file_of_group: str = GROUP_TO_SEARCH_SIMILAR_LONGS_LARGE):
 
         self.random_set_size = random_set_size
         self.radii = radii
+        self.original_radiis = original_radiis
 
         self.feature_extractor = feature_extractor
         self.feature_extractor.freeze()
@@ -43,14 +45,15 @@ class KNearestNeighboursTester:
 
         '''
         random_dataset = RandomDataset(self.random_set_size,
-                                       self.radii, VALIDATION_HALF)
+                                       self.original_radiis, VALIDATION_HALF,
+                                       self.radii)
         size_typical_images = 5
         if self.method == 'regular':
-            typical_images_dataset = ClassDataset(POINT_TO_SEARCH_SIMILAR, 1, self.radii,
-                                                  size_typical_images, VALIDATION_HALF, 'test_knn')
+            typical_images_dataset = ClassDataset(POINT_TO_SEARCH_SIMILAR, 1, self.original_radiis,
+                                                  size_typical_images, self.radii, VALIDATION_HALF, 'test_knn')
         elif self.method == 'group_from_file':
-            typical_images_dataset = ClassDataset(self.json_file_of_group, 1, self.radii,
-                                                  size_typical_images, VALIDATION_HALF, 'test_knn_group')
+            typical_images_dataset = ClassDataset(self.json_file_of_group, 1, self.original_radiis,
+                                                  size_typical_images,  self.radii, VALIDATION_HALF, 'test_knn_group')
         else:
             raise Exception(f'The knn method provided, {self.method} is not acceptable')
 

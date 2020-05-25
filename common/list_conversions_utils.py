@@ -8,8 +8,10 @@ from shapely.geometry import Point
 
 
 def str_to_int_list(string_list: str):
+    if type(string_list) == list:
+        return string_list
     list_list = ast.literal_eval(string_list)
-    int_list = [int(x) for x in list_list]
+    int_list = [int(x) if type(x) == int else str_to_int_list(x) for x in list_list ]
     return int_list
 
 

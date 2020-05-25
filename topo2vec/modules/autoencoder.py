@@ -41,12 +41,12 @@ class Autoencoder(Classifier):
         '''
         size_train = int(self.train_portion * self.total_dataset_size)
         size_val = int((1-self.train_portion) * self.total_dataset_size)
-        self.train_dataset = RandomDataset(size_train, self.radii, TRAIN_HALF)
-        self.validation_dataset = RandomDataset(size_val, self.radii, VALIDATION_HALF)
+        self.train_dataset = RandomDataset(size_train, self.original_radiis, TRAIN_HALF, self.radii)
+        self.validation_dataset = RandomDataset(size_val, self.original_radiis, VALIDATION_HALF, self.radii)
 
         if LOAD_CLASSES_LARGE:
-            self.test_dataset = SeveralClassesDataset(self.radii, VALIDATION_HALF, self.size_test, CLASS_PATHS_TEST,
-                                                      CLASS_NAMES_TEST, 'num_classes_' + str(self.num_classes) + 'test')
+            self.test_dataset = SeveralClassesDataset(self.original_radiis, VALIDATION_HALF, self.size_test, CLASS_PATHS_TEST,
+                                                      CLASS_NAMES_TEST, 'num_classes_' + str(self.num_classes) + 'test', radii=self.radii)
         else:
             self.test_dataset = None
 

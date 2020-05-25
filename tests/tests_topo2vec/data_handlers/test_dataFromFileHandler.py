@@ -19,3 +19,7 @@ class TestDataFromFileHandler(TestCase):
         patches, points = self.data_from_file_handler.get_points_as_np_array(test_points, radii)
         self.assertTupleEqual(patches.shape, (len(test_points), len(radii), 21, 21))
         self.assertEqual(len(test_points), len(points))
+        radii = [8, 8]
+        patches, points = self.data_from_file_handler.get_points_as_np_array(test_points, radii, radii[0])
+        self.assertTupleEqual(patches.shape, (len(test_points), len(radii), 17, 17))
+        self.assertEqual(len(test_points), len(points))

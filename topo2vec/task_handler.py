@@ -75,6 +75,7 @@ class TaskHandler:
 
         if hparams.test_knn:
             knn = KNearestNeighboursTester(random_set_size=hparams.random_set_size_for_knn,
+                                           original_radiis=str_to_int_list(hparams.original_radiis),
                                            radii=str_to_int_list(hparams.radii),
                                            feature_extractor=model, k=hparams.k,
                                            method=hparams.knn_method_for_typical_choosing,
@@ -89,7 +90,7 @@ class TaskHandler:
             torch.save(model.state_dict(), save_path)
 
         if hparams.save_to_final:
-            save_path = os.path.join(FINAL_MODEL_DIR, 'final_model.pt')
+            save_path = os.path.join(FINAL_MODEL_DIR, hparams.final_file_name)
             torch.save(model.state_dict(), save_path)
 
         return float(model.get_hyperparams_value_for_maximizing())

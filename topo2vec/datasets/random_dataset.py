@@ -7,18 +7,20 @@ from torch import tensor
 
 from common.geographic import geo_utils
 from topo2vec.constants import CACHE_BASE_DIR
-from topo2vec.datasets.multi_radius_dataset import MultiRadiusDataset
+from topo2vec.datasets.multi_radius_dataset import MultiRadiiDataset
 
 
-class RandomDataset(MultiRadiusDataset):
-    def __init__(self, num_points: int, radii: List[int], outer_polygon: Polygon, label: int = 0):
+class RandomDataset(MultiRadiiDataset):
+    def __init__(self, num_points: int, original_radiis: List[List[int]],
+                 outer_polygon: Polygon, radii: List[int] = None,
+                 label: int = 0):
         '''
 
         Args:
             num_points: mi,ber of random points to generate
-            radii: radii needed around each point.
+            original_radiis: original_radiis needed around each point. list of lists
         '''
-        super().__init__(radii)
+        super().__init__(original_radiis, radii)
         random_points = geo_utils.sample_points_in_polygon(outer_polygon, num_points)
         self.full_base_dir = os.path.join(CACHE_BASE_DIR, 'datasets', 'random', f'size_{num_points}')
 

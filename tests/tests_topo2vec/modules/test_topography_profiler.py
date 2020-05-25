@@ -4,7 +4,7 @@ from unittest import TestCase
 from shapely.geometry import Point
 
 import common.geographic.geo_utils
-import topo2vec.modules.topography_profiler as tp
+import topo2vec.topography_profiler as tp
 
 class Test(TestCase):
     @classmethod
@@ -16,10 +16,11 @@ class Test(TestCase):
         tp.set_working_polygon(cls.polygon_to_search_in)
 
     def test_get_features(self):
-        lis = tp.get_features(self.points_inside)
+        lis = tp.get_features(self.points_inside, 8)
         self.assertTupleEqual(lis.shape, (2, tp.FINAL_HPARAMS.latent_space_size))
 
     def test_get_all_class_points_in_polygon(self):
+        final_radii = tp.FINAL_ORIGINAL_RADIIS
         points, pathches_lis = tp.get_all_class_points_in_polygon(self.polygon_to_search_in, 100, 'peaks')
         print(len(points))
         self.assertTupleEqual(pathches_lis.shape, (len(points), 3, 17, 17))
@@ -30,7 +31,7 @@ class Test(TestCase):
 
     def test_get_top_n_similar_points_in_polygon(self):
         list_of_patches, list_of_points = tp.get_top_n_similar_points_in_polygon(self.points_inside,
-                                                                                 10, self.polygon_to_search_in, 100)
+                                                                                 10, 8, self.polygon_to_search_in, 100)
         self.assertEqual(len(list_of_points), 10)
         self.assertTupleEqual(list_of_patches.shape, (10, 3, 17, 17))
 

@@ -73,4 +73,5 @@ BUILD_CLASSES_DATA_HANDLERS = True
 
 if BUILD_CLASSES_DATA_HANDLERS:
     for class_path in CLASS_PATHS:
+        print("loading" + class_path)
         classes_data_handlers[class_path] = ClassesDataFileHadler(class_path)

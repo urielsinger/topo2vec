@@ -1,12 +1,10 @@
 from typing import List
 
-import pandas
 from shapely.geometry import Point, Polygon
 
 import folium
 import base64
 import matplotlib
-from tqdm import tqdm
 
 from api_client import client_lib
 from api_client.client_lib import build_polygon
@@ -217,7 +215,7 @@ class TopoMap(GeoMap):
         np_points_patches_used = convert_multi_radius_ndarray_to_printable(np_points_patches_used, dir=False)
         self.add_points_with_images(points_used, np_points_patches_used, color)
 
-    def add_similar_points(self, points: List[Point], polygon: Polygon, meters_step: float, n: int, color='red'):
+    def add_similar_points(self, points: List[Point], polygon: Polygon, meters_step: float, n: int, test_radius:int, color='red'):
         '''
         aded similar points to the map
         Args:
@@ -226,15 +224,16 @@ class TopoMap(GeoMap):
             meters_step: the resolution of the search in the polygon
             n: the number of points to plot that are similar
             color: the color of points that are similar. from FOLIUM_COLORS
+            test_radius: the minimal radius of the test images
 
         Returns:
 
         '''
-        closest_points, closest_images = client_lib.get_top_n_similar_points_in_polygon(points, n, polygon, meters_step)
+        closest_points, closest_images = client_lib.get_top_n_similar_points_in_polygon(points, n, polygon, meters_step, test_radius)
         closest_images = convert_multi_radius_ndarray_to_printable(closest_images, dir=False)
         self.add_points_with_images(closest_points, closest_images, color)
 
-    def add_random_class_points(self, polygon: Polygon, meters_step: float, class_name: str,
+    def add_random_class_points(self, polygon: Polygon, meters_step: float, class_name: str, test_radius: int,
                                 color='red', max_num: int = 25, threshold: float = 0):
         '''
         add only a random portion of the class_points that were retrived.
@@ -244,12 +243,14 @@ class TopoMap(GeoMap):
             class_name: the class to add
             color: the color of the points wanted. from FOLIUM_COLORS
             max_num: the maximum number of points wanted (if there are less - it won't work...)
+            test_radius: the minimal radius of the test images
+
 
         Returns:
 
         '''
         np_points_used, np_points_patches_used = client_lib.get_all_class_points_in_polygon(polygon, meters_step,
-                                                                                            class_name, threshold)
+                                                                                            class_name, threshold, test_radius)
         assert len(np_points_used) == len(np_points_patches_used)
         if max_num != 100:
             picked_indices = np.random.choice(list(range(len(np_points_used))), max_num)
@@ -262,7 +263,7 @@ class TopoMap(GeoMap):
         points_patches_used_picked = convert_multi_radius_ndarray_to_printable(points_patches_used_picked, dir=False)
         self.add_points_with_images(points_used_picked, points_patches_used_picked, color)
 
-    def add_segmentation_map(self, polygon: Polygon, meters_step: int, class_names: List[str], thresholds_list: List[float]):
+    def add_segmentation_map(self, polygon: Polygon, meters_step: int, class_names: List[str], thresholds_list: List[float], test_radius: int):
         '''
         Add a segmentation map to the bokeh plot.
         Args:
@@ -270,12 +271,14 @@ class TopoMap(GeoMap):
             meters_step:
             class_names:
             thresholds_list:
+            test_radius: the minimal radius of the test images
+
 
         Returns:
 
         '''
         points_list, indices_list = client_lib.get_all_classifications_in_polygon(polygon, meters_step,
-                                                                                  class_names, thresholds_list)
+                                                                                  class_names, thresholds_list, test_radius)
         polygons_list = points_list_to_polygons_wkt_list(points_list, meters_step)
 
         colors = ['red', 'blue', 'yellow', 'green']

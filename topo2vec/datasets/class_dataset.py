@@ -10,28 +10,29 @@ from common.list_conversions_utils import points_list_to_floats_list, floats_lis
     save_list_to_file
 from topo2vec.constants import CACHE_BASE_DIR
 from topo2vec.data_handlers.classes_data_file_handler import ClassesDataFileHadler
-from topo2vec.datasets.multi_radius_dataset import MultiRadiusDataset
+from topo2vec.datasets.multi_radius_dataset import MultiRadiiDataset
 
 import numpy as np
 
 
-class ClassDataset(MultiRadiusDataset):
+class ClassDataset(MultiRadiiDataset):
     '''
     A dataset contains only one class
     '''
 
     def __init__(self, class_path: str, class_label: float,
-                 radii: List[int], wanted_size: int, outer_polygon=None,
+                 original_radiis: List[int],
+                 wanted_size: int, radii: List[int] = None, outer_polygon=None,
                  dataset_type_name: str = None, load_save=True, return_point=False):
         '''
 
         Args:
             class_path: The path to the data of the first class wanted in the dataset
             class_label: The label of the first class wanted in the dataset
-            radii:
+            original_radiis:
             outer_polygon:
         '''
-        super().__init__(radii, outer_polygon)
+        super().__init__(original_radiis, radii, outer_polygon)
         self.points_locations = []
         self.labels = []
         self.wanted_size = wanted_size
@@ -40,7 +41,7 @@ class ClassDataset(MultiRadiusDataset):
         file_name, _ = os.path.splitext(class_path)
         type_area_name = file_name.split('/')[-1]
         self.full_base_dir = os.path.join(CACHE_BASE_DIR, 'datasets', type_area_name,
-                                          f'{dataset_type_name}_{wanted_size}_label_{class_label}')
+                                          f'{dataset_type_name}_{wanted_size}_label_{class_label}_{original_radiis}_{radii}')
         if self.load_save:
             Path(self.full_base_dir).mkdir(parents=True, exist_ok=True)
         self.add_class_from_file(class_path, float(class_label))
@@ -72,7 +73,6 @@ class ClassDataset(MultiRadiusDataset):
         Returns: nothing
 
         '''
-
         points_list = None
         if self.full_base_dir is not None:
             full_path_points_list = full_path_name_of_dataset_data_to_full_path(self.full_base_dir, 'points')

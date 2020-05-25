@@ -9,7 +9,6 @@ from flask import Flask, request
 from pathlib import Path
 
 from shapely import wkt
-from tqdm import tqdm
 
 from common.list_conversions_utils import points_list_to_lists_list, floats_list_to_points_list
 
@@ -17,7 +16,7 @@ my_path = os.path.abspath(__file__)
 parent_path = Path(my_path).parent.parent
 sys.path.append(str(parent_path))
 
-from topo2vec.modules import topography_profiler as tp
+from topo2vec import topography_profiler as tp
 
 app = Flask(__name__)
 
@@ -45,7 +44,8 @@ def get_all_classifications() -> Dict:
         meters_step = int(json_dictionary_in['meters_step'])
         class_names = json.loads(json_dictionary_in['class_names'])
         thresholds = json.loads(json_dictionary_in['thresholds'])
-        _, locations, class_indices = tp.get_all_points_and_classes(polygon, meters_step, class_names, thresholds)
+        test_radius = int(json_dictionary_in['test_radius'])
+        _, locations, class_indices = tp.get_all_points_and_classes(polygon, meters_step, class_names, thresholds, test_radius)
         locations = locations.tolist()
         locations_jsoned = json.dumps(locations)
         class_indices_jsoned = json.dumps(class_indices)
@@ -80,7 +80,9 @@ def get_class_points() -> Dict:
         meters_step = int(json_dictionary_in['meters_step'])
         class_name = json_dictionary_in['class_name']
         threshold = float(json_dictionary_in['threshold'])
-        class_points, class_patches = tp.get_all_class_points_in_polygon(polygon, meters_step, class_name, threshold)
+        test_radius = int(json_dictionary_in['test_radius'])
+
+        class_points, class_patches = tp.get_all_class_points_in_polygon(polygon, meters_step, class_name, test_radius, threshold)
         class_points_jsoned = json.dumps(class_points.tolist())
         class_patches_jsoned = json.dumps(class_patches.tolist())
         json_dictionary_out = {
@@ -114,8 +116,10 @@ def get_top_n_similar_points_in_polygon() -> Dict:
         meters_step = int(json_dictionary_in['meters_step'])
         n = int(json_dictionary_in['n'])
         points_got = json.loads(json_dictionary_in['points'])
+        test_radius = int(json_dictionary_in['test_radius'])
+
         points = floats_list_to_points_list(points_got)
-        class_patches, class_points = tp.get_top_n_similar_points_in_polygon(points, n, polygon, meters_step)
+        class_patches, class_points = tp.get_top_n_similar_points_in_polygon(points, n, polygon, meters_step, test_radius)
         class_points_jsoned = json.dumps(points_list_to_lists_list(class_points))
         class_patches_jsoned = json.dumps(class_patches.numpy().tolist())
         json_dictionary_out = {
@@ -143,8 +147,9 @@ def get_features() -> Dict:
     if request.is_json:
         json_dictionary_in = request.get_json()
         points_got = json.loads(json_dictionary_in['points'])
+        test_radius = int(json_dictionary_in['test_radius'])
         points = floats_list_to_points_list(points_got)
-        features_np = tp.get_features(points)
+        features_np = tp.get_features(points, test_radius)
         features_jsoned = json.dumps(features_np.tolist())
         points_as_list_lists_jsoned = json.dumps(points_list_to_lists_list(points))
 
@@ -210,6 +215,30 @@ def get_available_class_names() -> Dict:
     class_names_jsoned = json.dumps(class_names)
     json_dictionary_out = {
         'class_names': class_names_jsoned
+    }
+    data = json.dumps(json_dictionary_out)
+    return data
+
+@app.route('/load_final_model', methods=['GET', 'POST'])
+def load_final_model() -> Dict:
+    '''
+    '''
+    if request.is_json:
+        json_dictionary_in = request.get_json()
+        final_model_name = json_dictionary_in['final_model_name']
+        tp.load_final_model(final_model_name)
+        return "loaded new final model"
+    return "didnt work"
+
+
+@app.route('/get_final_model_file_names', methods=['POST','GET'])
+def get_final_model_file_names() -> Dict:
+    '''
+    '''
+    file_names = tp.get_available_final_model_file_names()
+    file_names_jsoned = json.dumps(file_names)
+    json_dictionary_out = {
+        'file_names': file_names_jsoned
     }
     data = json.dumps(json_dictionary_out)
     return data

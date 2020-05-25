@@ -2,6 +2,7 @@
 
 import os
 import random
+from os.path import isfile
 from typing import List, Tuple
 
 import torch
@@ -71,29 +72,39 @@ FINAL_HPARAMS = Classifier.get_args_parser().parse_args(
      '--num_classes', '4',
      ]
 )
+final_model_classifier = None
 
-load_path = os.path.join(FINAL_MODEL_DIR, 'final_model.pt')
-final_model_classifier = Classifier(FINAL_HPARAMS)
-final_model_classifier.load_state_dict(torch.load(load_path, map_location=torch.device('cpu')))
-final_model_classifier.eval()
 
+def load_final_model(final_model_name: str):
+    load_path = os.path.join(FINAL_MODEL_DIR, final_model_name)
+    global final_model_classifier
+    final_model_classifier = Classifier(FINAL_HPARAMS)
+    final_model_classifier.load_state_dict(torch.load(load_path, map_location=torch.device('cpu')))
+    final_model_classifier.eval()
+
+
+load_final_model('final_model_big163264.pt')
 FINAL_RADII = str_to_int_list(FINAL_HPARAMS.radii)
+FINAL_ORIGINAL_RADIIS = str_to_int_list(FINAL_HPARAMS.original_radiis)
 
 
 ################################################################################
-# module functions
+# module functions                                                             #
 ################################################################################
 
 
-def _build_new_dataset_for_query(points: List[Point], class_name: str = 'no_name') \
-        -> Tuple[ClassDataset, np.ndarray]:
+def _build_new_dataset_for_query(points: List[Point], original_radiis: List[int], test_radius: int,
+                                 class_name: str = 'no_name') -> Tuple[ClassDataset, np.ndarray]:
     queried_classes_path = os.path.join(FINAL_MODEL_DIR, 'queried_classes')
     Path(queried_classes_path).mkdir(parents=True, exist_ok=True)
     class_file_path = save_points_to_json_file(points, class_name, queried_classes_path)
     # take only the points from the query which are in the WORKING_POLYGON
-    points_dataset = ClassDataset(class_file_path, 0, FINAL_RADII,
-                                  len(points), outer_polygon=WORKING_POLYGON,
+    points_dataset = ClassDataset(class_path=class_file_path, class_label=0,
+                                  original_radiis=FINAL_ORIGINAL_RADIIS, radii=FINAL_RADII,
+                                  #original_radiis=[[int(test_radius), int(test_radius) * 2, int(test_radius) * 3]], radii=FINAL_RADII,
+                                  wanted_size=len(points), outer_polygon=WORKING_POLYGON,
                                   dataset_type_name=USER_DEFINED, return_point=True)
+    tqdm([1], desc=str([[int(test_radius), int(test_radius) * 2, int(test_radius) * 3]]))
     points_used = points_dataset.points_locations
 
     if len(points_dataset) != len(points):
@@ -105,7 +116,7 @@ def _build_new_dataset_for_query(points: List[Point], class_name: str = 'no_name
     return points_dataset, points_used
 
 
-def get_features(points: List[Point], class_name: str = 'no_name') -> np.ndarray:
+def get_features(points: List[Point], test_radius, class_name: str = 'no_name') -> np.ndarray:
     '''
     get features the model extracted for the points
 
@@ -115,7 +126,7 @@ def get_features(points: List[Point], class_name: str = 'no_name') -> np.ndarray
     Returns: the points' features, as (len(points), latent_size) np.ndarray.
 
     '''
-    points_dataset, _ = _build_new_dataset_for_query(points, class_name)
+    points_dataset, _ = _build_new_dataset_for_query(points, FINAL_ORIGINAL_RADIIS, test_radius, class_name)
     class_dataloader = DataLoader(points_dataset, FORWARD_BATCH_SIZE)
     latent_features_list = []
     for batch in class_dataloader:
@@ -136,8 +147,18 @@ def get_available_class_names() -> str:
     return final_model_classifier.class_names
 
 
+def get_available_final_model_file_names() -> str:
+    '''
+
+    Returns: a string list of the available final model files
+
+    '''
+    file_names = [f for f in os.listdir(FINAL_MODEL_DIR) if f[-3:] == '.pt']
+    return file_names
+
+
 def get_all_points_and_classes(polygon: Polygon, meters_step: int,
-                               class_names: List[str], thresholds: List[int]):
+                               class_names: List[str], thresholds: List[int], test_radius: int):
     points_list = []
     patches_list = []
     indices_list = []
@@ -145,7 +166,8 @@ def get_all_points_and_classes(polygon: Polygon, meters_step: int,
     points_in_polygon = sample_grid_in_poly(polygon, meters_step)
 
     for class_name, class_number, prob_threshold in zip(class_names, class_numbers, thresholds):
-        points_in_polygon_dataset, points_used = _build_new_dataset_for_query(points_in_polygon, class_name)
+        points_in_polygon_dataset, points_used = _build_new_dataset_for_query(points_in_polygon, FINAL_ORIGINAL_RADIIS,
+                                                                              test_radius, class_name)
         assert len(points_in_polygon_dataset) == len(points_used)
 
         class_dataloader = DataLoader(points_in_polygon_dataset, FORWARD_BATCH_SIZE)
@@ -163,7 +185,7 @@ def get_all_points_and_classes(polygon: Polygon, meters_step: int,
 
 
 def get_all_class_points_in_polygon(polygon: Polygon, meters_step: float, class_name: str,
-                                    prob_threshold: float = None) -> \
+                                    test_radius: int, prob_threshold: float = None) -> \
         Tuple[np.ndarray, np.ndarray]:
     '''
     get all the class points in a certain polygon.
@@ -181,12 +203,14 @@ def get_all_class_points_in_polygon(polygon: Polygon, meters_step: float, class_
     patches_np, points_np, _ = get_all_points_and_classes(polygon=polygon,
                                                           meters_step=meters_step,
                                                           class_names=[class_name],
+                                                          test_radius=test_radius,
                                                           thresholds=[prob_threshold])
     return points_np, patches_np
 
 
 def get_top_n_similar_points_in_polygon(points: List[Point], n: int, polygon: Polygon,
-                                        meters_step: float, class_name: str = 'no_name') -> List[Point]:
+                                        meters_step: float, test_radius: int, class_name: str = 'no_name') -> List[
+    Point]:
     '''
     Args:
         points: the points to search points similar to
@@ -197,11 +221,13 @@ def get_top_n_similar_points_in_polygon(points: List[Point], n: int, polygon: Po
     Returns: list of n points that are similar to the points in here.
     '''
     points_in_polygon = sample_grid_in_poly(polygon, meters_step)
-    points_in_polygon_dataset, points_typical_used = _build_new_dataset_for_query(points_in_polygon, 'dataset')
+    points_in_polygon_dataset, points_typical_used = _build_new_dataset_for_query(points_in_polygon,
+                                                                                  FINAL_ORIGINAL_RADIIS, test_radius,
+                                                                                  'dataset')
 
-    typical_points_dataset, _ = _build_new_dataset_for_query(points, class_name)
+    typical_points_dataset, _ = _build_new_dataset_for_query(points, FINAL_ORIGINAL_RADIIS, test_radius, class_name)
 
-    knn_tester = KNearestNeighboursTester(FINAL_RADII, final_model_classifier, n,
+    knn_tester = KNearestNeighboursTester(FINAL_RADII, FINAL_ORIGINAL_RADIIS, final_model_classifier, n,
                                           method='group_from_file', random_set_size=0,
                                           json_file_of_group='irelevant')
 

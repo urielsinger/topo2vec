@@ -38,6 +38,7 @@ class Classifier(LightningModule):
         self.hparams = hparams
         self.model = models.__dict__[hparams.arch](hparams)
         self.num_classes = hparams.num_classes
+        self.original_radiis = str_to_int_list(hparams.original_radiis)
         self.radii = str_to_int_list(hparams.radii)
         self.loss_fn = torch.nn.CrossEntropyLoss()
         self.total_dataset_size = hparams.total_dataset_size
@@ -60,16 +61,16 @@ class Classifier(LightningModule):
         size_train = int(self.train_portion * self.total_dataset_size)
         size_val = int((1 - self.train_portion) * self.total_dataset_size)
 
-        self.train_dataset = SeveralClassesDataset(self.radii, TRAIN_HALF, size_train, self.class_paths, self.class_names,
-                                                   'num_classes_' + str(self.num_classes) + '_train')
+        self.train_dataset = SeveralClassesDataset(self.original_radiis, TRAIN_HALF, size_train, self.class_paths, self.class_names,
+                                                   'num_classes_' + str(self.num_classes) + '_train', self.radii)
 
-        self.validation_dataset = SeveralClassesDataset(self.radii, VALIDATION_HALF, size_val, CLASS_PATHS, CLASS_NAMES,
-                                                        'num_classes_' + str(self.num_classes) + '_validation')
+        self.validation_dataset = SeveralClassesDataset(self.original_radiis, VALIDATION_HALF, size_val, CLASS_PATHS, CLASS_NAMES,
+                                                        'num_classes_' + str(self.num_classes) + '_validation', self.radii)
 
         if LOAD_CLASSES_LARGE:
-            self.test_dataset = SeveralClassesDataset(self.radii, VALIDATION_HALF, self.size_test, CLASS_PATHS_TEST,
+            self.test_dataset = SeveralClassesDataset(self.original_radiis, VALIDATION_HALF, self.size_test, CLASS_PATHS_TEST,
                                                       CLASS_NAMES_TEST,
-                                                      'num_classes_' + str(self.num_classes) + '_test')
+                                                      'num_classes_' + str(self.num_classes) + '_test', self.radii)
         else:
             self.test_dataset = None
 
@@ -125,7 +126,6 @@ class Classifier(LightningModule):
             name:
 
         Returns:
-
         '''
         x, y = batch
         outputs, _ = self.forward(x.float())
@@ -238,10 +238,10 @@ class Classifier(LightningModule):
             class_paths_special, class_names_special = get_paths_and_names_wanted(
                 self.hparams.special_classes_for_validation, CLASS_PATHS_SPECIAL, CLASS_NAMES_SPECIAL)
 
-            svm_special_test_dataset = SeveralClassesDataset(self.radii, VALIDATION_HALF,
+            svm_special_test_dataset = SeveralClassesDataset(self.original_radiis, VALIDATION_HALF,
                                                              self.hparams.test_set_size_for_svm,
                                                              class_paths_special, class_names_special,
-                                                             'test_svm_special')
+                                                             'test_svm_special', self.radii)
 
             svm_classifier_special_classes_test_log_dict = \
                 svm_classifier_test(self, class_paths_special, class_names_special,
@@ -342,6 +342,8 @@ class Classifier(LightningModule):
         parser.add_argument('--save_to_final', dest='save_to_final', action='store_true',
                             help='save the model to the location of the "final" model - the one used in the server_api'
                                  ' itself')
+        parser.add_argument('--final_file_name', dest='final_file_name', default='final_model.pt', type=str)
+
         parser.add_argument('--logs_path', default=LOGS_PATH, type=str,
                             help='tensorboard logs poath')
 
@@ -354,7 +356,9 @@ class Classifier(LightningModule):
         # the model #
         #############
 
+        parser.add_argument('--original_radiis', type=str, default='[[8, 16, 24],[4, 8, 6],[12,24,36]]')
         parser.add_argument('--radii', type=str, default='[8, 16, 24]')
+
         parser.add_argument('--arch', type=str)
         parser.add_argument('--num_classes', type=int, default=len(CLASS_PATHS),
                             help='number of the classes in the dataset. ')

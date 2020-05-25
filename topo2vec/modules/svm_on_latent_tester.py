@@ -44,12 +44,12 @@ def svm_classifier_test(model, class_paths_to_test: str, class_names_to_test: st
 
     '''
     if model.hparams.svm_classify_latent_space:
-        svm_train_dataset = SeveralClassesDataset(model.radii, TRAIN_HALF, train_dataset_size,
+        svm_train_dataset = SeveralClassesDataset(model.original_radiis, TRAIN_HALF, train_dataset_size,
                                                   class_paths_to_test, class_names_to_test,
-                                                  'train_svm_' + type_of_svm_evaluation_name)
-        svm_validation_dataset = SeveralClassesDataset(model.radii, VALIDATION_HALF, train_dataset_size,
+                                                  'train_svm_' + type_of_svm_evaluation_name, model.radii)
+        svm_validation_dataset = SeveralClassesDataset(model.original_radiis, VALIDATION_HALF, train_dataset_size,
                                                        class_paths_to_test, class_names_to_test,
-                                                       'train_svm_' + type_of_svm_evaluation_name)
+                                                       'train_svm_' + type_of_svm_evaluation_name, model.radii)
 
         X_train, y_train = get_dataset_as_tensor(svm_train_dataset)
         if model.hparams.use_gpu:

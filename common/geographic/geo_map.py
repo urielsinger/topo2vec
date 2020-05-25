@@ -96,7 +96,7 @@ class GeoMap:
                 geo_col (str,default=False)
                     the name of the geometry column to show
                     the geometries should be in the format of wkt string
-                    if you are using oracle, select the sdo_geometry with the oracle function sdo_util.to_wktgeometry 
+                    if you are using oracle, select_class the sdo_geometry with the oracle function sdo_util.to_wktgeometry
 
                    color (str,default=True)
                     the color to use when drawing the geoms on the map
@@ -158,7 +158,7 @@ class GeoMap:
                 wkt_column_name (str,default=False)
                     the name of the geometry column to show
                     the geometries should be in the format of wkt string
-                    if you are using oracle, select the sdo_geometry with the oracle function sdo_util.to_wktgeometry
+                    if you are using oracle, select_class the sdo_geometry with the oracle function sdo_util.to_wktgeometry
 
                 color (str,default=True)
                     the color to use when drawing the geoms on the map
@@ -221,7 +221,7 @@ class GeoMap:
                 wkt_column_name (str,default=False)
                     the name of the geometry column to show
                     the geometries should be in the format of wkt string
-                    if you are using oracle, select the sdo_geometry with the oracle function sdo_util.to_wktgeometry
+                    if you are using oracle, select_class the sdo_geometry with the oracle function sdo_util.to_wktgeometry
 
                 step (float,default=1)
                     resolution of sample in meters
@@ -269,7 +269,7 @@ class GeoMap:
                 wkt_column_name (str,default=False)
                     the name of the geometry column to show
                     the geometries should be in the format of wkt string
-                    if you are using oracle, select the sdo_geometry with the oracle function sdo_util.to_wktgeometry
+                    if you are using oracle, select_class the sdo_geometry with the oracle function sdo_util.to_wktgeometry
 
                 step (float,default=1)
                     resolution of sample in meters
@@ -294,11 +294,7 @@ class GeoMap:
         step = meters2degrees(step)
         # change all to tuples for LRU_CACHE to work.
         image = build_image_overlay(polygons_list, colors_list, fills_list, fill_alpha, line_alpha, step)
-        for j in tqdm(range(10), desc=f'3'):
-            pass
         min_lon, min_lat, max_lon, max_lat = geoms2bbox(gds) #TODO: very long
-        for j in tqdm(range(10), desc=f'4'):
-            pass
         image_overlay = folium.raster_layers.ImageOverlay(image,
                                                           bounds=[[min_lat, min_lon], [max_lat, max_lon]],
                                                           origin='lower', name=name)
