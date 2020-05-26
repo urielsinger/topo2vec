@@ -12,7 +12,7 @@ class SeveralClassesDataset(MultiRadiiDataset):
     def __init__(self, original_radiis: List[int], outer_polygon: Polygon, wanted_size: int,
                  class_paths: List[str], class_names: List[str], dataset_type_name: str,
                  radii: List[int] = None):
-        all_datasets = [class_names]
+        all_datasets = []
         self.class_names = class_names
         self.class_names_to_indexes = {}
         for i in range(len(self.class_names)):
@@ -32,7 +32,6 @@ class SeveralClassesDataset(MultiRadiiDataset):
         wanted_indices = list(range(0, size, 1))
         all_datasets = [Subset(dataset, wanted_indices) for dataset in all_datasets]
         self.combined_dataset = ConcatDataset(all_datasets)
-        tqdm([1], desc='total size is' + str(len(self.combined_dataset)))
 
 
     def class_name_to_index(self, class_name: str) -> int:

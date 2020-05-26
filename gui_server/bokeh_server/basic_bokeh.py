@@ -45,7 +45,7 @@ def set_working_polygon(polygon: Polygon):
 
 goral_hights = build_polygon(34.7, 31.3, 34.9, 31.43)
 north_is = build_polygon(35.1782, 32.8877, 35.5092,  33.0524)
-north_is_small = build_polygon(35.3782, 32.9877, 35.4092,  33.0000)
+north_is_small = build_polygon(35.3582, 32.9877, 35.4292,  33.0200)
 
 set_working_polygon(north_is_small)
 
@@ -66,7 +66,7 @@ class BasicBokeh:
         self.folium_fig = self.bokeh_new_class_folium(lonlat_text_inputs=self.lonlat_text_inputs)
 
         # Set up widgets
-        self.meters_step = Slider(title="meters_step", value=200, start=10, end=2000, step=10)
+        self.meters_step = Slider(title="meters_step", value=80, start=10, end=500, step=10)
         self.number_of_points_to_show = Slider(title="number of points to show", value=5, start=1, end=100)
         self.threshold = Slider(title="threshold for class", value=0, start=0, end=1, step=0.01)
         self.test_minimal_resolution = Slider(title="minimal resolution", value=8, start=2, end=50)
@@ -177,7 +177,8 @@ class BasicBokeh:
                                          meters_step=int(self.meters_step.value),
                                          n=int(self.number_of_points_to_show.value), color='red',
                                          test_radius=int(self.test_minimal_resolution.value))
-        images, _ = visualizer.get_points_as_list_of_np_arrays(points_chosen, [8, 16, 24])  # TODO: change the const!!
+        r = int(self.test_minimal_resolution.value)
+        images, _ = visualizer.get_points_as_list_of_np_arrays(points_chosen, [r, 2*r, 3*r], 8)  # TODO: change the const!!
         points_images = convert_multi_radius_list_to_printable(images, dir=False)
         self.topo_map.add_points_with_images(points_chosen, points_images, color='green')
         # self.topo_map.add_points_with_text(points_chosen, color='green', text='chosen')

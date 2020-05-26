@@ -2,7 +2,7 @@
 
 import os
 import random
-from os.path import isfile
+
 from typing import List, Tuple
 
 import torch
@@ -83,7 +83,7 @@ def load_final_model(final_model_name: str):
     final_model_classifier.eval()
 
 
-load_final_model('final_model_big163264.pt')
+load_final_model('final_model81624.pt')
 FINAL_RADII = str_to_int_list(FINAL_HPARAMS.radii)
 FINAL_ORIGINAL_RADIIS = str_to_int_list(FINAL_HPARAMS.original_radiis)
 
@@ -100,11 +100,10 @@ def _build_new_dataset_for_query(points: List[Point], original_radiis: List[int]
     class_file_path = save_points_to_json_file(points, class_name, queried_classes_path)
     # take only the points from the query which are in the WORKING_POLYGON
     points_dataset = ClassDataset(class_path=class_file_path, class_label=0,
-                                  original_radiis=FINAL_ORIGINAL_RADIIS, radii=FINAL_RADII,
-                                  #original_radiis=[[int(test_radius), int(test_radius) * 2, int(test_radius) * 3]], radii=FINAL_RADII,
+                                  # original_radiis=FINAL_ORIGINAL_RADIIS, radii=FINAL_RADII,
+                                  original_radiis=[[int(test_radius), int(test_radius) * 2, int(test_radius) * 3]], radii=FINAL_RADII,
                                   wanted_size=len(points), outer_polygon=WORKING_POLYGON,
                                   dataset_type_name=USER_DEFINED, return_point=True)
-    tqdm([1], desc=str([[int(test_radius), int(test_radius) * 2, int(test_radius) * 3]]))
     points_used = points_dataset.points_locations
 
     if len(points_dataset) != len(points):

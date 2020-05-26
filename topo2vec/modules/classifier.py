@@ -64,7 +64,7 @@ class Classifier(LightningModule):
         self.train_dataset = SeveralClassesDataset(self.original_radiis, TRAIN_HALF, size_train, self.class_paths, self.class_names,
                                                    'num_classes_' + str(self.num_classes) + '_train', self.radii)
 
-        self.validation_dataset = SeveralClassesDataset(self.original_radiis, VALIDATION_HALF, size_val, CLASS_PATHS, CLASS_NAMES,
+        self.validation_dataset = SeveralClassesDataset(self.original_radiis, VALIDATION_HALF, size_val, self.class_paths, self.class_names,
                                                         'num_classes_' + str(self.num_classes) + '_validation', self.radii)
 
         if LOAD_CLASSES_LARGE:
