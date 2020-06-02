@@ -40,7 +40,8 @@ class TaskHandler:
 
         name = f'{hparams.name}_{hparams.arch}_{str(hparams.radii)}_lr_' \
             f'{str(hparams.learning_rate)}' \
-            f'_size_{hparams.total_dataset_size}_num_classes_{hparams.num_classes}'
+            f'_size_{hparams.total_dataset_size}_num_classes_{hparams.num_classes}' \
+            f'_latent_size_{hparams.latent_space_size}'
         print(f'started running, name = {name}')
 
         # init the model
@@ -102,13 +103,13 @@ class TaskHandler:
             vars(args)['arch'] = trial.suggest_categorical('arch', ['AdvancedAmphibAutoencoder',
                                                                     'BasicAutoencoder',
                                                                     'BasicAmphibAutoencoder'])
-        if args.pytorch_module == 'Classifier':
-            vars(args)['arch'] = trial.suggest_categorical('arch', ['BasicConvNetLatent',
-                                                                    'AdvancedConvNetLatent'])
+        # if args.pytorch_module == 'Classifier':
+        #     vars(args)['arch'] = trial.suggest_categorical('arch', ['BasicConvNetLatent',
+        #                                                             'AdvancedConvNetLatent'])
 
         vars(args)['learning_rate'] = trial.suggest_loguniform('learning_rate', 1e-8, 1e-3)
-        vars(args)['latent_space_size'] = trial.suggest_int('latent_space_size', 5, 70)
-        vars(args)['total_dataset_size'] = trial.suggest_categorical('total_dataset_size', [2500, 10000, 25000])
+        #vars(args)['latent_space_size'] = trial.suggest_int('latent_space_size', 5, 70)
+        vars(args)['total_dataset_size'] = trial.suggest_categorical('total_dataset_size', [2500, 10000])
 
         return self._run_experiment(args)
 
@@ -125,7 +126,7 @@ class TaskHandler:
         pruner = optuna.pruners.MedianPruner()
 
         study = optuna.create_study(direction="maximize", pruner=pruner)
-        study.optimize(self._build_hparams_and_run_experiment, n_trials=1000, timeout=60*60*48,
+        study.optimize(self._build_hparams_and_run_experiment, n_trials=100, timeout=60*60*2,
                        n_jobs=1)
 
         print("Number of finished trials: {}".format(len(study.trials)))

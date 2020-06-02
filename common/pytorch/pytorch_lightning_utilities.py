@@ -4,7 +4,7 @@ from torch import Tensor
 from torch.utils.data import Dataset, DataLoader
 
 
-def get_dataset_as_tensor(dataset: Dataset) -> Tuple[Tensor, Tensor]:
+def get_dataset_as_tensor(dataset: Dataset, shuffle=False) -> Tuple[Tensor, Tensor]:
     '''
 
     Args:
@@ -14,7 +14,7 @@ def get_dataset_as_tensor(dataset: Dataset) -> Tuple[Tensor, Tensor]:
 
     '''
     dataset_length = len(dataset)
-    return get_random_part_of_dataset(dataset, dataset_length, shuffle=False)
+    return get_random_part_of_dataset(dataset, dataset_length, shuffle=shuffle)
 
 
 def get_random_part_of_dataset(dataset: Dataset, size_wanted: int, shuffle=True) -> Tuple[Tensor, Tensor]:

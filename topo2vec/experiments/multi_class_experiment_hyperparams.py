@@ -37,20 +37,21 @@ if not LOAD_CLASSES_LARGE:
 else:
     classifier_regular_args = classifier_parser.parse_args(['--save_model',
                                                             '--learning_rate', '1e-4',
-                                                            '--max_epochs', '200',
-                                                            '--total_dataset_size', '10000',
+                                                            '--max_epochs', '25',
+                                                            '--total_dataset_size', '25000',
                                                             '--arch', 'BasicConvNetLatent',
                                                             '--svm_classify_latent_space',
                                                             '--name', 'classifier',
                                                             '--pytorch_module', 'Classifier',
-                                                            '--random_set_size_for_svm', '4000',
-                                                            '--random_set_size_for_knn', '1000',
-                                                            '--latent_space_size', '50',
-                                                            '--knn_method_for_typical_choosing', 'group_from_file',
-                                                            '--test_knn',
+                                                            '--random_set_size_for_svm', '100',
+                                                            '--random_set_size_for_svm_special', '10',
+                                                            '--test_set_size_for_svm', '100',
+                                                            '--svm_classify_latent_space',
+                                                            '--latent_space_size', '35',
                                                             '--special_classes_for_validation',
-                                                            '["cliffs", "peaks"]',
-                                                            '--logs_path', MULTICLASS_LOGS_PATH
+                                                            '["alpine_huts", "antenas"]',
+                                                            '--logs_path', MULTICLASS_LOGS_PATH,
+                                                            '--save_model'
                                                             ])
 
 lab = TaskHandler(classifier_regular_args)

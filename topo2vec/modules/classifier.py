@@ -22,7 +22,7 @@ from common.pytorch.visualizations import convert_multi_radius_tensor_to_printab
     plot_to_image, plot_confusion_matrix
 from topo2vec.constants import SAVE_PATH, GROUP_TO_SEARCH_SIMILAR_LONGS_LARGE, LOGS_PATH
 from topo2vec.datasets.several_classes_datasets import SeveralClassesDataset
-from topo2vec.modules.svm_on_latent_tester import svm_classifier_test, svm_accuracy_on_dataset_in_latent_space
+from topo2vec.modules.svm_on_latent_tester import svm_classifier_test_build_datasets, svm_accuracy_on_dataset_in_latent_space
 
 
 class Classifier(LightningModule):
@@ -231,9 +231,9 @@ class Classifier(LightningModule):
             if 'test_acc' in basic_dict['log']:
                 self.final_test_accuracy = basic_dict['log']['test_acc']
 
-            svm_classifier_ordinary_classes_test_log_dict = svm_classifier_test(self, CLASS_PATHS, CLASS_NAMES,
+            svm_classifier_ordinary_classes_test_log_dict = svm_classifier_test_build_datasets(self, CLASS_PATHS, CLASS_NAMES,
                                                                                       'ordinary', self.test_dataset,
-                                                                                      self.hparams.random_set_size_for_svm)
+                                                                                               self.hparams.random_set_size_for_svm)
 
             class_paths_special, class_names_special = get_paths_and_names_wanted(
                 self.hparams.special_classes_for_validation, CLASS_PATHS_SPECIAL, CLASS_NAMES_SPECIAL)
@@ -244,9 +244,9 @@ class Classifier(LightningModule):
                                                              'test_svm_special', self.radii)
 
             svm_classifier_special_classes_test_log_dict = \
-                svm_classifier_test(self, class_paths_special, class_names_special,
+                svm_classifier_test_build_datasets(self, class_paths_special, class_names_special,
                                           'special', svm_special_test_dataset,
-                                          self.hparams.random_set_size_for_svm_special)
+                                                   self.hparams.random_set_size_for_svm_special)
 
             new_log_dict = {**svm_classifier_ordinary_classes_test_log_dict,
                             **svm_classifier_special_classes_test_log_dict,
@@ -275,11 +275,11 @@ class Classifier(LightningModule):
 
     def _evaluation_epoch_end(self, outputs: list, name: str) -> Dict:
         '''
-        a function consisting of all the operations needed after evaluation epoch, both validation and test epochs
+        a function consisting of all the operations needed after evaluation_experiments epoch, both validation and test epochs
         this is the part that will be overriden by sub-classes.
         Args:
             outputs:
-            name: whether it is the test or validation evaluation epoch end
+            name: whether it is the test or validation evaluation_experiments epoch end
 
         Returns:
 
@@ -404,7 +404,7 @@ class Classifier(LightningModule):
         parser.add_argument('--test_knn', dest='test_knn', action='store_true',
                             help='test the latent space to find the knn of the main things')
         parser.add_argument('--random_set_size_for_knn', type=int, default=10000,
-                            help='the random set size for the knn evaluation')
+                            help='the random set size for the knn evaluation_experiments')
         parser.add_argument('--k', type=int, default=5,
                             help='the number of neerest neighbours for the knn ebvaluation')
 
@@ -416,7 +416,7 @@ class Classifier(LightningModule):
 
         # svm on latent #
 
-        # svm classification on top of the model - for ecaluation only
+        # svm classification on top of the model - for evaluation_experiments only
         parser.add_argument('--svm_classify_latent_space', dest='svm_classify_latent_space', action='store_true',
                             help='classify the latent space using one linear layer to check if it is good')
         parser.add_argument('--random_set_size_for_svm', type=int, default=1000)

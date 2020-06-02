@@ -67,7 +67,7 @@ class Autoencoder(Classifier):
 
     def _evaluation_step(self, batch: Tensor, name: str) -> Dict:
         '''
-        the autoencoder does much less "evaluation step" operations because it is not about classifying.
+        the autoencoder does much less "evaluation_experiments step" operations because it is not about classifying.
 
         Args:
             batch:
@@ -106,7 +106,7 @@ class Autoencoder(Classifier):
 
     def _evaluation_epoch_end(self, outputs: list, name: str) -> Dict:
         '''
-        the autoencoder does much less "evaluation epoch end" operations because it is not about classifying.
+        the autoencoder does much less "evaluation_experiments epoch end" operations because it is not about classifying.
         Args:
             outputs:
             name: validation / test

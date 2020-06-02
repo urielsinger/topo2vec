@@ -52,7 +52,10 @@ class DataFromFileHandler(DataHandler):
         '''
         point_multi_patches = []
         points_used = []
-        resized_shape = (2 * radii + 1, 2 * radii + 1)
+        if radii == 224:
+            resized_shape = (224, 224)
+        else:
+            resized_shape = (2 * radii + 1, 2 * radii + 1)
         for point in center_points:
             point_patches = []
             for original_radius in original_radii:

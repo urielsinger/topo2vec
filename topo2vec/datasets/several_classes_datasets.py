@@ -25,7 +25,7 @@ class SeveralClassesDataset(MultiRadiiDataset):
                                          dataset_type_name=dataset_type_name,
                                          radii=radii)
 
-            print(f'{dataset_type_name} dataset: {len(class_dataset)} {class_names[i]} points')
+            # print(f'{dataset_type_name} dataset: {len(class_dataset)} {class_names[i]} points')
             all_datasets.append(class_dataset)
 
         size = min([len(dataset) for dataset in all_datasets])

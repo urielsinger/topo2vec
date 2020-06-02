@@ -37,7 +37,7 @@ else:
                                                             '--test_knn',
                                                             '--test_set_size_for_svm', '100',
                                                             '--special_classes_for_validation',
-                                                            '["cliffs", "peaks"]',
+                                                            '["cliffs", "antenas"]',
                                                             '--save_to_final',
                                                             '--original_radiis', '[[4,8,12]]',
                                                             '--final_file_name', 'final_mode4812.pt'
