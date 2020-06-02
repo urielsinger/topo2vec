@@ -14,12 +14,18 @@ class TopoResNet(ResNet):
         super(TopoResNet, self).__init__(BasicBlock, [2, 2, 2, 2])
         state_dict = load_state_dict_from_url(model_urls['resnet18'], progress=True)
         self.load_state_dict(state_dict)
+        self.num_classes = hparams.num_classes
+        self.latent_space_size = 512
+        if not hparams.train_all_resnet:
+            for param in self.parameters():
+                param.requires_grad = False
+        self.fc = nn.Sequential(
+            nn.SELU(inplace=True),
+            nn.Linear(512, self.num_classes),
+        )
         self.radii = str_to_int_list(hparams.radii)
         self.radius = min(self.radii)
-        self.w = 2 * self.radius + 1
-        self.h = 2 * self.radius + 1
-        self.patch_size = self.w * self.h
-        self.latent_space_size = hparams.latent_space_size
+
 
     def _forward_impl(self, x):
         # See note [TorchScript super()]
@@ -35,8 +41,9 @@ class TopoResNet(ResNet):
 
         x = self.avgpool(x)
         latent = torch.flatten(x, 1)
-        return latent
+        x = self.fc(latent)
+        return x, latent
 
     def forward(self, x):
-        latent = self._forward_impl(x)
-        return None, latent
+        x, latent = self._forward_impl(x)
+        return x, latent

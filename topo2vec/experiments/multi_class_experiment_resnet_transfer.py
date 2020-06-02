@@ -22,25 +22,23 @@ if not LOAD_CLASSES_LARGE:
                                                             '--save_to_final'])
 else:
     classifier_regular_args = classifier_parser.parse_args(['--save_model',
-                                                            '--learning_rate', '0.0003200196036593708',
-                                                            '--max_epochs', '10',
-                                                            '--total_dataset_size', '20',
-                                                            '--arch', 'BasicConvNetLatent',
-                                                            '--svm_classify_latent_space',
+                                                            '--learning_rate', '0.0009200196036593708',
+                                                            '--max_epochs', '9', #9 epochs are best.
+                                                            '--total_dataset_size', '10000',
+                                                            '--arch', 'TopoResNet',
+                                                            # '--svm_classify_latent_space',
                                                             '--name', 'classifier',
                                                             '--pytorch_module', 'Classifier',
-                                                            '--random_set_size_for_svm', '4000',
-                                                            '--random_set_size_for_svm_special', '1000',
-                                                            '--random_set_size_for_knn', '1000',
-                                                            '--latent_space_size', '35',
-                                                            '--knn_method_for_typical_choosing', 'group_from_file',
-                                                            '--test_knn',
-                                                            '--test_set_size_for_svm', '100',
-                                                            '--special_classes_for_validation',
-                                                            '["cliffs", "antenas"]',
-                                                            '--save_to_final',
-                                                            '--original_radiis', '[[4,8,12]]',
-                                                            '--final_file_name', 'final_mode4812.pt'
+                                                            # '--random_set_size_for_svm', '4000',
+                                                            # '--random_set_size_for_svm_special', '1000',
+                                                            # '--random_set_size_for_knn', '1000',
+                                                            # '--latent_space_size', '35',
+                                                            # '--test_set_size_for_svm', '100',
+                                                            # '--special_classes_for_validation',
+                                                            # '["cliffs", "antenas"]',
+                                                            '--original_radiis', '[[8,16,24]]',
+                                                            '--radii', '[224,224,224]',
+                                                            '--train_all_resnet',
                                                             ])
 lab = TaskHandler(classifier_regular_args)
 lab.run()

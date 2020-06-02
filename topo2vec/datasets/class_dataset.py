@@ -23,7 +23,7 @@ class ClassDataset(MultiRadiiDataset):
     def __init__(self, class_path: str, class_label: float,
                  original_radiis: List[int],
                  wanted_size: int, radii: List[int] = None, outer_polygon=None,
-                 dataset_type_name: str = None, load_save=True, return_point=False):
+                 dataset_type_name: str = None, load_save=True, return_point=False, seed=None):
         '''
 
         Args:
@@ -37,7 +37,7 @@ class ClassDataset(MultiRadiiDataset):
         self.labels = []
         self.wanted_size = wanted_size
         self.load_save = load_save
-
+        self.seed = seed
         file_name, _ = os.path.splitext(class_path)
         type_area_name = file_name.split('/')[-1]
         self.full_base_dir = os.path.join(CACHE_BASE_DIR, 'datasets', type_area_name,
@@ -84,7 +84,7 @@ class ClassDataset(MultiRadiiDataset):
                 classes_data_handlers[file_path] = class_data_handler
 
             points_list = classes_data_handlers[file_path]. \
-                get_random_subset_in_polygon(self.wanted_size, self.outer_polygon)
+                get_random_subset_in_polygon(self.wanted_size, self.outer_polygon, seed=self.seed)
             if self.full_base_dir is not None:
                 save_list_to_file(full_path_points_list, points_list_to_floats_list(points_list))
         else:

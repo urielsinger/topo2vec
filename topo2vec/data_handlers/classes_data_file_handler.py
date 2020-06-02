@@ -61,7 +61,9 @@ class ClassesDataFileHadler(DataHandler):
 
             save_list_to_file(full_path, self.points_list)
 
-    def get_random_subset_in_polygon(self, wanted_size: int, outer_polygon: Polygon = None):
+    def get_random_subset_in_polygon(self, wanted_size: int, outer_polygon: Polygon = None, seed=None):
+        if seed is not None:
+            random.seed(seed)
         if outer_polygon is not None:
             points_inside_polygon = []
             for i in range(0, len(self.points_list), 2):

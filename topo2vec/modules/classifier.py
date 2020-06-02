@@ -366,6 +366,9 @@ class Classifier(LightningModule):
                             help='choose what pytorch modelu to use: classsifier / autoencoder')
         parser.add_argument('--latent_space_size', type=int, default=50,
                             help='size of the desired latent space of the autoencoder.')
+        parser.add_argument('--train_all_resnet', dest='train_all_resnet', action='store_true',
+                            help='put if using a resnet architecture and want to train it all')
+
 
 
         # the classes data #

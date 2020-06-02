@@ -2,7 +2,6 @@ from typing import List
 
 from shapely.geometry import Polygon
 from torch.utils.data import ConcatDataset, Subset
-from tqdm import tqdm
 
 from topo2vec.datasets.class_dataset import ClassDataset
 from topo2vec.datasets.multi_radius_dataset import MultiRadiiDataset
@@ -11,7 +10,7 @@ from topo2vec.datasets.multi_radius_dataset import MultiRadiiDataset
 class SeveralClassesDataset(MultiRadiiDataset):
     def __init__(self, original_radiis: List[int], outer_polygon: Polygon, wanted_size: int,
                  class_paths: List[str], class_names: List[str], dataset_type_name: str,
-                 radii: List[int] = None):
+                 radii: List[int] = None, random_seed=None):
         all_datasets = []
         self.class_names = class_names
         self.class_names_to_indexes = {}
@@ -23,7 +22,7 @@ class SeveralClassesDataset(MultiRadiiDataset):
                                          wanted_size=class_wanted_size,
                                          outer_polygon=outer_polygon,
                                          dataset_type_name=dataset_type_name,
-                                         radii=radii)
+                                         radii=radii, seed=random_seed)
 
             # print(f'{dataset_type_name} dataset: {len(class_dataset)} {class_names[i]} points')
             all_datasets.append(class_dataset)

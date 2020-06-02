@@ -41,7 +41,7 @@ class TaskHandler:
         name = f'{hparams.name}_{hparams.arch}_{str(hparams.radii)}_lr_' \
             f'{str(hparams.learning_rate)}' \
             f'_size_{hparams.total_dataset_size}_num_classes_{hparams.num_classes}' \
-            f'_latent_size_{hparams.latent_space_size}'
+            f'_latent_size_{hparams.latent_space_size}_train_all_resnet_{hparams.train_all_resnet}'
         print(f'started running, name = {name}')
 
         # init the model
