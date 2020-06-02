@@ -105,5 +105,5 @@ for special_class_path, special_class_name in zip(class_paths_special, class_nam
     plt.title(f'few shot: {special_class_name} vs. random')
     plt.xlabel('number of poositive examples')
     plt.ylabel(f'{what_to_plot}')
-    plt.savefig(f'{special_class_name}_{what_to_plot}_regular.png')
+    plt.savefig(f'{special_class_name}_{what_to_plot}_regular_final.png')
     plt.clf()

@@ -1,3 +1,5 @@
+import time
+
 import sklearn
 from sklearn import svm
 from sklearn.metrics import accuracy_score
@@ -33,6 +35,9 @@ def svm_accuracy_on_dataset_in_latent_space(SVMClassifier, dataset: Dataset, mod
         probas = SVMClassifier.predict_proba(latent.numpy())
         y_np = y.numpy().squeeze()
         auc = sklearn.metrics.roc_auc_score(y_np, probas[:,1], multi_class='ovo')
+        # sklearn.metrics.plot_roc_curve(SVMClassifier, latent.numpy(), y.numpy().squeeze())
+        import matplotlib.pyplot as plt
+        plt.savefig(f'{time.time()}.png')
         return accuracy, auc
     return accuracy
 
