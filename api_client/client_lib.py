@@ -1,3 +1,4 @@
+import logging
 from typing import List
 
 import requests
@@ -32,14 +33,14 @@ def get_all_classifications_in_polygon(polygon: Polygon, meters_step: int, class
                     'thresholds': json.dumps(thresholds),
                     'test_radius': test_radius}
     url = f'{ADDRESS}/get_all_classifications'
-    print(f'waiting for {url}')
+    logging.info(f'waiting for {url}')
     response = requests.post(url=url, json=request_dict)
     json_dictionary_in = response.json()
     locations_jsoned = json_dictionary_in['locations']
     class_indices_jsoned = json_dictionary_in['class_indices']
     locations = json.loads(locations_jsoned)
     class_indices = json.loads(class_indices_jsoned)
-    print(f'retrieved{len(locations)} points')
+    logging.info(f'retrieved{len(locations)} points')
     return locations, class_indices
 
 
@@ -50,14 +51,14 @@ def get_all_class_points_in_polygon(polygon, meters_step, class_name, threshold,
                     'threshold': threshold,
                     'test_radius': test_radius}
     url = f'{ADDRESS}/get_class'
-    print(f'waiting for {url}')
+    logging.info(f'waiting for {url}')
     response = requests.post(url=url, json=request_dict)
     json_dictionary_in = response.json()
     class_points_jsoned = json_dictionary_in['class_points']
     class_patches_jsoned = json_dictionary_in['class_patches']
     class_points = json.loads(class_points_jsoned)
     class_patches = json.loads(class_patches_jsoned)
-    print(f'retrieved{len(class_points)} points')
+    logging.info(f'retrieved{len(class_points)} points')
     return np.array(class_points), np.array(class_patches)
 
 
@@ -69,7 +70,7 @@ def get_top_n_similar_points_in_polygon(points, n, polygon, meters_step, test_ra
                     'n': n,
                     'test_radius': test_radius}
     url = f'{ADDRESS}/get_similar'
-    print(f'waiting for {url}')
+    logging.info(f'waiting for {url}')
     response = requests.post(url=url, json=request_dict)
     json_dictionary_in = response.json()
     class_points_jsoned = json_dictionary_in['class_points']
@@ -84,7 +85,7 @@ def get_latent_for_points(points, test_radius):
     request_dict = {'points': points_to_send,
                     'test_radius': test_radius}
     url = f'{ADDRESS}/get_features'
-    print(f'waiting for {url}')
+    logging.info(f'waiting for {url}')
     response = requests.post(url=url, json=request_dict)
     json_dictionary_in = response.json()
     features_jsoned = json_dictionary_in['features']
@@ -100,7 +101,7 @@ def get_working_polygon():
 
     '''
     url = f'{ADDRESS}/get_working_polygon'
-    print(f'waiting for {url}')
+    logging.info(f'waiting for {url}')
     response = requests.post(url=url)
     json_dictionary_in = response.json()
     polygon_wkt = json_dictionary_in['polygon']
@@ -116,9 +117,9 @@ def set_working_polygon(polygon: Polygon):
     polygon_wkt = polygon.wkt
     request_dict = {'polygon': polygon_wkt}
     url = f'{ADDRESS}/set_working_polygon'
-    print(f'waiting for {url}')
+    logging.info(f'waiting for {url}')
     response = requests.post(url=url, json=request_dict)
-    print(response.content)
+    logging.info(response.content)
     return response.status_code
 
 
@@ -128,7 +129,7 @@ def get_available_class_names():
 
     '''
     url = f'{ADDRESS}/get_available_class_names'
-    print(f'waiting for {url}')
+    logging.info(f'waiting for {url}')
     response = requests.post(url=url)
     json_dictionary_in = response.json()
     class_names_jsoned = json_dictionary_in['class_names']
@@ -141,7 +142,7 @@ def get_available_final_model_file_names():
 
     '''
     url = f'{ADDRESS}/get_final_model_file_names'
-    print(f'waiting for {url}')
+    logging.info(f'waiting for {url}')
     response = requests.post(url=url)
     json_dictionary_in = response.json()
     class_names_jsoned = json_dictionary_in['file_names']
@@ -155,8 +156,8 @@ def set_final_model(file_name: str):
     '''
     request_dict = {'final_model_name': file_name}
     url = f'{ADDRESS}/load_final_model'
-    print(f'waiting for {url}')
+    logging.info(f'waiting for {url}')
     response = requests.post(url=url, json=request_dict)
-    print(response.content)
+    logging.info(response.content)
     return response.status_code
 

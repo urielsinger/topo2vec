@@ -1,3 +1,4 @@
+import logging
 import time
 from typing import List
 
@@ -30,7 +31,7 @@ class OneVsRandomDataset:
         classification_dataset = torch.utils.data.Subset(classification_dataset, wanted_indices)
         random_dataset = RandomDataset(len(classification_dataset), original_radiis, outer_polygon, radii=radii, seed=random_seed)
         combined_dataset = ConcatDataset([classification_dataset, random_dataset])
-        print(f'size: {len(combined_dataset)}')
+        logging.info(f'size: {len(combined_dataset)}')
         self.combined_dataset = combined_dataset
 
     def __getitem__(self, index):

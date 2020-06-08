@@ -1,7 +1,9 @@
 # the topography profiler module
-
+import json
+import logging
 import os
 import random
+from datetime import datetime
 
 from typing import List, Tuple
 
@@ -14,7 +16,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 from common.geographic.geo_utils import sample_grid_in_poly, build_polygon
-from common.other_scripts import save_points_to_json_file
+from common.other_scripts import points_to_json_dict
 from common.list_conversions_utils import str_to_int_list
 from topo2vec.constants import BASE_LOCATION
 from topo2vec.datasets.class_dataset import ClassDataset
@@ -97,7 +99,11 @@ def _build_new_dataset_for_query(points: List[Point], original_radiis: List[int]
                                  class_name: str = 'no_name') -> Tuple[ClassDataset, np.ndarray]:
     queried_classes_path = os.path.join(FINAL_MODEL_DIR, 'queried_classes')
     Path(queried_classes_path).mkdir(parents=True, exist_ok=True)
-    class_file_path = save_points_to_json_file(points, class_name, queried_classes_path)
+    data = points_to_json_dict(points, class_name)
+    class_file_path = os.path.join(queried_classes_path, class_name + str(datetime.now())+'.json')
+    with open(class_file_path, 'w') as outfile:
+        json.dump(data, outfile)
+
     # take only the points from the query which are in the WORKING_POLYGON
     points_dataset = ClassDataset(class_path=class_file_path, class_label=0,
                                   # original_radiis=FINAL_ORIGINAL_RADIIS, radii=FINAL_RADII,
@@ -107,7 +113,7 @@ def _build_new_dataset_for_query(points: List[Point], original_radiis: List[int]
     points_used = points_dataset.points_locations
 
     if len(points_dataset) != len(points):
-        print('some of the points are not in the right area and thus ignored')
+        logging.info('some of the points are not in the right area and thus ignored')
 
     if len(points_dataset) == 0:
         raise Exception('there is no single point in the data that is acceptable')

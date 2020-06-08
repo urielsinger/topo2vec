@@ -4,7 +4,6 @@ FROM base_anaconda
 USER root
 WORKDIR /home/root
 
-ENV BOKEH_PORT 8765
 # expose for the bokeh server
 EXPOSE ${BOKEH_PORT} 7722
 

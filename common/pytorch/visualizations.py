@@ -151,7 +151,6 @@ def convert_multi_radius_ndarray_to_printable(array: np.ndarray, dir = True) -> 
     if dir:
         printable_ndarray = array.reshape(num_samples_in_dataset, -1, w)
     else:
-        print(array.shape)
         printable_ndarray = array.transpose((0,1,3,2)).reshape(num_samples_in_dataset, -1, h).transpose((0,2,1))
     return printable_ndarray
 

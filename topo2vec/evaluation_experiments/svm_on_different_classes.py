@@ -1,17 +1,19 @@
+import logging
+
 import torch
 
 from topo2vec.background import CLASS_PATHS_SPECIAL, CLASS_NAMES_SPECIAL, VALIDATION_HALF, TRAIN_HALF
 from topo2vec.datasets.one_vs_random_dataset import OneVsRandomDataset
 from topo2vec.evaluation_experiments.final_models import classic_model_best, topo_resnet_model, topo_resnet_full
 from topo2vec.evaluation_experiments.svm_on_plain_experiment import test_svm_on_plain
-from topo2vec.helper_functions import get_paths_and_names_wanted
+from common.dataset_utils import get_paths_and_names_wanted
 from topo2vec.modules.svm_on_latent_tester import svm_classifier_test
 import numpy as np
 
 original_radiis = [[8,16,24]]
 test_set_size_for_svm = 100
 RESNET_RADII = [224, 224, 224]
-special_classes_for_validation = ['alpine_huts', 'peaks', 'airialway_stations', 'waterfalls']
+special_classes_for_validation = ['peaks']
 train_set_size_for_svm = 5 * len(special_classes_for_validation)
 
 class_paths_special, class_names_special = get_paths_and_names_wanted(
@@ -52,7 +54,7 @@ for special_class_path, special_class_name in zip(class_paths_special, class_nam
         res_full_list = []
 
         for seed in seeds:
-            print(seed)
+            logging.info(seed)
             svm_special_train_dataset = OneVsRandomDataset(original_radiis, train_set_size_for_svm, TRAIN_HALF, special_class_path, random_seed=seed)
             svm_special_train_dataset_resnet = OneVsRandomDataset(original_radiis, train_set_size_for_svm, TRAIN_HALF,
                                                                   special_class_path, radii=RESNET_RADII, random_seed=seed)
@@ -77,24 +79,24 @@ for special_class_path, special_class_name in zip(class_paths_special, class_nam
             res_list.append(svm_classifier_special_classes_test_log_dict_resnet[f'svm_test_special_{what_to_plot}'])
             res_full_list.append(svm_classifier_special_classes_test_log_dict_resnet_transfer[f'svm_test_special_{what_to_plot}'])
 
-        print(f'size of dataset = {svm_special_test_dataset}')
-        print('results on the latent space')
-        print(classic_list)
+        logging.info(f'size of dataset = {svm_special_test_dataset}')
+        logging.info('results on the latent space')
+        logging.info(classic_list)
         on_latent_accuracy.append(np.mean(classic_list))
 
-        print('results on the resnet latent space')
-        print(svm_classifier_special_classes_test_log_dict_resnet)
+        logging.info('results on the resnet latent space')
+        logging.info(svm_classifier_special_classes_test_log_dict_resnet)
         resnet_accuracy.append(np.mean(res_list))
-        print(res_list)
+        logging.info(res_list)
 
-        print('results on the resnet transfer latent space')
-        print(svm_classifier_special_classes_test_log_dict_resnet_transfer)
+        logging.info('results on the resnet transfer latent space')
+        logging.info(svm_classifier_special_classes_test_log_dict_resnet_transfer)
         resnet_transfer_accuracy.append(np.mean(res_full_list))
-        print(res_full_list)
+        logging.info(res_full_list)
 
-        print('results of SVM trained')
+        logging.info('results of SVM trained')
         on_plain_accuracy.append(np.mean(svm_list))
-        print(svm_list)
+        logging.info(svm_list)
 
     import matplotlib.pyplot as plt
     plt.plot(number_of_examples, on_latent_accuracy, label=f'classicnet on latent {what_to_plot}')

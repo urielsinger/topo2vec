@@ -7,9 +7,8 @@ import base64
 import matplotlib
 
 from api_client import client_lib
-from api_client.client_lib import build_polygon
 from common.geographic.geo_map import GeoMap
-from common.geographic.geo_utils import meters2degrees
+from common.geographic.geo_utils import meters2degrees, point_to_location
 
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -49,18 +48,6 @@ def _get_working_polygon():
     return client_lib.get_working_polygon()
 
 
-def point_to_location(point: Point) -> List:
-    '''
-    convert a point to the the list type that folium uses
-    Args:
-        point: the point
-
-    Returns: a lo
-
-    '''
-    return [point.x, point.y]
-
-
 def get_working_polygon_center():
     center_point = _get_working_polygon().centroid
     return point_to_location(center_point)[::-1]
@@ -68,7 +55,7 @@ def get_working_polygon_center():
 
 def points_list_to_polygons_wkt_list(points_list, meters_step):
     polygon_radius = meters2degrees(meters_step) / 2
-    polygons_list = [build_polygon(point[0] - polygon_radius, point[1] - polygon_radius,
+    polygons_list = [client_lib.build_polygon(point[0] - polygon_radius, point[1] - polygon_radius,
                                    point[0] + polygon_radius, point[1] + polygon_radius).wkt for point in points_list]
 
     return polygons_list

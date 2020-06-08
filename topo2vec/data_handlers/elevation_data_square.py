@@ -1,3 +1,5 @@
+import logging
+
 from skimage import io
 import math
 import os
@@ -5,6 +7,8 @@ from typing import Tuple
 
 import numpy as np
 from shapely.geometry import Point
+
+from common.geographic.geo_utils import lon_lat_to_string
 
 
 class ElevationDataSquare:
@@ -23,12 +27,12 @@ class ElevationDataSquare:
             for min_lat in range(self.min_lat, self.max_lat, 1):
                 #im_name = self.lon_lat_to_string(min_lon, min_lat) + '_AVE_DSM.tif'
                 try:
-                    im_name = 'ALPSMLC30_' + self.lon_lat_to_string(min_lon, min_lat) + '_DSM.tif'
-                    print(im_name)
+                    im_name = 'ALPSMLC30_' + lon_lat_to_string(min_lon, min_lat) + '_DSM.tif'
+                    logging.info(im_name)
                     im = self.load_image(os.path.join(elevation_base_dir, im_name))
                     this_lon_images.append(im)
                 except:
-                    print(f'min lon: {min_lon}, min lat: {min_lat}, is not in the files in {elevation_base_dir}')
+                    logging.info(f'min lon: {min_lon}, min lat: {min_lat}, is not in the files in {elevation_base_dir}')
             this_lon_images = np.concatenate(list(reversed(this_lon_images)), axis=0)
             images.append(this_lon_images)
         self.im = np.concatenate(images, axis=1)
@@ -60,21 +64,10 @@ class ElevationDataSquare:
                lat < self.max_lat and lat > self.min_lat
 
     def point_to_string(self, point: Point) -> str:
-        return self.lon_lat_to_string(point.x, point.y)
+        return lon_lat_to_string(point.x, point.y)
 
-    def lon_lat_to_string(self, lon: float, lat: float) -> str:
-        lon_floor, lat_floor = self.floor_lon_lat(lon, lat)
-        zeros_for_lon = '0' * (3 - len(str(lon_floor)))
-        zeros_for_lat = '0' * (3 - len(str(lat_floor)))
-
-        return f'N{zeros_for_lat}{lat_floor}E{zeros_for_lon}{lon_floor}'
-
-    def floor_lon_lat(self, lon: float, lat: float) -> Tuple[int, int]:
-        lon_floor = int(math.floor(lon))
-        lat_floor = int(math.floor(lat))
-        return lon_floor, lat_floor
-
-    def load_image(self, image_path):
+    @staticmethod
+    def load_image(image_path):
         '''
 
         Args:
@@ -85,7 +78,7 @@ class ElevationDataSquare:
         '''
         file_name, file_extension = os.path.splitext(image_path)
         if file_extension == '.tif':
-            print('loading a .tif extension')
+            logging.info('loading a .tif extension')
             return io.imread(image_path)
 
         elif file_extension == '.hgt':

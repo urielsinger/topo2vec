@@ -1,3 +1,5 @@
+import logging
+
 from topo2vec.data_handlers.classes_data_file_handler import ClassesDataFileHadler
 from topo2vec.constants import N49_E05_CLIFFS, N49_E05_RIVERS, N49_E05_PEAKS, N49_E05_STREAMS, TRAIN_HALF_LARGE, VALIDATION_HALF_LARGE, \
     VALIDATION_HALF_SMALL, TRAIN_HALF_SMALL, POINT_TO_SEARCH_SIMILAR_LARGE, POINT_TO_SEARCH_SIMILAR_SMALL, \
@@ -50,11 +52,11 @@ if LOAD_CLASSES_LARGE:
     CLASS_NAMES.sort()
     CLASS_PATHS.sort()
     CLASS_NAMES_TEST.sort()
-    print(CLASS_NAMES)
+    logging.info(CLASS_NAMES)
     CLASS_PATHS_TEST.sort()
     CLASS_PATHS_SPECIAL.sort()
     CLASS_NAMES_SPECIAL.sort()
-    print(CLASS_NAMES_SPECIAL)
+    logging.info(CLASS_NAMES_SPECIAL)
 
     TRAIN_HALF = TRAIN_HALF_LARGE
     VALIDATION_HALF = VALIDATION_HALF_LARGE
@@ -73,5 +75,5 @@ BUILD_CLASSES_DATA_HANDLERS = True
 
 if BUILD_CLASSES_DATA_HANDLERS:
     for class_path in CLASS_PATHS:
-        print("loading" + class_path)
+        logging.info("loading" + class_path)
         classes_data_handlers[class_path] = ClassesDataFileHadler(class_path)

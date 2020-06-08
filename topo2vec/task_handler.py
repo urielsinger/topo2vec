@@ -1,3 +1,4 @@
+import logging
 import os
 import random
 from argparse import Namespace
@@ -42,7 +43,7 @@ class TaskHandler:
             f'{str(hparams.learning_rate)}' \
             f'_size_{hparams.total_dataset_size}_num_classes_{hparams.num_classes}' \
             f'_latent_size_{hparams.latent_space_size}_train_all_resnet_{hparams.train_all_resnet}'
-        print(f'started running, name = {name}')
+        logging.info(f'started running, name = {name}')
 
         # init the model
         save_path = os.path.join(hparams.save_path, name + str('.pt'))
@@ -129,15 +130,15 @@ class TaskHandler:
         study.optimize(self._build_hparams_and_run_experiment, n_trials=100, timeout=60*60*2,
                        n_jobs=1)
 
-        print("Number of finished trials: {}".format(len(study.trials)))
+        logging.info("Number of finished trials: {}".format(len(study.trials)))
 
-        print("Best trial:")
+        logging.info("Best trial:")
         trial = study.best_trial
 
-        print("  Max validation accuracy: {}".format(trial.value))
+        logging.info("  Max validation accuracy: {}".format(trial.value))
 
-        print("  Params: ")
+        logging.info("  Params: ")
         for key, value in trial.params.items():
-            print("    {}: {}".format(key, value))
+            logging.info("    {}: {}".format(key, value))
 
 

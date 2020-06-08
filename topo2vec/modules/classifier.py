@@ -1,4 +1,5 @@
 import argparse
+import logging
 from argparse import Namespace
 from typing import Dict
 
@@ -6,23 +7,21 @@ import sklearn
 import torchvision as torchvision
 import torch
 from pytorch_lightning import LightningModule
-from sklearn import svm
 
 from torch import Tensor
-from torch.utils.data import DataLoader, Dataset
-
+from torch.utils.data import DataLoader
 
 import topo2vec.models as models
 from topo2vec.background import TRAIN_HALF, VALIDATION_HALF, CLASS_PATHS, CLASS_NAMES, LOAD_CLASSES_LARGE, \
     CLASS_PATHS_TEST, CLASS_NAMES_TEST, CLASS_NAMES_SPECIAL, CLASS_PATHS_SPECIAL
-from topo2vec.helper_functions import get_paths_and_names_wanted
-from common.pytorch.pytorch_lightning_utilities import get_dataset_as_tensor, get_random_part_of_dataset
+from common.dataset_utils import get_paths_and_names_wanted
+from common.pytorch.pytorch_lightning_utilities import get_random_part_of_dataset
 from common.list_conversions_utils import str_to_int_list
 from common.pytorch.visualizations import convert_multi_radius_tensor_to_printable, get_grid_sample_images_at_indexes, \
     plot_to_image, plot_confusion_matrix
 from topo2vec.constants import SAVE_PATH, GROUP_TO_SEARCH_SIMILAR_LONGS_LARGE, LOGS_PATH
 from topo2vec.datasets.several_classes_datasets import SeveralClassesDataset
-from topo2vec.modules.svm_on_latent_tester import svm_classifier_test_build_datasets, svm_accuracy_on_dataset_in_latent_space
+from topo2vec.modules.svm_on_latent_tester import svm_classifier_test_build_datasets
 
 
 class Classifier(LightningModule):
@@ -49,7 +48,7 @@ class Classifier(LightningModule):
         self.max_validation_accuracy = 0
         self.final_test_accuracy = 0
         self.class_names = CLASS_NAMES
-        print(self.class_names)
+        logging.info(self.class_names)
         self.class_paths = CLASS_PATHS
 
     def prepare_data(self):

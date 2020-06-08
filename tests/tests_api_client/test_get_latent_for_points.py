@@ -13,3 +13,4 @@ class TestGet_latent_for_points(TestCase):
         client_lib.set_working_polygon(small_polygon)
         points_list = [Point(35.32, 33.13), Point(35.31, 33.12)]
         patches, points = get_latent_for_points(points_list, 8)
+        self.assertEqual(len(points), len(patches))

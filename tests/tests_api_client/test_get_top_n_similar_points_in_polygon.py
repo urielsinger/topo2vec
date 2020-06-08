@@ -14,3 +14,4 @@ class TestGet_top_n_similar_points_in_polygon(TestCase):
         points_list = [Point(35.32, 33.13), Point(35.31, 33.12)]
 
         patches, points = get_top_n_similar_points_in_polygon(points_list, 10, small_polygon, 500)
+        self.assertEqual(len(patches),len(points))

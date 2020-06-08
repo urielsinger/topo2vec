@@ -1,4 +1,5 @@
 import ast
+import logging
 import os
 import time
 from typing import List
@@ -60,18 +61,15 @@ def floats_list_to_points_list(floats_list: object) -> object:
 
 def load_list_from_file(full_path: str) -> List:
     if os.path.exists(full_path):
-        # print(f'loading from: {full_path}')
         t0 = time.time()
         the_list = np.load(full_path).tolist()
         t1 = time.time()
-        # print(f'loaded. time it took:{t1 - t0} sec')
         return the_list
     return None
 
 
 def save_list_to_file(full_path: str, the_list: List):
-    # print(f'saving to: {full_path}')
     t0 = time.time()
     np.save(full_path, the_list)
     t1 = time.time()
-    # print(f'saved. time it took:{t1 - t0} sec')
+    logging.info(f'saved. time it took:{t1 - t0} sec')

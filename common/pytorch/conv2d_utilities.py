@@ -1,8 +1,17 @@
 def conv_output_shape(h_w, kernel_size=1, stride=1, pad=0, dilation=1):
-    """
+    '''
     Utility function for computing output of convolutions
     takes a tuple of (h,w) and returns a tuple of (h,w)
-    """
+    Args:
+        h_w: the height and width of input
+        kernel_size:
+        stride:
+        pad:
+        dilation:
+
+    Returns: the output shape
+
+    '''
 
     if type(h_w) is not tuple:
         h_w = (h_w, h_w)
@@ -22,10 +31,19 @@ def conv_output_shape(h_w, kernel_size=1, stride=1, pad=0, dilation=1):
     return h, w
 
 def convtransp_output_shape(h_w, kernel_size=1, stride=1, pad=0, dilation=1):
-    """
+    '''
     Utility function for computing output of transposed convolutions
     takes a tuple of (h,w) and returns a tuple of (h,w)
-    """
+    Args:
+        h_w: the height and width of input
+        kernel_size:
+        stride:
+        pad:
+        dilation:
+
+    Returns: the output shape
+
+    '''
 
     if type(h_w) is not tuple:
         h_w = (h_w, h_w)

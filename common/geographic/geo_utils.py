@@ -1,5 +1,6 @@
 import copy
 import logging
+import math
 from functools import partial
 from typing import List, Union, Tuple, Iterable
 
@@ -181,7 +182,7 @@ def sample_grid_in_poly(poly: Polygon, step: float = 50, verbose=False) -> List[
     coords = [Point(coord) for coord in tqdm(coords, desc='Sampling points', unit=' point')]
     coords_in_poly = list(filter(lambda point: point.within(poly), tqdm(coords, desc='filter in poly', unit=' point')))
     if verbose:
-        print(f"Sampled {len(coords_in_poly)} points in the polygon")
+        logging.info(f"Sampled {len(coords_in_poly)} points in the polygon")
     return coords_in_poly
 
 
@@ -351,3 +352,30 @@ def build_polygon(low_lon, low_lat, high_lon, high_lat):
     poly = Polygon([Point(low_lon, low_lat), Point(low_lon, high_lat), Point(high_lon, high_lat),
                     Point(high_lon, low_lat), Point(low_lon, low_lat)])
     return poly
+
+
+def point_to_location(point: Point) -> List:
+    '''
+    convert a point to the the list type that folium uses
+    Args:
+        point: the point
+
+    Returns: a list consists of [lon,lat]
+
+    '''
+    return [point.x, point.y]
+
+def point_to_string(self, point: Point) -> str:
+    return self.lon_lat_to_string(point.x, point.y)
+
+def lon_lat_to_string(self, lon: float, lat: float) -> str:
+    lon_floor, lat_floor = self.floor_lon_lat(lon, lat)
+    zeros_for_lon = '0' * (3 - len(str(lon_floor)))
+    zeros_for_lat = '0' * (3 - len(str(lat_floor)))
+
+    return f'N{zeros_for_lat}{lat_floor}E{zeros_for_lon}{lon_floor}'
+
+def floor_lon_lat(self, lon: float, lat: float) -> Tuple[int, int]:
+    lon_floor = int(math.floor(lon))
+    lat_floor = int(math.floor(lat))
+    return lon_floor, lat_floor

@@ -1,4 +1,3 @@
-import math
 import os
 import fiona
 import json
@@ -6,9 +5,9 @@ import random
 import numpy as np
 
 from shapely.geometry import Point, Polygon
-from typing import List, Tuple
+from typing import List
 
-from topo2vec.helper_functions import cache_path_name_to_full_path
+from common.dataset_utils import cache_path_name_to_full_path
 from common.list_conversions_utils import floats_list_to_points_list_till_size, load_list_from_file, save_list_to_file
 from topo2vec.constants import CACHE_BASE_DIR
 from topo2vec.data_handlers.data_handler import DataHandler
@@ -16,6 +15,9 @@ from common.geographic.geo_utils import check_if_point_in_polygon
 
 
 class ClassesDataFileHadler(DataHandler):
+    '''
+    A class that helps loading classes data
+    '''
     def __init__(self, file_path, cache_dir=CACHE_BASE_DIR):
         '''
         load all the points that are inside a points list
@@ -110,18 +112,3 @@ class ClassesDataFileHadler(DataHandler):
             except:
                 pass
         return []
-
-    def point_to_string(self, point: Point) -> str:
-        return self.lon_lat_to_string(point.x, point.y)
-
-    def lon_lat_to_string(self, lon: float, lat: float) -> str:
-        lon_floor, lat_floor = self.floor_lon_lat(lon, lat)
-        zeros_for_lon = '0' * (3 - len(str(lon_floor)))
-        zeros_for_lat = '0' * (3 - len(str(lat_floor)))
-
-        return f'N{zeros_for_lat}{lat_floor}E{zeros_for_lon}{lon_floor}'
-
-    def floor_lon_lat(self, lon: float, lat: float) -> Tuple[int, int]:
-        lon_floor = int(math.floor(lon))
-        lat_floor = int(math.floor(lat))
-        return lon_floor, lat_floor

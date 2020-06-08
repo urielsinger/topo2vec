@@ -5,6 +5,8 @@ from pathlib import Path
 #BASE_LOCATION = current_dir + '/'
 
 #when on server itself
+from common.geographic.geo_utils import build_polygon
+
 BASE_LOCATION = '/home/topo2vec_kavitzky/topo2vec/'
 #when inside the docker
 # BASE_LOCATION = '/home/root/'
@@ -68,3 +70,9 @@ NONE_STR = 'None'
 #server routes
 GET_CLASS_POINTS_ROUTE = '/get_class'
 GET_SIMILAR_POINTS_ROUTE = '/get_similar'
+points_inside = [Point(5.0658811, 45.0851164),
+                 Point(5.058811, 45.01164)]
+small_polygon = build_polygon(35.3, 33.11, 35.35, 33.15)
+goral_hights = build_polygon(34.7, 31.3, 34.9, 31.43)
+north_is = build_polygon(35.1782, 32.8877, 35.5092,  33.0524)
+north_is_small = build_polygon(35.3582, 32.9877, 35.4292,  33.0200)

@@ -17,22 +17,22 @@ from common.geographic.folium_extensions import NoClickGeoJson
 from common.geographic.geo_utils import geoms2bbox, geom2image_projection, meters2degrees
 
 @cached(cache=LRUCache(maxsize=256), key=lambda *a: hash(hash(tuple(p)) for p in a))
-def build_image_overlay(wkt_array, color, fill_color, fill_alpha, line_alpha, step):
+def build_image_overlay(wkt_array, color, fill_color, fill_alpha=0.2, line_alpha=1, degs_step=10):
     gds = gpd.GeoSeries([wkt.loads(s) for s in wkt_array])
 
     bbox = geoms2bbox(gds)
     min_lon, min_lat, max_lon, max_lat = bbox
 
-    image = np.zeros(shape=(int((max_lon - min_lon) / step) + 1, int((max_lat - min_lat) / step) + 1, 4))
+    image = np.zeros(shape=(int((max_lon - min_lon) / degs_step) + 1, int((max_lat - min_lat) / degs_step) + 1, 4))
     for index, geom in enumerate(gds):
         # fill color
         cur_color = fill_color[index] if type(fill_color) is not str else fill_color
-        cur_color = list(colors.to_rgb(cur_color)) + [0.2]
+        cur_color = list(colors.to_rgb(cur_color)) + [fill_alpha]
         image = geom2image_projection(image, bbox, geom, color=cur_color, fill=True)
 
         # edge color
         cur_color = color[index] if type(color) is not str else color
-        cur_color = list(colors.to_rgb(cur_color)) + [1]
+        cur_color = list(colors.to_rgb(cur_color)) + [line_alpha]
         image = geom2image_projection(image, bbox, geom, color=cur_color, fill=False, line_width=0)
 
     return image
@@ -208,8 +208,7 @@ class GeoMap:
             object_to_add.add_to(self.map)
 
     def load_image_overlay_from_dataframe(self, df: DataFrame, wkt_column_name: str, step: float = 1,
-                                          line_alpha: float = 1,
-                                          fill_alpha: float = 0.1, name=None):
+                                          fill_alpha=0.2, line_alpha=1, name=None):
         """
         loads additional layer to the map
 
@@ -256,8 +255,7 @@ class GeoMap:
 
     def load_image_overlay_from_lists(self, polygons_list:List, colors_list: List[str], fills_list:List[str],
                                           step: float = 1,
-                                          line_alpha: float = 1,
-                                          fill_alpha: float = 0.1, name=None):
+                                          fill_alpha=0.2, line_alpha=1, name=None):
         """
         loads additional layer to the map
 

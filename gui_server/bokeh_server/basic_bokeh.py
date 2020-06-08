@@ -7,6 +7,7 @@ at your command prompt. Then navigate to the URL
     http://localhost:5006/sliders
 in your browser.
 '''
+import logging
 import os
 
 import folium
@@ -20,7 +21,7 @@ import sys
 from pathlib import Path
 
 from api_client import client_lib
-from common.geographic.geo_utils import build_polygon
+from topo2vec.constants import north_is_small
 from visualization_server import visualizer
 
 from common.pytorch.visualizations import convert_multi_radius_list_to_printable
@@ -32,21 +33,10 @@ sys.path.append(str(parent_path))
 
 from gui_server.visual_topography_profiler import TopoMap
 
-points_inside = [Point(5.0658811, 45.0851164),
-                 Point(5.058811, 45.01164)]
-
-small_polygon = build_polygon(35.3, 33.11, 35.35, 33.15)
-
-
 def set_working_polygon(polygon: Polygon):
     client_lib.set_working_polygon(polygon)
     global WORKING_POLYGON
     WORKING_POLYGON = visual_topography_profiler._get_working_polygon()
-
-goral_hights = build_polygon(34.7, 31.3, 34.9, 31.43)
-north_is = build_polygon(35.1782, 32.8877, 35.5092,  33.0524)
-north_is_small = build_polygon(35.3582, 32.9877, 35.4292,  33.0200)
-
 set_working_polygon(north_is_small)
 
 
@@ -126,7 +116,7 @@ class BasicBokeh:
         filePath = os.path.join(static_folder, file_name)
 
         if os.path.exists(filePath):
-            print('removing')
+            logging.info('removing')
             os.remove(filePath)
 
         self.topo_map.map.save(filePath)

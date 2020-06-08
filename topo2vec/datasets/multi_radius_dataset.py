@@ -8,14 +8,14 @@ from visualization_server import visualizer
 import numpy as np
 
 from common.geographic.geo_utils import check_if_point_in_polygon
-from topo2vec.helper_functions import full_path_name_of_dataset_data_to_full_path
+from common.dataset_utils import full_path_name_of_dataset_data_to_full_path
 from common.list_conversions_utils import points_list_to_floats_list, floats_list_to_points_list, load_list_from_file, \
     save_list_to_file
 
 
 class MultiRadiiDataset(Dataset):
     '''
-    A dataset that supports the making of a point to an 3-dim ndarray
+    A dataset that supports the making of a point to an k-dim ndarray
     of the neighbourhood of the point in different original_radiis.
     '''
 

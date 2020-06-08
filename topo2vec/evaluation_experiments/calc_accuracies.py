@@ -1,4 +1,6 @@
 # accuracy in the validation polygon on 4 classes
+import logging
+
 import sklearn
 import torch
 from torch import nn
@@ -27,5 +29,5 @@ with torch.no_grad():
         probas = nn.functional.softmax(outputs).numpy()
         y_np = y.numpy().squeeze()
         auc = sklearn.metrics.roc_auc_score(y_np, probas, multi_class='ovo')
-        print(f'auc of {name} is {auc}')
+        logging.info(f'auc of {name} is {auc}')
         auc_s.append(auc)

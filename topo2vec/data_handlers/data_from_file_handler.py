@@ -88,6 +88,16 @@ class DataFromFileHandler(DataHandler):
 
 
     def crop_image(self, lon, lat, radius):
+        '''
+
+        Args:
+            lon: The center of the image
+            lat:  The center of the image
+            radius: an L0 radius of the image to be cropped
+
+        Returns: the cropped patfch form the image
+
+        '''
         for image in self.elevation_data_squares.values():
             if image.point_inside(lon, lat):
                 return image.crop_image(lon, lat, radius)

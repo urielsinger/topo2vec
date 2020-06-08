@@ -20,6 +20,9 @@ class RandomDataset(MultiRadiiDataset):
         Args:
             num_points: mi,ber of random points to generate
             original_radiis: original_radiis needed around each point. list of lists
+            outer_polygon: the polygon to pick randomliu from
+            radii: a list that the first number ios the size we want the arrays to be resized to
+            seed: random seed for building the random stuff
         '''
         super().__init__(original_radiis, radii)
         random_points = geo_utils.sample_points_in_poly(outer_polygon, num_points, seed=seed)
@@ -43,4 +46,4 @@ class RandomDataset(MultiRadiiDataset):
         '''
         # if self.mask_patches is not None and self.use_masks:
         #    return (self.actual_patches[index], self.mask_patches[index], tensor([0.]))
-        return (self.actual_patches[index], tensor([float(self.label)]))
+        return self.actual_patches[index], tensor([float(self.label)])

@@ -1,3 +1,4 @@
+import logging
 from unittest import TestCase
 
 from geopy import Point
@@ -12,4 +13,4 @@ class TestGet_class_points(TestCase):
         client_lib.set_working_polygon(small_polygon)
         points_list = [Point(35.32, 33.13), Point(35.31, 33.12)]
         points, patches = get_all_class_points_in_polygon(small_polygon, 2000, 'peaks', 0)
-        print(points.shape)
+        logging.info(points.shape)

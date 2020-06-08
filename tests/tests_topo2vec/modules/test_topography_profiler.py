@@ -1,4 +1,4 @@
-
+import logging
 from unittest import TestCase
 
 from shapely.geometry import Point
@@ -22,11 +22,11 @@ class Test(TestCase):
     def test_get_all_class_points_in_polygon(self):
         final_radii = tp.FINAL_ORIGINAL_RADIIS
         points, pathches_lis = tp.get_all_class_points_in_polygon(self.polygon_to_search_in, 100, 'peaks')
-        print(len(points))
+        logging.info(len(points))
         self.assertTupleEqual(pathches_lis.shape, (len(points), 3, 17, 17))
 
         points, pathches_lis = tp.get_all_class_points_in_polygon(self.polygon_to_search_in, 100, 'peaks', prob_threshold=0.9)
-        print(len(points))
+        logging.info(len(points))
         self.assertTupleEqual(pathches_lis.shape, (len(points), 3, 17, 17))
 
     def test_get_top_n_similar_points_in_polygon(self):

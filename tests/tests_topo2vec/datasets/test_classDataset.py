@@ -1,3 +1,4 @@
+import logging
 from unittest import TestCase
 
 from shapely.geometry import Point, Polygon
@@ -27,7 +28,7 @@ class TestClassDataset(TestCase):
                                               original_radiis=[[Radius]],
                                               outer_polygon=outer_polygon,
                                               radii=[Radius])
-        print(classification_dataset.actual_patches.shape)
+        logging.info(classification_dataset.actual_patches.shape)
         self.assertEqual(classification_dataset.actual_patches.shape[2], 2 * Radius + 1)
         self.assertTrue(check_if_point_in_polygon(classification_dataset.points_locations[0],
                                                   outer_polygon))

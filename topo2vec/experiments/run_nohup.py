@@ -1,9 +1,10 @@
+import logging
 import os
 import sys
 
 from topo2vec.constants import BASE_LOCATION
 
-print(sys.executable)
+logging.info(sys.executable)
 
 ###############################################
 # run the program using nohup - in background #

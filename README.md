@@ -1,4 +1,4 @@
-initial setup of the project:
+# initial setup of the project:
 a. download the needed data:
 1. run the "scripts/get_elevation_data.sh min_lon, min_lat, max_lon, max_lat"
 2. edit and run the "scripts/get_classes_data.sh min_lon, min_lat, max_lon, max_lat"
