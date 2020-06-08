@@ -365,17 +365,18 @@ def point_to_location(point: Point) -> List:
     '''
     return [point.x, point.y]
 
-def point_to_string(self, point: Point) -> str:
-    return self.lon_lat_to_string(point.x, point.y)
+def point_to_string(point: Point) -> str:
+    return lon_lat_to_string(point.x, point.y)
 
-def lon_lat_to_string(self, lon: float, lat: float) -> str:
-    lon_floor, lat_floor = self.floor_lon_lat(lon, lat)
+def floor_lon_lat(lon: float, lat: float) -> Tuple[int, int]:
+    lon_floor = int(math.floor(lon))
+    lat_floor = int(math.floor(lat))
+    return lon_floor, lat_floor
+
+def lon_lat_to_string(lon: float, lat: float) -> str:
+    lon_floor, lat_floor = floor_lon_lat(lon, lat)
     zeros_for_lon = '0' * (3 - len(str(lon_floor)))
     zeros_for_lat = '0' * (3 - len(str(lat_floor)))
 
     return f'N{zeros_for_lat}{lat_floor}E{zeros_for_lon}{lon_floor}'
 
-def floor_lon_lat(self, lon: float, lat: float) -> Tuple[int, int]:
-    lon_floor = int(math.floor(lon))
-    lat_floor = int(math.floor(lat))
-    return lon_floor, lat_floor

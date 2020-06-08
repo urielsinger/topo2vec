@@ -90,13 +90,23 @@ def svm_classifier_test(model, svm_train_dataset, svm_validation_dataset, test_d
     validation_accuracy = svm_accuracy_on_dataset_in_latent_space(SVMClassifier,
                                                                   svm_validation_dataset, model)
 
-    test_accuracy, test_auc = svm_accuracy_on_dataset_in_latent_space(SVMClassifier,
-                                                            test_dataset, model, predict_probas=True)
-    model.svm_validation_accuracy = validation_accuracy
-    model.svm_test_accuracy = test_accuracy
+    if len(test_dataset.class_names) == 2:
+        test_accuracy, test_auc = svm_accuracy_on_dataset_in_latent_space(SVMClassifier,
+                                                                test_dataset, model, predict_probas=True)
+        model.svm_validation_accuracy = validation_accuracy
+        model.svm_test_accuracy = test_accuracy
 
-    return {f'svm_train_{type_of_svm_evaluation_name}_accuracy': train_accuracy,
-            f'svm_validation_{type_of_svm_evaluation_name}_accuracy': validation_accuracy,
-            f'svm_test_{type_of_svm_evaluation_name}_accuracy': test_accuracy,
-            f'svm_test_{type_of_svm_evaluation_name}_auc': test_auc}
+        return {f'svm_train_{type_of_svm_evaluation_name}_accuracy': train_accuracy,
+                f'svm_validation_{type_of_svm_evaluation_name}_accuracy': validation_accuracy,
+                f'svm_test_{type_of_svm_evaluation_name}_accuracy': test_accuracy,
+                f'svm_test_{type_of_svm_evaluation_name}_auc': test_auc}
+    else:
+        test_accuracy = svm_accuracy_on_dataset_in_latent_space(SVMClassifier,
+                                                                test_dataset, model, predict_probas=False)
+        model.svm_validation_accuracy = validation_accuracy
+        model.svm_test_accuracy = test_accuracy
+
+        return {f'svm_train_{type_of_svm_evaluation_name}_accuracy': train_accuracy,
+                f'svm_validation_{type_of_svm_evaluation_name}_accuracy': validation_accuracy,
+                f'svm_test_{type_of_svm_evaluation_name}_accuracy': test_accuracy}
 
