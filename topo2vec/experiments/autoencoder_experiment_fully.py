@@ -8,15 +8,15 @@ parser = Classifier.get_args_parser()
 if LOAD_CLASSES_LARGE:
     autoencoder_regular_args = parser.parse_args(['--save_model',
                                                   '--learning_rate', '0.004',
-                                                  '--max_epochs', '1000',
-                                                  '--total_dataset_size', '10',
+                                                  '--max_epochs', '1',
+                                                  '--total_dataset_size', '100',
                                                   '--arch', 'BasicAutoencoder',
                                                   '--svm_classify_latent_space',
                                                   '--knn_method_for_typical_choosing', 'regular',
                                                   '--name', 'autoencoder',
                                                   '--pytorch_module', 'Autoencoder',
                                                   '--random_set_size_for_svm', '2000',
-                                                  '--latent_space_size', '30',
+                                                  '--latent_space_size', '10',
                                                   '--svm_classify_latent_space',
                                                   '--test_knn'])
 

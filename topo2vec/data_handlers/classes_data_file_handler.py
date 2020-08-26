@@ -29,7 +29,7 @@ class ClassesDataFileHadler(DataHandler):
 
         '''
         file_name, file_extension = os.path.splitext(file_path)
-        self.file_name = file_name.split('/')[-1]
+        self.file_name = file_name.split('\\')[-1]
         full_path = cache_path_name_to_full_path(cache_dir, file_path, 'points')
 
         points_list = load_list_from_file(full_path)

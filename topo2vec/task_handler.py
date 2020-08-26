@@ -73,7 +73,7 @@ class TaskHandler:
 
         #test time
         if model.test_dataset is not None:
-            trainer.test()
+            trainer.test(model)
 
         if hparams.test_knn:
             knn = KNearestNeighboursTester(random_set_size=hparams.random_set_size_for_knn,
@@ -110,7 +110,7 @@ class TaskHandler:
 
         vars(args)['learning_rate'] = trial.suggest_loguniform('learning_rate', 1e-8, 1e-3)
         #vars(args)['latent_space_size'] = trial.suggest_int('latent_space_size', 5, 70)
-        vars(args)['total_dataset_size'] = trial.suggest_categorical('total_dataset_size', [2500, 10000])
+        # vars(args)['total_dataset_size'] = trial.suggest_categorical('total_dataset_size', [2500, 10000])
 
         return self._run_experiment(args)
 

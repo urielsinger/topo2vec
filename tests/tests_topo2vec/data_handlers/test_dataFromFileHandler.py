@@ -5,7 +5,7 @@ from shapely.geometry import Point
 from topo2vec.constants import BASE_LOCATION
 from topo2vec.data_handlers.data_from_file_handler import DataFromFileHandler
 
-ELEVATION_BASE_DIR = BASE_LOCATION + 'data/elevation/big_europe'
+ELEVATION_BASE_DIR = BASE_LOCATION + 'data\\elevation\\big_europe'
 
 class TestDataFromFileHandler(TestCase):
     @classmethod

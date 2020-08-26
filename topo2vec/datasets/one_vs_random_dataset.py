@@ -33,6 +33,7 @@ class OneVsRandomDataset:
         combined_dataset = ConcatDataset([classification_dataset, random_dataset])
         logging.info(f'size: {len(combined_dataset)}')
         self.combined_dataset = combined_dataset
+        self.class_names = [class_label, 'random']
 
     def __getitem__(self, index):
         return self.combined_dataset[index]

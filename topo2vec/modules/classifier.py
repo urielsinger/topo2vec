@@ -336,7 +336,7 @@ class Classifier(LightningModule):
         parser.add_argument('--save_path', metavar='DIR', default=SAVE_PATH, type=str,
                             help='path to save model')
         parser.add_argument('--pretrained', dest='pretrained', action='store_true',
-                            help='use pre-trained model, stored in save_path/{name}.pt')
+                            help='use pre-trained model, stored in save_path\\{name}.pt')
 
         parser.add_argument('--save_to_final', dest='save_to_final', action='store_true',
                             help='save the model to the location of the "final" model - the one used in the server_api'

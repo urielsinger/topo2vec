@@ -22,7 +22,7 @@ if LOAD_CLASSES_LARGE:
     autoencoder_regular_args = parser.parse_args(['--save_model',
                                                   '--learning_rate', '0.004',
                                                   '--max_epochs', '1000',
-                                                  '--total_dataset_size', '10',
+                                                  '--total_dataset_size', '10000',
                                                   '--arch', 'BasicAmphibAutoencoder',
                                                   '--svm_classify_latent_space',
                                                   '--name', 'autoencoder',

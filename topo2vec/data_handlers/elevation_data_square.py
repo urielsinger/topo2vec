@@ -28,7 +28,6 @@ class ElevationDataSquare:
             for min_lat in range(self.min_lat, self.max_lat, 1):
                 im_name = 'ALPSMLC30_' + lon_lat_to_string(min_lon, min_lat) + '_DSM.tif'
                 logging.info(im_name)
-                tqdm.tqdm([0], desc=im_name)
                 im = self.load_image(os.path.join(elevation_base_dir, im_name))
                 this_lon_images.append(im)
             this_lon_images = np.concatenate(list(reversed(this_lon_images)), axis=0)

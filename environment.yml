@@ -1,4 +1,4 @@
-name: topo2vec2
+name: topo2vec
 channels:
 - pytorch
 - conda-forge
@@ -7,13 +7,11 @@ channels:
 dependencies:
 # Core scientific python
 - pip
-
+- geopandas
 # Web app / visualization
 
 - pip:
-    - numpy
-    - pandas
-    - geopandas
+    - torch
     - pytorch-lightning
     - scikit-image
     - sklearn
@@ -21,7 +19,6 @@ dependencies:
     - folium
     - opencv-python
     - optuna
-    - folium
     - geopy
     - flask
     - torchvision

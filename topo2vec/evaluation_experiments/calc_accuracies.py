@@ -22,6 +22,7 @@ models = [classic_model_best, topo_resnet_full, topo_resnet_transfer]
 models_names = ["classic_model_best", "topo_resnet_full", "topo_resnet_transfer"]
 val_datasets = [europe_dataset_ordinary, europe_dataset_resnet, europe_dataset_resnet]
 auc_s =[]
+
 with torch.no_grad():
     for model, name, dataset in zip(models, models_names, val_datasets):
         X, y = get_dataset_as_tensor(dataset)

@@ -1,4 +1,5 @@
 import logging
+import pickle
 from typing import List
 
 from shapely.geometry import Polygon
@@ -28,7 +29,7 @@ class SeveralClassesDataset(MultiRadiiDataset):
             radii: the firs int inside the list is the radius of each patch in the final patches inside the class
             random_seed: a random seed for making the process deterministic
         '''
-        all_datasets = []
+        self.all_datasets = []
         self.class_names = class_names
         self.class_names_to_indexes = {}
         for i in range(len(self.class_names)):
@@ -42,11 +43,11 @@ class SeveralClassesDataset(MultiRadiiDataset):
                                          radii=radii, seed=random_seed)
 
             # logging.info(f'{dataset_type_name} dataset: {len(class_dataset)} {class_names[i]} points')
-            all_datasets.append(class_dataset)
+            self.all_datasets.append(class_dataset)
 
-        size = min([len(dataset) for dataset in all_datasets])
+        size = min([len(dataset) for dataset in self.all_datasets])
         wanted_indices = list(range(0, size, 1))
-        all_datasets = [Subset(dataset, wanted_indices) for dataset in all_datasets]
+        all_datasets = [Subset(dataset, wanted_indices) for dataset in self.all_datasets]
         self.combined_dataset = ConcatDataset(all_datasets)
 
 
@@ -66,3 +67,4 @@ class SeveralClassesDataset(MultiRadiiDataset):
 
     def __len__(self):
         return len(self.combined_dataset)
+

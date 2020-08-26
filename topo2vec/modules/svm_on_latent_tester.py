@@ -3,6 +3,7 @@ import time
 import sklearn
 from sklearn import svm
 from sklearn.metrics import accuracy_score
+from sklearn.neighbors import KNeighborsClassifier
 from torch import Tensor
 from torch.utils.data import Dataset
 from torch.utils.data.dataset import Dataset
@@ -109,4 +110,61 @@ def svm_classifier_test(model, svm_train_dataset, svm_validation_dataset, test_d
         return {f'svm_train_{type_of_svm_evaluation_name}_accuracy': train_accuracy,
                 f'svm_validation_{type_of_svm_evaluation_name}_accuracy': validation_accuracy,
                 f'svm_test_{type_of_svm_evaluation_name}_accuracy': test_accuracy}
+
+
+
+def knn_accuracy_on_dataset_in_latent_space(knn_classfier, dataset: Dataset, model) -> Tensor:
+    '''
+
+    Args:
+        SVMClassifier: the svm classifier with which the classifying should be done
+        dataset: the dataset we want to classify on
+        model: the model which produces the latent space
+
+    Returns: the efficient accuracy
+
+    '''
+    X, y = get_dataset_as_tensor(dataset)
+    if model.hparams.use_gpu:
+        X = X.cuda()
+    _, latent = model.forward(X)
+    if model.hparams.use_gpu:
+        latent = latent.cpu()
+    predicted = knn_classfier.predict(latent.numpy())
+    accuracy = accuracy_score(y.numpy(), predicted)
+    return accuracy
+
+def knn_classifier_test(model, knn_train_dataset, knn_validation_dataset, test_dataset, type_of_knn_evaluation_name):
+    X_train, y_train = get_dataset_as_tensor(knn_train_dataset)
+    if model.hparams.use_gpu:
+        X_train = X_train.cuda()
+
+    _, latent_train = model.forward(X_train)
+    knn_classifier = KNeighborsClassifier()
+
+    if model.hparams.use_gpu:
+        latent_train = latent_train.cpu()
+        y_train = y_train.cpu()
+
+    latent_train_numpy = latent_train.numpy()
+    y_train_numpy = y_train.numpy()
+
+    knn_classifier.fit(latent_train_numpy, y_train_numpy)
+
+    train_accuracy = knn_accuracy_on_dataset_in_latent_space(knn_classifier,
+                                                             knn_train_dataset, model)
+
+    validation_accuracy = knn_accuracy_on_dataset_in_latent_space(knn_classifier,
+                                                                  knn_validation_dataset, model)
+
+    if len(test_dataset.class_names) == 2:
+        test_accuracy, test_auc = knn_accuracy_on_dataset_in_latent_space(knn_classifier,
+                                                                test_dataset, model)
+        model.svm_validation_accuracy = validation_accuracy
+        model.svm_test_accuracy = test_accuracy
+
+        return {f'knn_train_{type_of_knn_evaluation_name}_accuracy': train_accuracy,
+                f'knn_validation_{type_of_knn_evaluation_name}_accuracy': validation_accuracy,
+                f'knn_test_{type_of_knn_evaluation_name}_accuracy': test_accuracy}
+
 

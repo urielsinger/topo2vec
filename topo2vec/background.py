@@ -17,7 +17,7 @@ if LOAD_CLASSES_LARGE:
     from os import listdir
     from os.path import isfile, join
 
-    CLASSES_POINTS_FOLDER = BASE_LOCATION + 'data/overpass_classes_data'
+    CLASSES_POINTS_FOLDER = BASE_LOCATION + 'data\\overpass_classes_data'
     Path(CLASSES_POINTS_FOLDER).mkdir(parents=True, exist_ok=True)
 
     ## assuming the classes in data
@@ -38,7 +38,7 @@ if LOAD_CLASSES_LARGE:
                         in listdir(CLASSES_TEST_POINTS_FOLDER)
                         if isfile(join(CLASSES_TEST_POINTS_FOLDER, f))]
 
-    SPECIAL_CLASSES_POINTS_FOLDER = BASE_LOCATION + 'data/overpass_classes_data/for_eval'
+    SPECIAL_CLASSES_POINTS_FOLDER = BASE_LOCATION + 'data\\overpass_classes_data\\for_eval'
     Path(SPECIAL_CLASSES_POINTS_FOLDER).mkdir(parents=True, exist_ok=True)
 
     CLASS_PATHS_SPECIAL = [str(join(SPECIAL_CLASSES_POINTS_FOLDER, f)) for f
@@ -66,7 +66,7 @@ else:
     # use data of only the small area (5,49,6,50)
     CLASS_PATHS = [N49_E05_CLIFFS, N49_E05_RIVERS, N49_E05_PEAKS, N49_E05_STREAMS]
     CLASS_NAMES = ['Cliff', 'River', 'Peak', 'Stream']
-    CLASSES_POINTS_FOLDER = BASE_LOCATION + 'data/N049E005/classes'
+    CLASSES_POINTS_FOLDER = BASE_LOCATION + 'data\\N049E005\\classes'
     TRAIN_HALF = TRAIN_HALF_SMALL
     VALIDATION_HALF = VALIDATION_HALF_SMALL
     POINT_TO_SEARCH_SIMILAR = POINT_TO_SEARCH_SIMILAR_SMALL
