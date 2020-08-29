@@ -1,0 +1,6 @@
+what should be done next:
+take the jsons from the drive (rivers, saddles, peaks, cliffs) and put them in data/overpass_classes_data ( if it still does not work - take them from topo2vec_ilay)
+
+take the final models from the drive and put them in the final_model folder
+
+run the calc_accuracies, knn_random_vs_classes experiments as they are the most important
