@@ -26,7 +26,7 @@ class SeveralClassesDataset(MultiRadiiDataset):
             class_paths: The paths to the clasess' points
             class_names: the classes name in order
             dataset_type_name: a name for the dataset. shopuld be unique for caching.
-            radii: the firs int inside the list is the radius of each patch in the final patches inside the class
+            radii: the first int inside the list is the radius of each patch in the final patches inside the class
             random_seed: a random seed for making the process deterministic
         '''
         self.all_datasets = []

@@ -4,11 +4,14 @@ import logging
 import sklearn
 import torch
 from torch import nn
-
+import sys
+sys.path.append('/home/root')
 from common.pytorch.pytorch_lightning_utilities import get_dataset_as_tensor
 from topo2vec.background import VALIDATION_HALF, CLASS_NAMES, CLASS_PATHS
 from topo2vec.datasets.several_classes_datasets import SeveralClassesDataset
 from topo2vec.evaluation_experiments.final_models import topo_resnet_transfer, topo_resnet_full, classic_model_best
+
+
 
 original_radiis = [[8,16,24]]
 size_val = 10

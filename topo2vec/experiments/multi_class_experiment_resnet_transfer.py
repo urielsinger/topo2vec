@@ -1,3 +1,5 @@
+import sys
+sys.path.append('/home/root')
 from topo2vec.background import LOAD_CLASSES_LARGE
 from topo2vec.task_handler import TaskHandler
 from topo2vec.modules import Classifier
