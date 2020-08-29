@@ -3,4 +3,4 @@ take the jsons from the drive (rivers, saddles, peaks, cliffs) and put them in d
 
 take the final models from the drive and put them in the final_model folder
 
-run the calc_accuracies, knn_random_vs_classes experiments as they are the most important
+run the calc_accuracies, knn_random_vs_classes experiments from evaluation_experiments
