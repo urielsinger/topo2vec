@@ -18,6 +18,7 @@ services:
     ports:
       - "${FLASK_PORT}:${FLASK_PORT}"
       - "${API_SSH_PORT}:22"
+      - 8100-8199:8100-8199
 
   web_gui:
     build:
@@ -32,6 +33,7 @@ services:
     ports:
       - "${BOKEH_PORT}:${BOKEH_PORT}"
       - "${GUI_SSH_PORT}:22"
+      - 8000-8099:8000-8099
 
 networks:
   main_net:

@@ -100,7 +100,7 @@ class TaskHandler:
 
     def _build_hparams_and_run_experiment(self, trial):
         args = self.model_hyperparams
-        if args.pytorch_module == 'Autoencoder':
+        if args.pytorch_module == 'Autoencoder' or args.pytorch_module == 'Outpainting':
             vars(args)['arch'] = trial.suggest_categorical('arch', ['AdvancedAmphibAutoencoder',
                                                                     'BasicAutoencoder',
                                                                     'BasicAmphibAutoencoder'])

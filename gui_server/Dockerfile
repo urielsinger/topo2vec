@@ -1,5 +1,5 @@
 # define the container itself: all installations etc.
-FROM base_anaconda
+FROM base_anaconda2
 
 USER root
 WORKDIR /home/root

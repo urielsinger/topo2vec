@@ -1,5 +1,5 @@
 # define the container itself: all installations etc.
-FROM base_anaconda
+FROM base_anaconda2
 EXPOSE ${FLASK_PORT} 6622
 RUN echo 'building with port' ${FLASK_PORT}
 ENTRYPOINT bash /home/root/api_server/web_api_startup.sh ${FLASK_PORT}
