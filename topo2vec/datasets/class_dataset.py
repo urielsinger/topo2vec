@@ -39,7 +39,7 @@ class ClassDataset(MultiRadiiDataset):
         self.load_save = load_save
         self.seed = seed
         file_name, _ = os.path.splitext(class_path)
-        type_area_name = file_name.split('\\')[-1]
+        type_area_name = file_name.split('/')[-1]
         self.full_base_dir = os.path.join(CACHE_BASE_DIR, 'datasets', type_area_name,
                                           f'{dataset_type_name}_{wanted_size}_label_{class_label}_{original_radiis}_{radii}')
         if self.load_save:

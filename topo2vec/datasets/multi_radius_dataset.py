@@ -89,7 +89,7 @@ class MultiRadiiDataset(Dataset):
         return len(self.actual_patches)
 
     def save_to_pickle(self):
-        filename = f'data\\datasets_for_simclr\\dataset_{self.original_radiis}_{self.radii}_{self.labels[0]}.pickle'
+        filename = f'data/datasets_for_simclr/dataset_{self.original_radiis}_{self.radii}_{self.labels[0]}.pickle'
         pickle_dict = {}
         pickle_dict['data'] = self.actual_patches
         pickle_dict['labels'] = self.labels

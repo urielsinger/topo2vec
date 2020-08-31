@@ -29,7 +29,7 @@ def cache_path_name_to_full_path(cache_dir: str, file_path: str, name: str) -> s
 
     '''
     file_name, _ = os.path.splitext(file_path)
-    file_name_end = name + '_' + file_name.split('\\')[-1]
+    file_name_end = name + '_' + file_name.split('/')[-1]
     full_path = os.path.join(cache_dir, file_name_end + '.npy')
     return full_path
 

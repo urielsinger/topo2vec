@@ -21,8 +21,8 @@ class Outpainting(Autoencoder):
 
     def training_step(self, batch: Tensor, batch_idx: int) -> Dict:
         x, y = batch
-        decoded, latent = self.forward(x[:, :len(self.radii) - 1].float())
-        loss = self.loss_fn(decoded.float(), x[:, len(self.radii) - 1:].float())
+        decoded, latent = self.forward(x[:, [len(self.radii)-2]].float())
+        loss = self.loss_fn(decoded.float(), x[:, [len(self.radii)-1]].float())
         tensorboard_logs = {'train_loss': loss}
         return {'loss': loss, 'log': tensorboard_logs}
 
@@ -38,8 +38,8 @@ class Outpainting(Autoencoder):
 
         '''
         x, y = batch
-        decoded, latent = self.forward(x[:, :len(self.radii) - 1].float())
-        loss = self.loss_fn(decoded.float(), x[:, len(self.radii) - 1:].float())
+        decoded, latent = self.forward(x[:, [len(self.radii)-2]].float())
+        loss = self.loss_fn(decoded.float(), x[:, [len(self.radii)-1]].float())
         return {name + '_loss': loss}
 
     def plot_before_after(self, dataset_name: str, number_to_plot: int = 5):
@@ -57,9 +57,9 @@ class Outpainting(Autoencoder):
         if self.hparams.use_gpu:
             random_images_as_tensor = random_images_as_tensor.cuda()
 
-        random_images_after_autoencoder, _ = self.model(random_images_as_tensor[:, :len(self.radii) - 1])
+        random_images_after_autoencoder, _ = self.model(random_images_as_tensor[:, [len(self.radii)-2]])
         grid_before = torchvision.utils.make_grid(
-            convert_multi_radius_tensor_to_printable(random_images_as_tensor[:, len(self.radii) - 1:]))
+            convert_multi_radius_tensor_to_printable(random_images_as_tensor[:, [len(self.radii)-1]]))
         grid_after = torchvision.utils.make_grid(
             convert_multi_radius_tensor_to_printable(random_images_after_autoencoder))
         self.logger.experiment.add_image(f'{dataset_name}_original', grid_before, 0)

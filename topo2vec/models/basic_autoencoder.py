@@ -10,7 +10,7 @@ class BasicAutoencoder(nn.Module):
     def __init__(self, hparams):
         super(BasicAutoencoder, self).__init__()
         self.radii = str_to_int_list(hparams.radii)
-        in_dim = len(self.radii)-1 if hparams.pytorch_module == 'Outpainting' else len(self.radii)
+        in_dim = 1 if hparams.pytorch_module == 'Outpainting' else len(self.radii)
         out_dim = 1 if hparams.pytorch_module == 'Outpainting' else len(self.radii)
 
         self.encoder = nn.Sequential(
