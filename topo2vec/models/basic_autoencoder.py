@@ -10,11 +10,9 @@ class BasicAutoencoder(nn.Module):
     def __init__(self, hparams):
         super(BasicAutoencoder, self).__init__()
         self.radii = str_to_int_list(hparams.radii)
-        in_dim = 1 if hparams.pytorch_module == 'Outpainting' else len(self.radii)
-        out_dim = 1 if hparams.pytorch_module == 'Outpainting' else len(self.radii)
 
         self.encoder = nn.Sequential(
-            nn.Conv2d(in_dim, 4, 3, stride=1, padding=2),
+            nn.Conv2d(len(self.radii), 4, 3, stride=1, padding=2),
             nn.ReLU(True),
             nn.Conv2d(4, 8, 5, stride=1),
             nn.ReLU(True),
@@ -38,7 +36,7 @@ class BasicAutoencoder(nn.Module):
             nn.ReLU(True),
             nn.ConvTranspose2d(8, 4, 5, stride=1),
             nn.ReLU(True),
-            nn.ConvTranspose2d(4, out_dim, 3, stride=1, padding=2),
+            nn.ConvTranspose2d(4, len(self.radii), 3, stride=1, padding=2),
             nn.Sigmoid()
         )
 
