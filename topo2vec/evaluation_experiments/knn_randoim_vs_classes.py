@@ -12,7 +12,7 @@ from topo2vec.datasets.one_vs_random_dataset import OneVsRandomDataset
 from topo2vec.evaluation_experiments.final_models import classic_model_best, topo_resnet_model, topo_resnet_full, \
     amphib_autoencoder, superresolution_model
 from common.dataset_utils import get_paths_and_names_wanted
-from topo2vec.modules.svm_on_latent_tester import svm_classifier_test
+
 import numpy as np
 
 original_radiis = [[8, 16, 24]]

@@ -15,11 +15,12 @@ import topo2vec.models as models
 from topo2vec.background import TRAIN_HALF, VALIDATION_HALF, CLASS_PATHS, CLASS_NAMES, LOAD_CLASSES_LARGE, \
     CLASS_PATHS_TEST, CLASS_NAMES_TEST, CLASS_NAMES_SPECIAL, CLASS_PATHS_SPECIAL
 from common.dataset_utils import get_paths_and_names_wanted
-from common.pytorch.pytorch_lightning_utilities import get_random_part_of_dataset
+from common.pytorch.pytorch_lightning_utilities import get_random_part_of_dataset, get_dataset_as_tensor
 from common.list_conversions_utils import str_to_int_list
 from common.pytorch.visualizations import convert_multi_radius_tensor_to_printable, get_grid_sample_images_at_indexes, \
     plot_to_image, plot_confusion_matrix
 from topo2vec.constants import SAVE_PATH, GROUP_TO_SEARCH_SIMILAR_LONGS_LARGE, LOGS_PATH
+from topo2vec.datasets.one_vs_random_dataset import OneVsRandomDataset
 from topo2vec.datasets.several_classes_datasets import SeveralClassesDataset
 from topo2vec.modules.svm_on_latent_tester import svm_classifier_test_build_datasets
 
@@ -51,6 +52,12 @@ class Classifier(LightningModule):
         logging.info(self.class_names)
         self.class_paths = CLASS_PATHS
 
+        # for the scale experiment
+        self.scale_exp = int(hparams.scale_exp)
+        self.scale_exp_class_name = hparams.scale_exp_class_name
+        self.scale_exp_class_path = hparams.scale_exp_class_path
+        self.scale_exp_random_seed = hparams.scale_exp_random_seed
+
     def prepare_data(self):
         '''
 
@@ -59,15 +66,28 @@ class Classifier(LightningModule):
         '''
         size_train = int(self.train_portion * self.total_dataset_size)
         size_val = int((1 - self.train_portion) * self.total_dataset_size)
+        if self.scale_exp:
+            self.train_dataset = OneVsRandomDataset(self.original_radiis, size_train, TRAIN_HALF,
+                                                    self.scale_exp_class_path,
+                                                    # f'scale_exp_{self.scale_exp_class_name}_vs_random_train',
+                                                    radii=self.radii, random_seed=self.scale_exp_random_seed)
+            self.validation_dataset = OneVsRandomDataset(self.original_radiis, size_val, VALIDATION_HALF,
+                                                         self.scale_exp_class_path,
+                                                         # f'scale_exp_{self.scale_exp_class_name}_vs_random_validation',
+                                                         radii=self.radii, random_seed=self.scale_exp_random_seed)
+        else:
+            self.train_dataset = SeveralClassesDataset(self.original_radiis, TRAIN_HALF, size_train, self.class_paths,
+                                                       self.class_names,
+                                                       'num_classes_' + str(self.num_classes) + '_train', self.radii)
 
-        self.train_dataset = SeveralClassesDataset(self.original_radiis, TRAIN_HALF, size_train, self.class_paths, self.class_names,
-                                                   'num_classes_' + str(self.num_classes) + '_train', self.radii)
-
-        self.validation_dataset = SeveralClassesDataset(self.original_radiis, VALIDATION_HALF, size_val, self.class_paths, self.class_names,
-                                                        'num_classes_' + str(self.num_classes) + '_validation', self.radii)
+            self.validation_dataset = SeveralClassesDataset(self.original_radiis, VALIDATION_HALF, size_val,
+                                                            self.class_paths, self.class_names,
+                                                            'num_classes_' + str(self.num_classes) + '_validation',
+                                                            self.radii)
 
         if LOAD_CLASSES_LARGE:
-            self.test_dataset = SeveralClassesDataset(self.original_radiis, VALIDATION_HALF, self.size_test, CLASS_PATHS_TEST,
+            self.test_dataset = SeveralClassesDataset(self.original_radiis, VALIDATION_HALF, self.size_test,
+                                                      CLASS_PATHS_TEST,
                                                       CLASS_NAMES_TEST,
                                                       'num_classes_' + str(self.num_classes) + '_test', self.radii)
         else:
@@ -86,6 +106,13 @@ class Classifier(LightningModule):
         probability, predicted = torch.max(outputs.data, 1)
         return predicted, probability
 
+    def get_accuracy_for_small_dataset(self, dataset):
+        X, y = get_dataset_as_tensor(dataset)
+        outputs, _ = self.forward(X.float())
+        _, predicted = torch.max(outputs.data, 1)
+        batch_size, channels, _, _ = X.size()
+        accuracy = torch.tensor([float(torch.sum(predicted == y.squeeze())) / batch_size])
+        return accuracy
 
     def train_dataloader(self):
         return DataLoader(self.train_dataset, shuffle=True, num_workers=0, batch_size=64)
@@ -150,7 +177,7 @@ class Classifier(LightningModule):
             y = y.cpu()
             predicted = predicted.cpu()
 
-        self.log_confusion_matrix(y.numpy(), predicted.numpy(), CLASS_NAMES)
+        # self.log_confusion_matrix(y.numpy(), predicted.numpy(), CLASS_NAMES)
 
         return {**{name + '_loss': loss, name + '_acc': accuracy}, **accuracies}
 
@@ -199,9 +226,9 @@ class Classifier(LightningModule):
         '''
         confusion_matrix = sklearn.metrics.confusion_matrix(y_true, y_pred, normalize='pred')
         ax, fig = plot_confusion_matrix(cm=confusion_matrix,
-                              normalize=False,
-                              target_names=CLASS_NAMES,
-                              title="Confusion Matrix")
+                                        normalize=False,
+                                        target_names=CLASS_NAMES,
+                                        title="Confusion Matrix")
         image = plot_to_image(fig)
         tensor_image = Tensor(image)
         self.logger.experiment.add_image(f'confusion matrix: {labels}', tensor_image, 0, dataformats='HWC')
@@ -230,8 +257,10 @@ class Classifier(LightningModule):
             if 'test_acc' in basic_dict['log']:
                 self.final_test_accuracy = basic_dict['log']['test_acc']
 
-            svm_classifier_ordinary_classes_test_log_dict = svm_classifier_test_build_datasets(self, CLASS_PATHS, CLASS_NAMES,
-                                                                                      'ordinary', self.test_dataset,
+            svm_classifier_ordinary_classes_test_log_dict = svm_classifier_test_build_datasets(self, CLASS_PATHS,
+                                                                                               CLASS_NAMES,
+                                                                                               'ordinary',
+                                                                                               self.test_dataset,
                                                                                                self.hparams.random_set_size_for_svm)
 
             class_paths_special, class_names_special = get_paths_and_names_wanted(
@@ -244,7 +273,7 @@ class Classifier(LightningModule):
 
             svm_classifier_special_classes_test_log_dict = \
                 svm_classifier_test_build_datasets(self, class_paths_special, class_names_special,
-                                          'special', svm_special_test_dataset,
+                                                   'special', svm_special_test_dataset,
                                                    self.hparams.random_set_size_for_svm_special)
 
             new_log_dict = {**svm_classifier_ordinary_classes_test_log_dict,
@@ -253,8 +282,6 @@ class Classifier(LightningModule):
             basic_dict['log'] = new_log_dict
             return basic_dict
         return {}
-
-
 
     def validation_epoch_end(self, outputs: list) -> Dict:
         '''
@@ -300,7 +327,7 @@ class Classifier(LightningModule):
         log the embedding space of the latent to the tensorboard
         '''
         x, y = get_random_part_of_dataset(self.test_dataset,
-                                               self.embedding_visualization_size)
+                                          self.embedding_visualization_size)
         x = x.float()
         if self.hparams.use_gpu:
             x = x.cuda()
@@ -346,7 +373,6 @@ class Classifier(LightningModule):
         parser.add_argument('--logs_path', default=LOGS_PATH, type=str,
                             help='tensorboard logs poath')
 
-
         parser.add_argument('--seed', type=int, default=42,
                             help='seed for initializing training. ')
         parser.add_argument('--use_gpu', dest='use_gpu', action='store_true',
@@ -363,13 +389,22 @@ class Classifier(LightningModule):
         parser.add_argument('--num_classes', type=int, default=len(CLASS_PATHS),
                             help='number of the classes in the dataset. ')
         parser.add_argument('--pytorch_module', type=str,
-                            help='choose what pytorch modelu to use: classsifier / autoencoder')
+                            help='choose what pytorch module to use: classsifier / autoencoder')
         parser.add_argument('--latent_space_size', type=int, default=50,
                             help='size of the desired latent space of the autoencoder.')
         parser.add_argument('--train_all_resnet', dest='train_all_resnet', action='store_true',
                             help='put if using a resnet architecture and want to train it all')
 
-
+        # if the model is for scale exsperiment: should be trained on one vs random #
+        #############################################################################
+        parser.add_argument('--scale_exp', dest='scale_exp', action='store_true',
+                            help='if exists - this is a scale experiment object')
+        parser.add_argument('--scale_exp_class_name', type=str,
+                            help='name of the class in the experiment')
+        parser.add_argument('--scale_exp_class_path', type=str,
+                            help='path to the json file of the class of this experiment')
+        parser.add_argument('--scale_exp_random_seed', type=int, default=55,
+                            help='random seed for building the train dataset')
 
         # the classes data #
         ####################
@@ -390,7 +425,6 @@ class Classifier(LightningModule):
         parser.add_argument('--wd', '--weight-decay', default=1e-4, type=float,
                             metavar='W', help='weight decay (default: 1e-4)',
                             dest='weight_decay')
-
 
         # evealuation / Tensorboard constants #
         #######################################

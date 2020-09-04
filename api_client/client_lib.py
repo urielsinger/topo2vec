@@ -11,10 +11,10 @@ from common.list_conversions_utils import points_list_to_floats_list
 
 PROTOCOL = 'http'
 # inside docker:
-# IP = 'topo2vec_web_api4_1'
+IP = 'topo2vec_kavitzky_web_api_1'
 # outside docker:
-IP = '159.122.160.134'
-PORT = '9876'
+# IP = '159.122.160.134'
+PORT = '7654'
 
 ADDRESS = f'{PROTOCOL}://{IP}:{PORT}'
 

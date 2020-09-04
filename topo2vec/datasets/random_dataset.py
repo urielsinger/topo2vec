@@ -26,7 +26,7 @@ class RandomDataset(MultiRadiiDataset):
         '''
         super().__init__(original_radiis, radii)
         random_points = geo_utils.sample_points_in_poly(outer_polygon, num_points, seed=seed)
-        self.full_base_dir = os.path.join(CACHE_BASE_DIR, 'datasets', 'random', f'size_{num_points}_radii{radii}_orig_radii_{original_radiis}_{time.time()}')
+        self.full_base_dir = os.path.join(CACHE_BASE_DIR, 'datasets', 'random', f'size_{num_points}_radii{radii}_orig_radii_{original_radiis}_{time.time()}_seed{seed}')
         Path(self.full_base_dir).mkdir(parents=True, exist_ok=True)
 
         self.add_points_as_patches_to_actual_patches(random_points)
