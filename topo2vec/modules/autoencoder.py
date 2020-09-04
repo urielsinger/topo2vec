@@ -24,7 +24,7 @@ class Autoencoder(Classifier):
         """
         self.hparams = hparams
         super(Autoencoder, self).__init__(hparams)
-        self.loss_fn = torch.nn.MSELoss()
+        self.loss_fn = torch.nn.L1Loss()#torch.nn.MSELoss()
         self.w_h = min(self.radii) * 2 + 1
         self.img_size = len(self.radii) * self.w_h ** 2
         self.train_portion = hparams.train_portion
