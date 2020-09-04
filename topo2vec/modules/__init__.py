@@ -1,4 +1,4 @@
 from .autoencoder import *
 from .classifier import *
-from .outpainting import *
-
+from .superresolution import *
+from .pix2pix import *

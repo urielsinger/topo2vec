@@ -359,6 +359,7 @@ class Classifier(LightningModule):
         parser.add_argument('--radii', type=str, default='[8, 16, 24]')
 
         parser.add_argument('--arch', type=str)
+        parser.add_argument('--discriminator', type=str)
         parser.add_argument('--num_classes', type=int, default=len(CLASS_PATHS),
                             help='number of the classes in the dataset. ')
         parser.add_argument('--pytorch_module', type=str,
@@ -398,6 +399,8 @@ class Classifier(LightningModule):
 
         # how many points we want to put in the embedding space
         parser.add_argument('--embedding_visualization_size', type=list, default=100)
+        parser.add_argument('--index_in', type=int, default=1)
+        parser.add_argument('--index_out', type=int, default=2)
 
         # knn #
 

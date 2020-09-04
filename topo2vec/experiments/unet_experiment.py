@@ -9,19 +9,23 @@ from topo2vec.modules import Classifier
 parser = Classifier.get_args_parser()
 if LOAD_CLASSES_LARGE:
     autoencoder_regular_args = parser.parse_args(['--save_model',
-                                                  '--learning_rate', '0.0008',
-                                                  '--max_epochs', '200',
+                                                  '--index_in', '1',
+                                                  '--index_out', '0',
+                                                  '--learning_rate', '0.0015',
+                                                  '--max_epochs', '600',
                                                   '--total_dataset_size', '20000',
-                                                  '--arch', 'BasicAutoencoder',
+                                                  '--arch', 'UNet',
                                                   '--svm_classify_latent_space',
                                                   '--knn_method_for_typical_choosing', 'regular',
-                                                  '--name', 'outpainting',
-                                                  '--pytorch_module', 'Outpainting',
+                                                  '--name', 'Superresolution',
+                                                  '--pytorch_module', 'Superresolution',
                                                   '--random_set_size_for_svm', '2000',
-                                                  '--latent_space_size', '50',
+                                                  '--latent_space_size', '600',
                                                   '--svm_classify_latent_space',
                                                   '--test_knn',
-                                                  # '--use_gpu'
+                                                  '--use_gpu',
+                                                  '--original_radiis', '[[34, 136], [68, 272], [102, 408]]',
+                                                  '--radii', '[34, 136]'
                                                   ])
 
 lab = TaskHandler(autoencoder_regular_args)

@@ -5,7 +5,7 @@ import torch
 from topo2vec.background import CLASS_PATHS_SPECIAL, CLASS_NAMES_SPECIAL, VALIDATION_HALF, TRAIN_HALF
 from topo2vec.datasets.one_vs_random_dataset import OneVsRandomDataset
 from topo2vec.evaluation_experiments.final_models import classic_model_best, topo_resnet_model, topo_resnet_full, \
-    amphib_autoencoder
+    amphib_autoencoder, superresolution_model
 from topo2vec.evaluation_experiments.svm_on_plain_experiment import test_svm_on_plain
 from common.dataset_utils import get_paths_and_names_wanted
 from topo2vec.modules.svm_on_latent_tester import svm_classifier_test
@@ -37,6 +37,7 @@ for special_class_path, special_class_name in zip(class_paths_special, class_nam
     resnet_accuracy = []
     resnet_transfer_accuracy = []
     amphib_ae_accuracy = []
+    superresolution_accuracy = []
     number_of_examples = list(range(train_set_size_for_svm_min, train_set_size_for_svm_max))
     for train_set_size_for_svm in number_of_examples:
         svm_list = []
@@ -44,6 +45,7 @@ for special_class_path, special_class_name in zip(class_paths_special, class_nam
         classic_list = []
         res_full_list = []
         amphib_ae_list = []
+        superresolution_list = []
 
         for seed in seeds:
             logging.info(seed)
@@ -70,12 +72,19 @@ for special_class_path, special_class_name in zip(class_paths_special, class_nam
                     svm_classifier_test(amphib_autoencoder, svm_special_train_dataset, svm_special_train_dataset,
                                         svm_special_test_dataset, 'special')
 
+            with torch.no_grad():
+                svm_classifier_special_classes_test_log_dict_superresolution = \
+                    svm_classifier_test(superresolution_model, svm_special_train_dataset, svm_special_train_dataset,
+                                        svm_special_test_dataset, 'special')
+
             svm_classifier_special_classes_test_log_dict_svm = test_svm_on_plain(svm_special_train_dataset, svm_special_test_dataset)
             svm_list.append(svm_classifier_special_classes_test_log_dict_svm[f'svm_test_special_{what_to_plot}'])
             classic_list.append(svm_classifier_special_classes_test_log_dict_classic[f'svm_test_special_{what_to_plot}'])
             res_list.append(svm_classifier_special_classes_test_log_dict_resnet[f'svm_test_special_{what_to_plot}'])
             res_full_list.append(svm_classifier_special_classes_test_log_dict_resnet_transfer[f'svm_test_special_{what_to_plot}'])
             amphib_ae_list.append(svm_classifier_special_classes_test_log_dict_amphib_autoencoder[f'svm_test_special_{what_to_plot}'])
+            superresolution_list.append(svm_classifier_special_classes_test_log_dict_superresolution[f'svm_test_special_{what_to_plot}'])
+
 
         logging.info(f'size of dataset = {svm_special_test_dataset}')
         logging.info('results on the latent space')
@@ -101,12 +110,18 @@ for special_class_path, special_class_name in zip(class_paths_special, class_nam
         amphib_ae_accuracy.append(np.mean(amphib_ae_list))
         logging.info(amphib_ae_list)
 
+        logging.info('results on the superresolution latent space')
+        logging.info(svm_classifier_special_classes_test_log_dict_superresolution)
+        superresolution_accuracy.append(np.mean(superresolution_list))
+        logging.info(superresolution_accuracy)
+
     import matplotlib.pyplot as plt
     plt.plot(number_of_examples, on_latent_accuracy, label=f'classicnet on latent {what_to_plot}')
     plt.plot(number_of_examples, resnet_accuracy, label=f'resnet on latent {what_to_plot}')
     plt.plot(number_of_examples, resnet_transfer_accuracy,  label=f'resnet full transfer on latent {what_to_plot}')
     plt.plot(number_of_examples, amphib_ae_accuracy, label=f'amphib ae {what_to_plot}')
-    plt.plot(number_of_examples, on_plain_accuracy, label=f'on plain {what_to_plot}')
+    # plt.plot(number_of_examples, on_plain_accuracy, label=f'on plain {what_to_plot}')
+    plt.plot(number_of_examples, superresolution_accuracy, label=f'superresolution {what_to_plot}')
 
     plt.legend()
     plt.title(f'few shot: {special_class_name} vs. random')

@@ -71,19 +71,21 @@ class TaskHandler:
         if len(list(model.parameters())) != 0:
             trainer.fit(model)
 
-        #test time
-        if model.test_dataset is not None:
-            trainer.test(model)
+        torch.cuda.empty_cache()
 
-        if hparams.test_knn:
-            knn = KNearestNeighboursTester(random_set_size=hparams.random_set_size_for_knn,
-                                           original_radiis=str_to_int_list(hparams.original_radiis),
-                                           radii=str_to_int_list(hparams.radii),
-                                           feature_extractor=model, k=hparams.k,
-                                           method=hparams.knn_method_for_typical_choosing,
-                                           json_file_of_group=hparams.json_file_of_group_for_knn)
-            knn.prepare_data()
-            knn.test_and_plot_via_feature_extractor_tensorboard()
+        #test time
+        # if model.test_dataset is not None:
+        #     trainer.test(model)
+
+        # if hparams.test_knn:
+        #     knn = KNearestNeighboursTester(random_set_size=hparams.random_set_size_for_knn,
+        #                                    original_radiis=str_to_int_list(hparams.original_radiis),
+        #                                    radii=str_to_int_list(hparams.radii),
+        #                                    feature_extractor=model, k=hparams.k,
+        #                                    method=hparams.knn_method_for_typical_choosing,
+        #                                    json_file_of_group=hparams.json_file_of_group_for_knn)
+        #     knn.prepare_data()
+        #     knn.test_and_plot_via_feature_extractor_tensorboard()
 
 
 
