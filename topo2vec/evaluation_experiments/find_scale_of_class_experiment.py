@@ -65,9 +65,9 @@ def std_mean_accuracy_radius_class(train_set_size_for_scales_experiment, random_
 
 
 train_set_size_for_scales_experiment = 1000
-random_seeds = list(range(899, 900))
+random_seeds = list(range(895, 900))
 MAX_EPOCHS = 10
-original_radii_to_check = list(range(2, 20))
+original_radii_to_check = list(range(2, 40))
 EXP_LOGS_PATH = BASE_LOCATION + 'tb_logs/scale_experiment'
 class_names = ['cliffs', 'rivers', 'peaks', 'saddles']
 
