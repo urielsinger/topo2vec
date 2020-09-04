@@ -1,0 +1,26 @@
+name: topo2vec
+channels:
+- pytorch
+- conda-forge
+- defaults
+
+dependencies:
+# Core scientific python
+- pip
+- geopandas
+# Web app / visualization
+
+- pip:
+    - torch
+    - pytorch-lightning
+    - scikit-image
+    - sklearn
+    - jupyter
+    - folium
+    - opencv-python
+    - optuna
+    - geopy
+    - flask
+    - torchvision
+    - bokeh
+    - Flask

@@ -2,7 +2,7 @@ import logging
 import requests
 import os
 from io import BytesIO
-from PIL import Image, ImageTk
+from PIL import Image
 import numpy as np
 
 from topo2vec.data_handlers.data_handler import DataHandler
@@ -44,7 +44,7 @@ class DataFromServerHandler(DataHandler):
                              f'response.status_code = {response.status_code}')
         return response
 
-    def write_patch_to_file(self, file_name, directory='', file_type ='data', response = None):
+    def write_patch_to_file(self, file_name, directory='', file_type='data', response=None):
         '''
 
         Args:
@@ -56,7 +56,7 @@ class DataFromServerHandler(DataHandler):
         Returns:
 
         '''
-        if response!= None:
+        if response != None:
             if file_type == 'data':
                 file_name += '.tiff'
             elif file_type == 'img':
@@ -65,8 +65,7 @@ class DataFromServerHandler(DataHandler):
             f = open(path, 'wb+')
             f.write(response.content)
             f.close()
-            return True #worked
-
+            return True  # worked
 
     def get_data_as_np_array_from_response(self, response):
         '''

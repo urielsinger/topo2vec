@@ -1,0 +1,37 @@
+version: "3.8"
+services:
+  base_anaconda2:
+    build:
+      context: "."
+      dockerfile: "Dockerfile"
+    image: 'base_anaconda2'
+  web_api:
+    build:
+      context: "api_server"
+      dockerfile: "Dockerfile"
+    networks:
+      - main_net
+    volumes:
+      - .:/home/root/.
+    env_file: .env
+    image: 'web_api2'
+    ports:
+      - "${FLASK_PORT}:${FLASK_PORT}"
+      - "${API_SSH_PORT}:22"
+
+  web_gui:
+    build:
+      context: "gui_server"
+      dockerfile: "Dockerfile"
+    networks:
+      - main_net
+    volumes:
+      - .:/home/root/.
+    env_file: .env
+    image: 'web_gui2'
+    ports:
+      - "${BOKEH_PORT}:${BOKEH_PORT}"
+      - "${GUI_SSH_PORT}:22"
+
+networks:
+  main_net:
