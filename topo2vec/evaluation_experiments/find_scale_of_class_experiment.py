@@ -61,24 +61,22 @@ def std_mean_accuracy_radius_class(train_set_size_for_scales_experiment, random_
             resulted_accuracies_this_original_radiis_list.append(test_accuracy)
         validation_accuracies_means.append(np.mean(resulted_accuracies_this_original_radiis_list))
         validation_accuracies_stds.append(np.std(resulted_accuracies_this_original_radiis_list))
-        return validation_accuracies_means, validation_accuracies_stds
+    return validation_accuracies_means, validation_accuracies_stds
 
 
 train_set_size_for_scales_experiment = 1000
-random_seeds = list(range(890, 900))
-MAX_EPOCHS = 1
-original_radii_to_check = list(range(8, 9))
+random_seeds = list(range(899, 900))
+MAX_EPOCHS = 10
+original_radii_to_check = list(range(2, 20))
 EXP_LOGS_PATH = BASE_LOCATION + 'tb_logs/scale_experiment'
-class_name = 'cliffs'
+class_names = ['cliffs', 'rivers', 'peaks', 'saddles']
 
-validation_accuracies_means, validation_accuracies_stds = std_mean_accuracy_radius_class(
-    train_set_size_for_scales_experiment, random_seeds, MAX_EPOCHS,
-    original_radii_to_check, EXP_LOGS_PATH, class_name)
+
 
 import matplotlib.pyplot as plt
 
 
-def save_and_plot(original_radii_to_check, validation_accuracies_means, validation_accuracies_stds):
+def save_and_plot(original_radii_to_check, validation_accuracies_means, validation_accuracies_stds, class_name):
     plt.plot(original_radii_to_check, validation_accuracies_means, 'o')
     plt.xlabel('original size')
     plt.ylabel('accuracy')
@@ -91,5 +89,8 @@ def save_and_plot(original_radii_to_check, validation_accuracies_means, validati
         columns=['original_radii', 'mean', 'std'])
     dataframe.to_excel('results_evaluation_experiments/' + title + '.xlsx')
 
-
-save_and_plot(original_radii_to_check, validation_accuracies_means, validation_accuracies_stds)
+for class_name in class_names:
+    validation_accuracies_means, validation_accuracies_stds = std_mean_accuracy_radius_class(
+        train_set_size_for_scales_experiment, random_seeds, MAX_EPOCHS,
+        original_radii_to_check, EXP_LOGS_PATH, class_name)
+    save_and_plot(original_radii_to_check, validation_accuracies_means, validation_accuracies_stds, class_name)
