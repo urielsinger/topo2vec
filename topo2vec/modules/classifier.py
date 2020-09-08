@@ -23,6 +23,7 @@ from topo2vec.constants import SAVE_PATH, GROUP_TO_SEARCH_SIMILAR_LONGS_LARGE, L
 from topo2vec.datasets.one_vs_random_dataset import OneVsRandomDataset
 from topo2vec.datasets.several_classes_datasets import SeveralClassesDataset
 from topo2vec.modules.svm_on_latent_tester import svm_classifier_test_build_datasets
+import numpy as np
 
 
 class Classifier(LightningModule):
@@ -157,13 +158,17 @@ class Classifier(LightningModule):
         outputs, _ = self.forward(x.float())
         _, predicted = torch.max(outputs.data, 1)
         batch_size, channels, _, _ = x.size()
-        accuracy = torch.tensor([float(torch.sum(predicted == y.squeeze())) / batch_size])
-        accuracies = {}
+        tp = torch.tensor([float(torch.sum(predicted == y.squeeze()))])
+        total = torch.tensor([float(batch_size)])
+        TPS = {}
+        totals = {}
         for i in range(self.num_classes):
             predicted_i = (predicted == i)
             y_i = (y == i).squeeze()
-            accuracies[f'{name}_{CLASS_NAMES[i]}_acc'] = torch.tensor(
-                [float(torch.sum(predicted_i * y_i.squeeze()) / (torch.sum(y_i) + 0.000001))])
+            TPS[f'{name}_{CLASS_NAMES[i]}_tp'] = torch.tensor(
+                [float(torch.sum(predicted_i * y_i.squeeze()))])
+            totals[f'{name}_{CLASS_NAMES[i]}_total'] = torch.tensor(
+                [float(torch.sum(torch.sum(y_i)))])
 
         loss = self.loss_fn(outputs.float(), y.squeeze().long())
 
@@ -177,9 +182,8 @@ class Classifier(LightningModule):
             y = y.cpu()
             predicted = predicted.cpu()
 
-        # self.log_confusion_matrix(y.numpy(), predicted.numpy(), CLASS_NAMES)
-
-        return {**{name + '_loss': loss, name + '_acc': accuracy}, **accuracies}
+        return {**{name + '_loss': loss, name + '_tp': tp, name + '_total': total, 'y': y, 'pred': predicted}, **TPS,
+                **totals}
 
     def _run_images_TP_TN_FP_FN_evaluation(self, predicted, x, y):
         '''
@@ -224,14 +228,16 @@ class Classifier(LightningModule):
         Returns:
 
         '''
-        confusion_matrix = sklearn.metrics.confusion_matrix(y_true, y_pred, normalize='pred')
-        ax, fig = plot_confusion_matrix(cm=confusion_matrix,
-                                        normalize=False,
-                                        target_names=CLASS_NAMES,
-                                        title="Confusion Matrix")
-        image = plot_to_image(fig)
-        tensor_image = Tensor(image)
-        self.logger.experiment.add_image(f'confusion matrix: {labels}', tensor_image, 0, dataformats='HWC')
+        confusion_matrix = sklearn.metrics.confusion_matrix(y_true.flatten(), y_pred.flatten(), normalize='true')
+        if len(np.unique(y_pred)) == 4 and len(np.unique(y_true)) == 4:
+            ax, fig = plot_confusion_matrix(cm=confusion_matrix,
+                                            normalize=False,
+                                            target_names=list(
+                                                np.array(CLASS_NAMES)[np.sort(np.unique(y_pred)).astype(int)]),
+                                            title="Confusion Matrix")
+            image = plot_to_image(fig)
+            tensor_image = Tensor(image)
+            self.logger.experiment.add_image(f'confusion matrix: {labels}', tensor_image, 0, dataformats='HWC')
 
     def _sample_images_and_log_one_hot(self, all_images: torch.tensor,
                                        one_hot_vector: torch.tensor,
@@ -293,6 +299,9 @@ class Classifier(LightningModule):
 
         '''
         basic_dict = self._evaluation_epoch_end(outputs, 'validation')
+        self.log_confusion_matrix(torch.cat([x['y'] for x in outputs]).numpy(),
+                                  torch.cat([x['pred'] for x in outputs]).numpy(), CLASS_NAMES)
+
         if 'validation_acc' in basic_dict['log']:
             self.final_validation_accuracy = basic_dict['log']['validation_acc']
             if self.final_validation_accuracy > self.max_validation_accuracy:
@@ -311,11 +320,13 @@ class Classifier(LightningModule):
 
         '''
         avg_loss = torch.stack([x[name + '_loss'] for x in outputs]).mean()
-        avg_accuracy = torch.stack([x[name + '_acc'] for x in outputs]).mean()
+        avg_accuracy = torch.tensor([torch.stack([x[name + '_tp'] for x in outputs]).sum() / torch.stack(
+            [torch.tensor([x[name + '_total']]) for x in outputs]).sum()])
         avg_accuracies = {}
         for i in range(self.num_classes):
-            avg_accuracies[f'{name}_{CLASS_NAMES[i]}_acc'] = torch.stack(
-                [x[f'{name}_{CLASS_NAMES[i]}_acc'] for x in outputs]).mean()
+            avg_accuracies[f'{name}_{CLASS_NAMES[i]}_acc'] = torch.tensor([torch.stack(
+                [x[f'{name}_{CLASS_NAMES[i]}_tp'] for x in outputs]).sum() / torch.stack(
+                [x[f'{name}_{CLASS_NAMES[i]}_total'] for x in outputs]).sum()])
 
         tensorboard_logs = {name + '_loss': avg_loss,
                             name + '_acc': avg_accuracy,
@@ -347,7 +358,7 @@ class Classifier(LightningModule):
 
 
         '''
-        return self.max_validation_accuracy
+        return self.final_validation_accuracy
 
     @staticmethod
     def get_args_parser():
@@ -466,4 +477,7 @@ class Classifier(LightningModule):
                             help='a list of the names of the names of the classes where the svm_special is stored')
         parser.add_argument('--test_set_size_for_svm', type=int, default=100)
 
+        # for classifiying on top of latent
+        parser.add_argument('--retrain', dest='retrain', action='store_true',
+                            help='if true - retrain the basic model that give sthe latent')
         return parser

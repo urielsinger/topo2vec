@@ -16,13 +16,15 @@ from topo2vec.modules.knearestneighbourstester import KNearestNeighboursTester
 import optuna
 import numpy as np
 
+
 class TaskHandler:
     '''
     A lab where classifier objects are tested in different hypeparams
     '''
 
-    def __init__(self, model_hyperparams):
+    def __init__(self, model_hyperparams, trained_module = None):
         self.model_hyperparams = model_hyperparams
+        self.trained_module = trained_module
 
     def _run_experiment(self, hparams: Namespace) -> float:
         '''
@@ -40,23 +42,29 @@ class TaskHandler:
             np.random.seed(hparams.seed)
 
         name = f'{hparams.name}_{hparams.arch}_{str(hparams.radii)}_lr_' \
-            f'{str(hparams.learning_rate)}' \
-            f'_size_{hparams.total_dataset_size}_num_classes_{hparams.num_classes}' \
-            f'_latent_size_{hparams.latent_space_size}_train_all_resnet_{hparams.train_all_resnet}'
+               f'{str(hparams.learning_rate)}' \
+               f'_size_{hparams.total_dataset_size}_num_classes_{hparams.num_classes}' \
+               f'_latent_size_{hparams.latent_space_size}_train_all_resnet_{hparams.train_all_resnet}'
+        if hparams.retrain:
+            name += '_retrain'
         logging.info(f'started running, name = {name}')
 
         # init the model
         save_path = os.path.join(hparams.save_path, name + str('.pt'))
 
-        pytorch_module = modules.__dict__[hparams.pytorch_module]
-        if hparams.pretrained and save_path is not None:
-            model = pytorch_module(hparams)
-            model.load_state_dict(torch.load(save_path))
-            model.eval()
-        else:
-            model = pytorch_module(hparams)
+        if self.trained_module is None:
+            pytorch_module = modules.__dict__[hparams.pytorch_module]
+            if hparams.pretrained and save_path is not None:
+                model = pytorch_module(hparams)
+                model.load_state_dict(torch.load(save_path))
+                model.eval()
+            else:
+                model = pytorch_module(hparams)
 
-        #init the logger
+        else:
+            model = self.trained_module
+
+        # init the logger
         logger = TensorBoardLogger(hparams.logs_path, name=name)
 
         # init the trainer
@@ -73,7 +81,7 @@ class TaskHandler:
 
         torch.cuda.empty_cache()
 
-        #test time
+        # test time
         # if model.test_dataset is not None:
         #     trainer.test(model)
 
@@ -87,9 +95,7 @@ class TaskHandler:
         #     knn.prepare_data()
         #     knn.test_and_plot_via_feature_extractor_tensorboard()
 
-
-
-        #save if needed
+        # save if needed
         if hparams.save_model:
             torch.save(model.state_dict(), save_path)
 
@@ -99,20 +105,19 @@ class TaskHandler:
 
         return float(model.get_hyperparams_value_for_maximizing())
 
-
     def _build_hparams_and_run_experiment(self, trial):
         args = self.model_hyperparams
-        if args.pytorch_module == 'Autoencoder' or args.pytorch_module == 'Outpainting':
-            vars(args)['arch'] = trial.suggest_categorical('arch', ['AdvancedAmphibAutoencoder',
-                                                                    'BasicAutoencoder',
-                                                                    'BasicAmphibAutoencoder'])
-        # if args.pytorch_module == 'Classifier':
-        #     vars(args)['arch'] = trial.suggest_categorical('arch', ['BasicConvNetLatent',
-        #                                                             'AdvancedConvNetLatent'])
+        # if args.pytorch_module == 'Autoencoder' or args.pytorch_module == 'Outpainting':
+        #     vars(args)['arch'] = trial.suggest_categorical('arch', ['AdvancedAmphibAutoencoder',
+        #                                                             'BasicAutoencoder',
+        #                                                             'BasicAmphibAutoencoder'])
+        if args.pytorch_module == 'Classifier':
+            vars(args)['arch'] = trial.suggest_categorical('arch', ['BasicConvNetLatent'])
 
-        vars(args)['learning_rate'] = trial.suggest_loguniform('learning_rate', 1e-8, 1e-3)
-        #vars(args)['latent_space_size'] = trial.suggest_int('latent_space_size', 5, 70)
-        # vars(args)['total_dataset_size'] = trial.suggest_categorical('total_dataset_size', [2500, 10000])
+        # vars(args)['learning_rate'] = trial.suggest_loguniform('learning_rate', 1e-8, 1e-3)
+        # vars(args)['latent_space_size'] = trial.suggest_int('latent_space_size', 5, 70)
+        vars(args)['total_dataset_size'] = trial.suggest_categorical('total_dataset_size', [2500, 10000])
+        vars(args)['latent_space_size'] = trial.suggest_categorical('latent_space_size', [32, 64, 128])
 
         return self._run_experiment(args)
 
@@ -129,7 +134,7 @@ class TaskHandler:
         pruner = optuna.pruners.MedianPruner()
 
         study = optuna.create_study(direction="maximize", pruner=pruner)
-        study.optimize(self._build_hparams_and_run_experiment, n_trials=100, timeout=60*60*2,
+        study.optimize(self._build_hparams_and_run_experiment, n_trials=100, timeout=60 * 60 * 2,
                        n_jobs=1)
 
         logging.info("Number of finished trials: {}".format(len(study.trials)))
@@ -142,5 +147,3 @@ class TaskHandler:
         logging.info("  Params: ")
         for key, value in trial.params.items():
             logging.info("    {}: {}".format(key, value))
-
-

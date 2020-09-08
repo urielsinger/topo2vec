@@ -12,7 +12,7 @@ from topo2vec.datasets.one_vs_random_dataset import OneVsRandomDataset
 from topo2vec.evaluation_experiments.final_models import classic_model_best, topo_resnet_model, topo_resnet_full, \
     amphib_autoencoder, superresolution_model
 from common.dataset_utils import get_paths_and_names_wanted
-
+from topo2vec.modules.svm_on_latent_tester import knn_classifier_test, svm_classifier_test
 import numpy as np
 
 original_radiis = [[8, 16, 24]]
@@ -32,11 +32,11 @@ number_of_examples = [10, 100, 200, 300, 400, 500]
 
 class_paths_special, class_names_special = get_paths_and_names_wanted(
     special_classes_for_validation, CLASS_PATHS_SPECIAL, CLASS_NAMES_SPECIAL)
-classifier = 'svm'
+classifier = 'knn'
 classifier_test = eval(classifier + '_classifier_test')
 
-seeds = list(range(665, 675))
-what_to_plot = 'auc'  # accuracy,auc
+seeds = list(range(665, 666))
+what_to_plot = 'accuracy'  # accuracy,auc
 
 
 def knn_accuracy_on_dataset_in_latent_space(knn_classfier, dataset: Dataset, model) -> torch.Tensor:
@@ -93,13 +93,14 @@ def knn_classifier_test(model, knn_train_dataset, knn_validation_dataset, test_d
 
 
 for special_class_path, special_class_name in zip(class_paths_special, class_names_special):
+    print('making datasets')
     knn_special_test_dataset = OneVsRandomDataset(original_radiis, test_set_size_for_knn, VALIDATION_HALF,
                                                   special_class_path, random_seed=665)
     knn_special_test_dataset_resnet = OneVsRandomDataset(original_radiis, test_set_size_for_knn, VALIDATION_HALF,
                                                          special_class_path, radii=RESNET_RADII, random_seed=665)
     knn_special_test_dataset_superresolution = OneVsRandomDataset([[34, 136]], test_set_size_for_knn, VALIDATION_HALF,
                                                                   special_class_path, radii=[34, 136], random_seed=665)
-
+    print('made the datasets')
     on_latent_accuracy = []
     on_plain_accuracy = []
     resnet_accuracy = []
@@ -115,7 +116,7 @@ for special_class_path, special_class_name in zip(class_paths_special, class_nam
         amphib_ae_list = []
         superresolution_list = []
         for seed in tqdm.tqdm(seeds):
-            logging.info(seed)
+            print(f'making dataset for seed:{seed}')
             knn_special_train_dataset = OneVsRandomDataset(original_radiis, train_set_size_for_knn, TRAIN_HALF,
                                                            special_class_path, random_seed=seed)
             knn_special_train_dataset_resnet = OneVsRandomDataset(original_radiis, train_set_size_for_knn, TRAIN_HALF,

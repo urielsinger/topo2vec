@@ -83,21 +83,20 @@ SUPERRESOLUTION_HPARAMS = Classifier.get_args_parser().parse_args(
         '--index_in', '1',
         '--index_out', '0',
         '--learning_rate', '0.0015',
-        '--max_epochs', '600',
-        '--total_dataset_size', '20000',
+        '--max_epochs', '300',
+        '--total_dataset_size', '100000',
         '--arch', 'UNet',
         '--svm_classify_latent_space',
         '--knn_method_for_typical_choosing', 'regular',
-        '--name', 'outpainting',
+        '--name', 'Superresolution',
         '--pytorch_module', 'Superresolution',
         '--random_set_size_for_svm', '2000',
         '--latent_space_size', '600',
         '--svm_classify_latent_space',
         '--test_knn',
         '--original_radiis', '[[34, 136], [68, 272], [102, 408]]',
-        '--radii', '[34, 136]'
+        '--radii', '[34, 136]',
      ]
 )
-
-superresolution_model = load_model_from_file('outpainting_UNet_[34, 136]_lr_0.0015_size_20000_num_classes_4_latent_size_600_train_all_resnet_False.pt',
+superresolution_model = load_model_from_file('Superresolution_UNet_[34, 136]_lr_0.0015_size_100000_num_classes_4_latent_size_600_train_all_resnet_False.pt',
                                                  SUPERRESOLUTION_HPARAMS)

@@ -9,6 +9,7 @@ from shapely.geometry import Point
 
 
 def str_to_int_list(string_list: str):
+    assert type(string_list) is List
     if type(string_list) == list:
         return string_list
     list_list = ast.literal_eval(string_list)

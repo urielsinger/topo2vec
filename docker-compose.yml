@@ -18,6 +18,7 @@ services:
     ports:
       - "${FLASK_PORT}:${FLASK_PORT}"
       - "${API_SSH_PORT}:22"
+      - "6800-6900:6800-6900"
 
   web_gui:
     build:

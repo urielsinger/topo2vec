@@ -22,7 +22,8 @@ class Superresolution(Autoencoder):
 
         if hparams.index_in > hparams.index_out:
             resize = int(
-                (int((2 * self.radii[hparams.index_out] + 1) / (2 * self.radii[hparams.index_in] + 1) * (2*self.radii[0]+1)) - 1) / 2)
+                (int((2 * self.radii[hparams.index_out] + 1) / (2 * self.radii[hparams.index_in] + 1) * (
+                            2 * self.radii[0] + 1)) - 1) / 2)
             self.start_index = self.radii[0] - resize
             self.end_index = self.radii[0] + resize + 1
         else:
@@ -84,9 +85,11 @@ class Superresolution(Autoencoder):
         grid_gt = torchvision.utils.make_grid(
             convert_multi_radius_tensor_to_printable(random_images_as_tensor[:, [self.hparams.index_out], 3:-2, 2:-3]))
         grid_input = torchvision.utils.make_grid(
-            convert_multi_radius_tensor_to_printable(random_images_as_tensor[:, [self.hparams.index_in], self.start_index:self.end_index, self.start_index:self.end_index]))
+            convert_multi_radius_tensor_to_printable(
+                random_images_as_tensor[:, [self.hparams.index_in], self.start_index:self.end_index,
+                self.start_index:self.end_index]))
         grid_after = torchvision.utils.make_grid(
-                    convert_multi_radius_tensor_to_printable(random_images_after_autoencoder))
+            convert_multi_radius_tensor_to_printable(random_images_after_autoencoder))
         self.logger.experiment.add_image(f'{dataset_name}_GT', grid_gt, 0)
         self.logger.experiment.add_image(f'{dataset_name}_input', grid_input, 0)
         self.logger.experiment.add_image(f'{dataset_name}_pred', grid_after, 0)

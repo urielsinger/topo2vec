@@ -31,6 +31,9 @@ N45_50_E5_15_STREAMS = BASE_LOCATION + 'data/overpass_classes_data/streams_(45,5
 LOGS_PATH = BASE_LOCATION + 'tb_logs/logs'
 MULTICLASS_LOGS_PATH = BASE_LOCATION + 'tb_logs/multiclass'
 AUTOENCODER_LOGS_PATH = BASE_LOCATION + 'tb_logs/autoencoder'
+ON_TOP_LOGS_PATH = BASE_LOCATION + 'tb_logs/on_top'
+Path(ON_TOP_LOGS_PATH).mkdir(parents=True, exist_ok=True)
+
 CLIFFS_TEST = BASE_LOCATION + 'data/overpass_classes_data/tests/cliffs_test_(45,10,50,15).json'
 PEAKS_TEST = BASE_LOCATION + 'data/overpass_classes_data/tests/peaks_test_(45,10,50,15).json'
 RIVERS_TEST = BASE_LOCATION + 'data/overpass_classes_data/tests/rivers_test_(45,10,50,15).json'
@@ -40,7 +43,7 @@ POINT_TO_SEARCH_SIMILAR_LARGE = BASE_LOCATION + 'data/overpass_classes_data/poin
 POINT_TO_SEARCH_SIMILAR_SMALL = BASE_LOCATION + 'data/overpass_classes_data/points_search_similar/points_to_search_similar_(49,5,50,59).json'
 GROUP_TO_SEARCH_SIMILAR_LONGS_LARGE = BASE_LOCATION + 'data/overpass_classes_data/points_search_similar/group_to_search_similar_longs(45,10,50,15).json'
 
-SAVE_PATH = BASE_LOCATION + 'data/pretrained_models/basicconvnetlatent'
+SAVE_PATH = BASE_LOCATION + 'data/pretrained_models/final_hypeparams_search'
 
 Path(SAVE_PATH).mkdir(parents=True, exist_ok=True)
 

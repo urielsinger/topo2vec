@@ -37,7 +37,7 @@ if not LOAD_CLASSES_LARGE:
 else:
     classifier_regular_args = classifier_parser.parse_args(['--save_model',
                                                             '--learning_rate', '1e-4',
-                                                            '--max_epochs', '25',
+                                                            '--max_epochs', '100',
                                                             '--total_dataset_size', '25000',
                                                             '--arch', 'BasicConvNetLatent',
                                                             '--svm_classify_latent_space',
@@ -51,7 +51,6 @@ else:
                                                             '--special_classes_for_validation',
                                                             '["alpine_huts", "antenas"]',
                                                             '--logs_path', MULTICLASS_LOGS_PATH,
-                                                            '--save_model'
                                                             ])
 
 lab = TaskHandler(classifier_regular_args)
