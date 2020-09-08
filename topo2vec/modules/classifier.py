@@ -401,6 +401,7 @@ class Classifier(LightningModule):
         parser.add_argument('--embedding_visualization_size', type=list, default=100)
         parser.add_argument('--index_in', type=int, default=1)
         parser.add_argument('--index_out', type=int, default=2)
+        parser.add_argument('--upsample', dest='upsample', action='store_true')
 
         # knn #
 

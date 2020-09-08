@@ -3,6 +3,7 @@ from typing import Dict
 import torch
 import torchvision
 from torch import Tensor
+import torch.nn.functional as F
 
 from topo2vec.modules import Autoencoder
 from common.pytorch.pytorch_lightning_utilities import get_random_part_of_dataset
@@ -30,13 +31,19 @@ class Superresolution(Autoencoder):
 
     def training_step(self, batch: Tensor, batch_idx: int) -> Dict:
         x, y = batch
+        x_out = x[:, [self.hparams.index_out], 3:-2, 2:-3]
+        x_in = x[:, [self.hparams.index_in], self.start_index:self.end_index, self.start_index:self.end_index]
+
         decoded, latent = self.forward(x.float())
 
         # mask = torch.ones_like(decoded, dtype=torch.bool)
         # mask[:, :, self.start_index:self.end_index, self.start_index:self.end_index] = False
         # decoded = torch.masked_select(decoded, mask)
         # x_masked = torch.masked_select(x[:, [self.hparams.index_out]], mask)
-        x_masked = x[:, [self.hparams.index_out], 3:-2, 2:-3]
+        if self.hparams.upsample:
+            x_masked = x_out
+        else:
+            x_masked = F.interpolate(x_in, size=decoded.shape[-1])
 
         loss = self.loss_fn(decoded.float(), x_masked.float())
         tensorboard_logs = {'train_loss': loss}
@@ -54,13 +61,24 @@ class Superresolution(Autoencoder):
 
         '''
         x, y = batch
-        decoded, latent = self.forward(x.float())
+        x_out = x[:, [self.hparams.index_out], 3:-2, 2:-3]
+        x_in = x[:, [self.hparams.index_in], self.start_index:self.end_index, self.start_index:self.end_index]
+
+        x_t = x.cpu().numpy().copy()
+        x_t[:, [self.hparams.index_in, self.hparams.index_out]] = x_t[:, [self.hparams.index_out, self.hparams.index_in]]
+        x_t = torch.from_numpy(x_t)
+        if self.hparams.use_gpu:
+            x_t = x_t.cuda(x.device.index)
+        decoded, latent = self.forward(x_t.float())
 
         # mask = torch.ones_like(decoded, dtype=torch.bool)
         # mask[:, :, self.start_index:self.end_index, self.start_index:self.end_index] = False
         # decoded = torch.masked_select(decoded, mask)
         # x_masked = torch.masked_select(x[:, [self.hparams.index_out]], mask)
-        x_masked = x[:, [self.hparams.index_out], 3:-2, 2:-3]
+        if self.hparams.upsample:
+            x_masked = x_out
+        else:
+            x_masked = F.interpolate(x_in, size=decoded.shape[-1])
 
         loss = self.loss_fn(decoded.float(), x_masked.float())
         return {name + '_loss': loss}

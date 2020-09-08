@@ -25,6 +25,7 @@ class pix2pix(Superresolution):
         self.discriminator = models.__dict__[hparams.discriminator](hparams)
 
         self.generated_imgs = None
+        self.lambda_l1 = 100.0
 
     def adversarial_loss(self, y_hat, y):
         return F.binary_cross_entropy(y_hat, y)
@@ -53,7 +54,7 @@ class pix2pix(Superresolution):
             # adversarial loss is binary cross-entropy
             fake_pair = torch.cat((x_in, self.generated_imgs), 1)
             g_loss = self.adversarial_loss(self.discriminator(fake_pair), valid)
-            g_loss += 100.0 * self.loss_fn(self.generated_imgs.float(), x_out.float())
+            g_loss += self.lambda_l1 * self.loss_fn(self.generated_imgs.float(), x_out.float())
 
             tqdm_dict = {'g_loss': g_loss}
             return {
@@ -132,7 +133,7 @@ class pix2pix(Superresolution):
         # adversarial loss is binary cross-entropy
         fake_pair = torch.cat((x_in, self.generated_imgs), 1)
         g_loss = self.adversarial_loss(self.discriminator(fake_pair), valid)
-        g_loss += 100.0 * self.loss_fn(self.generated_imgs.float(), x_out.float())
+        g_loss += self.lambda_l1 * self.loss_fn(self.generated_imgs.float(), x_out.float())
         ############## discriminator ##############
         # Measure discriminator's ability to classify real from generated samples
 
@@ -180,6 +181,7 @@ class pix2pix(Superresolution):
         b1 = 0.5  # self.hparams.b1
         b2 = 0.999  # self.hparams.b2
 
-        opt_g = torch.optim.Adam(self.model.parameters(), lr=lr, betas=(b1, b2))
+        opt_g = torch.optim.Adam(self.model.parameters(), lr=lr*8, betas=(b1, b2))
         opt_d = torch.optim.Adam(self.discriminator.parameters(), lr=lr, betas=(b1, b2))
+
         return [opt_g, opt_d], []
