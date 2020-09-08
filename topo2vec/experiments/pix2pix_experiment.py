@@ -12,8 +12,8 @@ if LOAD_CLASSES_LARGE:
                                                   '--index_in', '1',
                                                   '--index_out', '0',
                                                   '--learning_rate', '0.0002',
-                                                  '--max_epochs', '200',
-                                                  '--total_dataset_size', '20000',
+                                                  '--max_epochs', '300',
+                                                  '--total_dataset_size', '100000',
                                                   '--arch', 'UNet',
                                                   '--discriminator', 'Discriminator',
                                                   '--svm_classify_latent_space',
@@ -26,7 +26,8 @@ if LOAD_CLASSES_LARGE:
                                                   '--test_knn',
                                                   '--use_gpu',
                                                   '--original_radiis', '[[34, 136], [68, 272], [102, 408]]',
-                                                  '--radii', '[34, 136]'
+                                                  '--radii', '[34, 136]',
+                                                  '--upsample'
                                                   ])
 
 lab = TaskHandler(autoencoder_regular_args)

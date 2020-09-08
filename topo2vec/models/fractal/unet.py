@@ -1,4 +1,5 @@
 """ Full assembly of the parts to form the complete network """
+import functools
 
 import numpy as np
 import torch
@@ -14,7 +15,7 @@ class UNet(nn.Module):
         self.index_in = hparams.index_in
         self.index_out = hparams.index_out
         resize = int((int((2 * self.radii[hparams.index_out] + 1) / (2 * self.radii[hparams.index_in] + 1) * (
-                    2 * self.radii[0] + 1)) - 1) / 2)
+                2 * self.radii[0] + 1)) - 1) / 2)
         self.start_index = self.radii[0] - resize
         self.end_index = self.radii[0] + resize + 1
 
@@ -22,6 +23,7 @@ class UNet(nn.Module):
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.bilinear = bilinear
+        self.upsample = hparams.upsample
 
         self.inc = DoubleConv(in_channels, 8)
         self.down1 = Down(8, 16)
@@ -32,9 +34,12 @@ class UNet(nn.Module):
         self.up2 = Up(64, 32, bilinear)
         self.up3 = Up(32, 16, bilinear)
         self.up4 = Up(16, 8, bilinear)
-        self.up5 = Up(8, 4, bilinear)
-        self.up6 = Up(4, 2, bilinear)
-        self.outc = OutConv(2, out_channels)
+        if self.upsample:
+            self.up5 = Up(8, 4, bilinear)
+            self.up6 = Up(4, 2, bilinear)
+            self.outc = OutConv(2, out_channels)
+        else:
+            self.outc = OutConv(8, out_channels)
 
     def forward(self, x):
         if self.training:
@@ -52,17 +57,17 @@ class UNet(nn.Module):
         h = self.up2(h)
         h = self.up3(h)
         h = self.up4(h)
-        h = self.up5(h)
-        h = self.up6(h)
+        if self.upsample:
+            h = self.up5(h)
+            h = self.up6(h)
         out = self.outc(h)
 
         return out, latent
 
 
-
-
-
 """ Parts of the U-Net model """
+
+
 class DoubleConv(nn.Module):
     """(convolution => [BN] => ReLU) * 2"""
 
@@ -111,7 +116,6 @@ class Up(nn.Module):
             self.up = nn.ConvTranspose2d(in_channels, in_channels // 2, kernel_size=2, stride=2)
             self.conv = DoubleConv(in_channels, out_channels)
 
-
     def forward(self, x):
         x = self.up(x)
         return self.conv(x)
@@ -124,10 +128,6 @@ class OutConv(nn.Module):
 
     def forward(self, x):
         return self.conv(x)
-
-
-
-
 
 
 class CNR2d(nn.Module):
@@ -166,6 +166,7 @@ class Conv2d(nn.Module):
     def forward(self, x):
         return self.conv(x)
 
+
 class Linear(nn.Module):
     def __init__(self, nch_in, nch_out):
         super(Linear, self).__init__()
@@ -173,6 +174,7 @@ class Linear(nn.Module):
 
     def forward(self, x):
         return self.linear(x)
+
 
 class Norm2d(nn.Module):
     def __init__(self, nch, norm_mode):
@@ -185,6 +187,7 @@ class Norm2d(nn.Module):
     def forward(self, x):
         return self.norm(x)
 
+
 class ReLU(nn.Module):
     def __init__(self, relu):
         super(ReLU, self).__init__()
@@ -195,6 +198,7 @@ class ReLU(nn.Module):
 
     def forward(self, x):
         return self.relu(x)
+
 
 class Discriminator(nn.Module):
     def __init__(self, hparams):
@@ -213,7 +217,8 @@ class Discriminator(nn.Module):
                           relu=0.2)
         self.dsc4 = CNR2d(4 * self.nch_ker, 8 * self.nch_ker, kernel_size=4, stride=2, padding=1, norm=self.norm,
                           relu=0.2)
-        self.dsc5 = CNR2d(8 * self.nch_ker, 16 * self.nch_ker, kernel_size=4, stride=1, padding=0, norm=[], relu=[], bias=False)
+        self.dsc5 = CNR2d(8 * self.nch_ker, 16 * self.nch_ker, kernel_size=4, stride=1, padding=0, norm=[], relu=[],
+                          bias=False)
 
         self.fc1 = nn.Linear(16 * self.nch_ker, 8 * self.nch_ker)
         self.fc2 = nn.Linear(8 * self.nch_ker, 4 * self.nch_ker)

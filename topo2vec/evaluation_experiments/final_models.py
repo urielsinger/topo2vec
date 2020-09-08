@@ -3,7 +3,7 @@ import os
 import torch
 
 from topo2vec.constants import BASE_LOCATION
-from topo2vec.modules import Classifier, Autoencoder
+from topo2vec.modules import Classifier, Autoencoder, Superresolution, pix2pix
 
 FINAL_MODEL_DIR = BASE_LOCATION + 'data/final_model'
 FINAL_HPARAMS = Classifier.get_args_parser().parse_args(
@@ -20,10 +20,8 @@ FINAL_HPARAMS = Classifier.get_args_parser().parse_args(
 def load_model_from_file(final_model_name = 'classifier_BasicConvNetLatent_[8, 16, 24]_lr_0.0009704376798307045_size_10000_num_classes_4_latent_size_35.pt',
                          hparams=FINAL_HPARAMS):
     load_path = os.path.join(FINAL_MODEL_DIR, final_model_name)
-    if hparams.pytorch_module =='Classifier':
-        final_model_classifier = Classifier(hparams)
-    else:
-        final_model_classifier = Autoencoder(hparams)
+    final_model_classifier = eval(hparams.pytorch_module)(hparams)
+
     final_model_classifier.load_state_dict(torch.load(load_path, map_location=torch.device('cpu')))
     final_model_classifier.eval()
     return final_model_classifier
@@ -77,27 +75,104 @@ amphib_autoencoder = load_model_from_file('autoencoder_AdvancedAmphibAutoencoder
                                                  AE_HPARAMS)
 
 
+# SUPERRESOLUTION_HPARAMS = Classifier.get_args_parser().parse_args(
+#     [
+#         '--save_model',
+#         '--index_in', '1',
+#         '--index_out', '0',
+#         '--learning_rate', '0.0015',
+#         '--max_epochs', '600',
+#         '--total_dataset_size', '20000',
+#         '--arch', 'UNet',
+#         '--svm_classify_latent_space',
+#         '--knn_method_for_typical_choosing', 'regular',
+#         '--name', 'outpainting',
+#         '--pytorch_module', 'Superresolution',
+#         '--random_set_size_for_svm', '2000',
+#         '--latent_space_size', '600',
+#         '--svm_classify_latent_space',
+#         '--test_knn',
+#         '--original_radiis', '[[34, 136], [68, 272], [102, 408]]',
+#         '--radii', '[34, 136]',
+#         '--upsample'
+#      ]
+# )
+# superresolution_model_old = load_model_from_file('outpainting_UNet_[34, 136]_lr_0.0015_size_20000_num_classes_4_latent_size_600_train_all_resnet_False.pt',
+#                                                  SUPERRESOLUTION_HPARAMS)
+
+
 SUPERRESOLUTION_HPARAMS = Classifier.get_args_parser().parse_args(
     [
         '--save_model',
         '--index_in', '1',
         '--index_out', '0',
         '--learning_rate', '0.0015',
-        '--max_epochs', '600',
-        '--total_dataset_size', '20000',
+        '--max_epochs', '300',
+        '--total_dataset_size', '100000',
         '--arch', 'UNet',
         '--svm_classify_latent_space',
         '--knn_method_for_typical_choosing', 'regular',
-        '--name', 'outpainting',
+        '--name', 'Superresolution',
         '--pytorch_module', 'Superresolution',
         '--random_set_size_for_svm', '2000',
         '--latent_space_size', '600',
         '--svm_classify_latent_space',
         '--test_knn',
         '--original_radiis', '[[34, 136], [68, 272], [102, 408]]',
-        '--radii', '[34, 136]'
+        '--radii', '[34, 136]',
+        '--upsample'
      ]
 )
-
-superresolution_model = load_model_from_file('outpainting_UNet_[34, 136]_lr_0.0015_size_20000_num_classes_4_latent_size_600_train_all_resnet_False.pt',
+superresolution_model = load_model_from_file('Superresolution_UNet_[34, 136]_lr_0.0015_size_100000_num_classes_4_latent_size_600_train_all_resnet_False.pt',
                                                  SUPERRESOLUTION_HPARAMS)
+
+AE_HPARAMS = Classifier.get_args_parser().parse_args(
+    [
+        '--save_model',
+        '--index_in', '1',
+        '--index_out', '0',
+        '--learning_rate', '0.0015',
+        '--max_epochs', '300',
+        '--total_dataset_size', '100000',
+        '--arch', 'UNet',
+        '--svm_classify_latent_space',
+        '--knn_method_for_typical_choosing', 'regular',
+        '--name', 'Superresolution_upsample-False',
+        '--pytorch_module', 'Superresolution',
+        '--random_set_size_for_svm', '2000',
+        '--latent_space_size', '600',
+        '--svm_classify_latent_space',
+        '--test_knn',
+        '--original_radiis', '[[34, 136], [68, 272], [102, 408]]',
+        '--radii', '[34, 136]',
+     ]
+)
+ae_model = load_model_from_file('Superresolution_upsample-False_UNet_[34, 136]_lr_0.0015_size_100000_num_classes_4_latent_size_600_train_all_resnet_False.pt',
+                                                 AE_HPARAMS)
+
+PIX2PIX_HPARAMS = Classifier.get_args_parser().parse_args(
+    [
+        '--save_model',
+        '--index_in', '1',
+        '--index_out', '0',
+        '--learning_rate', '0.0002',
+        '--max_epochs', '300',
+        '--total_dataset_size', '100000',
+        '--arch', 'UNet',
+        '--discriminator', 'Discriminator',
+        '--svm_classify_latent_space',
+        '--knn_method_for_typical_choosing', 'regular',
+        '--name', 'pix2pix',
+        '--pytorch_module', 'pix2pix',
+        '--random_set_size_for_svm', '2000',
+        '--latent_space_size', '128',
+        '--svm_classify_latent_space',
+        '--test_knn',
+        '--original_radiis', '[[34, 136], [68, 272], [102, 408]]',
+        '--radii', '[34, 136]',
+        '--upsample'
+     ]
+)
+pix2pix_model = load_model_from_file('pix2pix_UNet_[34, 136]_lr_0.0002_size_100000_num_classes_4_latent_size_128_train_all_resnet_False.pt',
+                                                 PIX2PIX_HPARAMS)
+
