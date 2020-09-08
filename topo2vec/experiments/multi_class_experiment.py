@@ -46,8 +46,8 @@ else:
     #                                                         ])
     classifier_regular_args = classifier_parser.parse_args(['--save_model',
                                                             '--learning_rate', '1e-4',
-                                                            '--max_epochs', '50',
-                                                            '--total_dataset_size', '20000',
+                                                            '--max_epochs', '100',
+                                                            '--total_dataset_size', '1000',
                                                             '--arch', 'BasicConvNetLatent',
                                                             '--svm_classify_latent_space',
                                                             '--name', 'classifier',

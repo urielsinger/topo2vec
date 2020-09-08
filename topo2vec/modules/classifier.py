@@ -3,12 +3,13 @@ import logging
 from argparse import Namespace
 from typing import Dict
 
+import numpy
 import sklearn
 import torchvision as torchvision
 import torch
 from pytorch_lightning import LightningModule
 
-from torch import Tensor
+from torch import Tensor, nn
 from torch.utils.data import DataLoader
 
 import topo2vec.models as models
@@ -182,7 +183,8 @@ class Classifier(LightningModule):
             y = y.cpu()
             predicted = predicted.cpu()
 
-        return {**{name + '_loss': loss, name + '_tp': tp, name + '_total': total, 'y': y, 'pred': predicted}, **TPS,
+        return {**{name + '_loss': loss, name + '_tp': tp, name + '_total': total, 'y': y, 'pred': predicted,
+                   'outputs': outputs}, **TPS,
                 **totals}
 
     def _run_images_TP_TN_FP_FN_evaluation(self, predicted, x, y):
@@ -322,6 +324,15 @@ class Classifier(LightningModule):
         avg_loss = torch.stack([x[name + '_loss'] for x in outputs]).mean()
         avg_accuracy = torch.tensor([torch.stack([x[name + '_tp'] for x in outputs]).sum() / torch.stack(
             [torch.tensor([x[name + '_total']]) for x in outputs]).sum()])
+        y_true = np.concatenate([x['y'] for x in outputs])
+        probas = np.concatenate([x['outputs'].numpy() for x in outputs])
+        if len(np.unique(y_true)) == probas.shape[1]:
+            avg_f1_micro = sklearn.metrics.f1_score(y_true, np.argmax(probas, axis = 1), average='micro')
+            avg_f1_macro = sklearn.metrics.f1_score(y_true, np.argmax(probas, axis = 1), average='macro')
+
+        else:
+            avg_f1_micro = -0.0000009
+            avg_f1_macro = -0.0000009
         avg_accuracies = {}
         for i in range(self.num_classes):
             avg_accuracies[f'{name}_{CLASS_NAMES[i]}_acc'] = torch.tensor([torch.stack(
@@ -330,6 +341,9 @@ class Classifier(LightningModule):
 
         tensorboard_logs = {name + '_loss': avg_loss,
                             name + '_acc': avg_accuracy,
+                            name + '_f1_micro': avg_f1_micro,
+                            name + '_f1_macro': avg_f1_macro,
+
                             **avg_accuracies}
         return {'avg_' + name + '_loss': avg_loss, 'log': tensorboard_logs}
 

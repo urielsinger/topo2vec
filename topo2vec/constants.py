@@ -79,3 +79,8 @@ small_polygon = build_polygon(35.3, 33.11, 35.35, 33.15)
 goral_hights = build_polygon(34.7, 31.3, 34.9, 31.43)
 north_is = build_polygon(35.1782, 32.8877, 35.5092,  33.0524)
 north_is_small = build_polygon(35.3582, 32.9877, 35.4292,  33.0200)
+
+
+SCALES_DICT_DIR = os.join(BASE_LOCATION, 'data/scales_dicts')
+
+Path(SCALES_DICT_DIR).mkdir(parents=True, exist_ok=True)

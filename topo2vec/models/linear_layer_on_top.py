@@ -20,6 +20,8 @@ class LinearLayerOnTop(nn.Module):
         self.retrain = hparams.retrain
         self.linear_layer = nn.Sequential(
             nn.Linear(hparams.latent_space_size, self.num_classes),
+            nn.Softmax()
+
         )
 
     def forward(self, x):

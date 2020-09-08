@@ -13,7 +13,8 @@ from topo2vec.background import TRAIN_HALF, VALIDATION_HALF
 from topo2vec.datasets.several_classes_datasets import SeveralClassesDataset
 
 
-def svm_accuracy_on_dataset_in_latent_space(SVMClassifier, dataset: Dataset, model, predict_probas = False, multi=False) -> Tensor:
+def svm_accuracy_on_dataset_in_latent_space(SVMClassifier, dataset: Dataset, model, predict_probas=False,
+                                            multi=False) -> Tensor:
     '''
 
     Args:
@@ -43,11 +44,15 @@ def svm_accuracy_on_dataset_in_latent_space(SVMClassifier, dataset: Dataset, mod
         # import matplotlib.pyplot as plt
         # plt.savefig(f'{time.time()}.png')
         return accuracy, auc
-    return accuracy
+
+    f1_macro = sklearn.metrics.f1_score(y.numpy(), predicted, average='macro')
+    f1_micro = sklearn.metrics.f1_score(y.numpy(), predicted, average='micro')
+    accuracy = sklearn.metrics.accuracy_score(y.numpy(), predicted)
+    return accuracy, f1_micro, f1_macro
 
 
-
-def svm_classifier_test_build_datasets(model, class_paths_to_test: str, class_names_to_test: str, type_of_svm_evaluation_name: str,
+def svm_classifier_test_build_datasets(model, class_paths_to_test: str, class_names_to_test: str,
+                                       type_of_svm_evaluation_name: str,
                                        test_dataset: Dataset, train_dataset_size: int):
     '''
 
@@ -68,8 +73,10 @@ def svm_classifier_test_build_datasets(model, class_paths_to_test: str, class_na
         svm_validation_dataset = SeveralClassesDataset(model.original_radiis, VALIDATION_HALF, train_dataset_size,
                                                        class_paths_to_test, class_names_to_test,
                                                        'train_svm_' + type_of_svm_evaluation_name, model.radii)
-        return svm_classifier_test(model, svm_train_dataset, svm_validation_dataset, test_dataset, type_of_svm_evaluation_name)
+        return svm_classifier_test(model, svm_train_dataset, svm_validation_dataset, test_dataset,
+                                   type_of_svm_evaluation_name)
     return {}
+
 
 def svm_classifier_test(model, svm_train_dataset, svm_validation_dataset, test_dataset, type_of_svm_evaluation_name):
     X_train, y_train = get_dataset_as_tensor(svm_train_dataset)
@@ -88,27 +95,30 @@ def svm_classifier_test(model, svm_train_dataset, svm_validation_dataset, test_d
 
     SVMClassifier.fit(latent_train_numpy, y_train_numpy)
 
-    train_accuracy = svm_accuracy_on_dataset_in_latent_space(SVMClassifier,
-                                                             svm_train_dataset, model)
+    train_accuracy, f1_micro_train, f1_macro_train = svm_accuracy_on_dataset_in_latent_space(SVMClassifier,
+                                                                                             svm_train_dataset, model)
 
-    validation_accuracy = svm_accuracy_on_dataset_in_latent_space(SVMClassifier,
-                                                                  svm_validation_dataset, model)
+    validation_accuracy, f1_micro_validation, f1_macro_validation = svm_accuracy_on_dataset_in_latent_space(
+        SVMClassifier,
+        svm_validation_dataset, model)
 
     if len(test_dataset.class_names) == 2:
         test_accuracy, test_auc = svm_accuracy_on_dataset_in_latent_space(SVMClassifier,
-                                                                test_dataset, model, predict_probas=True)
+                                                                          test_dataset, model, predict_probas=True)
 
     else:
         test_accuracy, test_auc = svm_accuracy_on_dataset_in_latent_space(SVMClassifier,
-                                                                test_dataset, model, predict_probas=True, multi=True)
+                                                                          test_dataset, model, predict_probas=True,
+                                                                          multi=True)
     model.svm_validation_accuracy = validation_accuracy
     model.svm_test_accuracy = test_accuracy
 
     return {f'svm_train_{type_of_svm_evaluation_name}_accuracy': train_accuracy,
-            f'svm_validation_{type_of_svm_evaluation_name}_accuracy': validation_accuracy,
             f'svm_test_{type_of_svm_evaluation_name}_accuracy': test_accuracy,
-            f'svm_test_{type_of_svm_evaluation_name}_auc': test_auc}
-
+            f'svm_test_{type_of_svm_evaluation_name}_auc': test_auc,
+            f'svm_validation_{type_of_svm_evaluation_name}_accuracy': validation_accuracy,
+            f'svm_validation_{type_of_svm_evaluation_name}_f1_micro': f1_micro_validation,
+            f'svm_validation_{type_of_svm_evaluation_name}_f1_macro': f1_macro_validation}
 
 
 def knn_accuracy_on_dataset_in_latent_space(knn_classfier, dataset: Dataset, model) -> Tensor:
@@ -131,6 +141,7 @@ def knn_accuracy_on_dataset_in_latent_space(knn_classfier, dataset: Dataset, mod
     predicted = knn_classfier.predict(latent.numpy())
     accuracy = accuracy_score(y.numpy(), predicted)
     return accuracy
+
 
 def knn_classifier_test(model, knn_train_dataset, knn_validation_dataset, test_dataset, type_of_knn_evaluation_name):
     X_train, y_train = get_dataset_as_tensor(knn_train_dataset)
@@ -157,12 +168,10 @@ def knn_classifier_test(model, knn_train_dataset, knn_validation_dataset, test_d
 
     if len(test_dataset.class_names) == 2:
         test_accuracy, test_auc = knn_accuracy_on_dataset_in_latent_space(knn_classifier,
-                                                                test_dataset, model)
+                                                                          test_dataset, model)
         model.svm_validation_accuracy = validation_accuracy
         model.svm_test_accuracy = test_accuracy
 
         return {f'knn_train_{type_of_knn_evaluation_name}_accuracy': train_accuracy,
                 f'knn_validation_{type_of_knn_evaluation_name}_accuracy': validation_accuracy,
                 f'knn_test_{type_of_knn_evaluation_name}_accuracy': test_accuracy}
-
-

@@ -1,4 +1,5 @@
 import pickle
+from pathlib import Path
 from typing import List
 
 from shapely.geometry import Point, Polygon
@@ -53,7 +54,8 @@ class MultiRadiiDataset(Dataset):
         if self.full_base_dir is not None:
             full_path_actual_patches = full_path_name_of_dataset_data_to_full_path(self.full_base_dir, 'actual_patches')
             actual_patches = load_list_from_file(full_path_actual_patches)
-            full_path_points_locations = full_path_name_of_dataset_data_to_full_path(self.full_base_dir, 'points_locations')
+            full_path_points_locations = full_path_name_of_dataset_data_to_full_path(self.full_base_dir,
+                                                                                     'points_locations')
             points_locations = load_list_from_file(full_path_points_locations)
 
         if actual_patches is None or points_locations is None:
@@ -88,10 +90,18 @@ class MultiRadiiDataset(Dataset):
     def __len__(self):
         return len(self.actual_patches)
 
-    def save_to_pickle(self):
-        filename = f'data/datasets_for_simclr/dataset_{self.original_radiis}_{self.radii}_{self.labels[0]}.pickle'
+    def save_to_pickle(self, location='data/datasets_for_simclr', name=''):
+        Path(location).mkdir(parents=True, exist_ok=True)
+        try:
+            filename = f'{location}/{name}_dataset_{self.original_radiis}_{self.radii}_{self.labels[0]}.pickle'
+        except:
+            filename = f'{location}/{name}_dataset_{self.original_radiis}_size_{len(self.actual_patches)}_{self.radii}_{self.label}.pickle'
+
         pickle_dict = {}
         pickle_dict['data'] = self.actual_patches
-        pickle_dict['labels'] = self.labels
+        try:
+            pickle_dict['labels'] = self.labels
+        except:
+            pass
         with open(filename, 'wb') as handle:
             pickle.dump(pickle_dict, handle)

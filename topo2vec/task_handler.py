@@ -45,7 +45,8 @@ class TaskHandler:
                f'{str(hparams.learning_rate)}' \
                f'_size_{hparams.total_dataset_size}_num_classes_{hparams.num_classes}' \
                f'_latent_size_{hparams.latent_space_size}_train_all_resnet_{hparams.train_all_resnet}'
-        if hparams.retrain:
+
+        if self.trained_module is not None and self.trained_module.hparams.retrain:
             name += '_retrain'
         logging.info(f'started running, name = {name}')
 

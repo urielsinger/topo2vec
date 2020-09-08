@@ -40,6 +40,7 @@ class AdvancedConvNetLatent(nn.Module):
         self.classifier = nn.Sequential(
             nn.SELU(inplace=True),
             nn.Linear(self.latent_space_size, self.num_classes),
+            torch.nn.Softmax()
         )
 
     def forward(self, x):
