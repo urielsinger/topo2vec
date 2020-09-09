@@ -18,7 +18,7 @@ class ClassesDataFileHadler(DataHandler):
     '''
     A class that helps loading classes data
     '''
-    def __init__(self, file_path, cache_dir=CACHE_BASE_DIR):
+    def __init__(self, file_path, cache_dir=CACHE_BASE_DIR, cache_load=True):
         '''
         load all the points that are inside a points list
         Args:
@@ -31,9 +31,10 @@ class ClassesDataFileHadler(DataHandler):
         file_name, file_extension = os.path.splitext(file_path)
         self.file_name = file_name.split('/')[-1]
         full_path = cache_path_name_to_full_path(cache_dir, file_path, 'points')
-
+        full_path = None
         points_list = load_list_from_file(full_path)
-        if points_list is not None:
+
+        if points_list is not None and cache_load:
             self.points_list = points_list
         else:
             if file_extension == '.shp':
@@ -57,13 +58,16 @@ class ClassesDataFileHadler(DataHandler):
                 raise Exception('No points in file!')
 
             self.points_list = []
+            self.elevations_list = []
             for index in range(len(new_features)):
                 coord_as_points_list = self._get_coord_as_floats_list(index, new_features, file_extension)
+                ele = self._get_elevation_of_peak(index, new_features, file_extension)
                 self.points_list += coord_as_points_list
+                self.elevations_list.append(ele)
 
             save_list_to_file(full_path, self.points_list)
 
-    def get_random_subset_in_polygon(self, wanted_size: int, outer_polygon: Polygon = None, seed=None):
+    def get_random_subset_in_polygon(self, wanted_size: int, outer_polygon: Polygon = None, seed=None, only_higher_than = None):
         if seed is not None:
             random.seed(seed)
         if outer_polygon is not None:
@@ -71,9 +75,10 @@ class ClassesDataFileHadler(DataHandler):
             for i in range(0, len(self.points_list), 2):
                 point = Point(self.points_list[i], self.points_list[i+1])
                 if check_if_point_in_polygon(point, outer_polygon):
-                    points_inside_polygon.append(point)
-                    if len(points_inside_polygon) >= 5 * wanted_size:
-                        break
+                    if only_higher_than is None or self.elevations_list[i//2] > only_higher_than:
+                        points_inside_polygon.append(point)
+                        if len(points_inside_polygon) >= 5 * wanted_size:
+                            break
         else:
             points_inside_polygon = floats_list_to_points_list_till_size(self.points_list, 5 * wanted_size)
 
@@ -84,6 +89,14 @@ class ClassesDataFileHadler(DataHandler):
                             f'class: {self.file_name}, wanted size: {wanted_size}, '
                             f'available: {len(points_inside_polygon)}')
 
+    def _get_elevation_of_peak(self, index: int, new_features: np.ndarray, file_extension:str):
+        if file_extension == '.json' or file_extension == '.geojson':
+            try:
+                chosen_point_ele = int(new_features[index]['tags']['ele'])
+                return chosen_point_ele
+            except:
+                pass
+        return -999
     def _get_coord_as_floats_list(self, index: int, new_features: np.ndarray, file_extension:str) -> List[Point]:
         '''
         Args:

@@ -1,13 +1,16 @@
 import logging
 
 from topo2vec.data_handlers.classes_data_file_handler import ClassesDataFileHadler
-from topo2vec.constants import N49_E05_CLIFFS, N49_E05_RIVERS, N49_E05_PEAKS, N49_E05_STREAMS, TRAIN_HALF_LARGE, VALIDATION_HALF_LARGE, \
+from topo2vec.constants import N49_E05_CLIFFS, N49_E05_RIVERS, N49_E05_PEAKS, N49_E05_STREAMS, TRAIN_HALF_LARGE, \
+    VALIDATION_HALF_LARGE, \
     VALIDATION_HALF_SMALL, TRAIN_HALF_SMALL, POINT_TO_SEARCH_SIMILAR_LARGE, POINT_TO_SEARCH_SIMILAR_SMALL, \
     CLASSES_TEST_POINTS_FOLDER, BASE_LOCATION
 
 from pathlib import Path
 # True to use the large area in europe data
 # False for the certain place:
+from topo2vec.datasets.scales_dict import ScalesDict
+
 LOAD_CLASSES_LARGE = True
 
 classes_data_handlers = {}
@@ -29,6 +32,30 @@ if LOAD_CLASSES_LARGE:
     CLASS_NAMES = [str(f.split('_')[0]) for f
                    in listdir(CLASSES_POINTS_FOLDER)
                    if isfile(join(CLASSES_POINTS_FOLDER, f))]
+
+    ## init the scales dict
+
+    scales_dict_4 = {'streams': 11,
+                   'saddles': 8,
+                   'rivers': 11,
+                   'peaks': 8,
+                   'cliffs': 10}
+
+    scales_dict_8 = {'streams': 11,
+                   'saddles': 8,
+                   'rivers': 16,
+                   'peaks': 11,
+                   'cliffs': 9}
+    scales_dict = {'streams': 8,
+                   'saddles': 8,
+                   'rivers': 8,
+                   'peaks': 8,
+                   'cliffs': 8}
+    sd = ScalesDict()
+    sd.init_from_dict(scales_dict_8)
+    sd.save_to_file()
+
+    PROJECT_SCALES_DICT = sd
 
     CLASS_PATHS_TEST = [str(join(CLASSES_TEST_POINTS_FOLDER, f)) for f
                         in listdir(CLASSES_TEST_POINTS_FOLDER)
@@ -76,4 +103,4 @@ BUILD_CLASSES_DATA_HANDLERS = True
 if BUILD_CLASSES_DATA_HANDLERS:
     for class_path in CLASS_PATHS:
         logging.info("loading" + class_path)
-        classes_data_handlers[class_path] = ClassesDataFileHadler(class_path)
+        classes_data_handlers[class_path] = ClassesDataFileHadler(class_path, cache_load=False)

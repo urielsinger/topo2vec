@@ -9,7 +9,6 @@ from shapely.geometry import Point
 
 
 def str_to_int_list(string_list: str):
-    assert type(string_list) is List
     if type(string_list) == list:
         return string_list
     list_list = ast.literal_eval(string_list)
@@ -61,6 +60,8 @@ def floats_list_to_points_list(floats_list: object) -> object:
 
 
 def load_list_from_file(full_path: str) -> List:
+    if full_path is None:
+        return None
     if os.path.exists(full_path):
         t0 = time.time()
         the_list = np.load(full_path).tolist()
@@ -70,6 +71,8 @@ def load_list_from_file(full_path: str) -> List:
 
 
 def save_list_to_file(full_path: str, the_list: List):
+    if full_path is None:
+        return None
     t0 = time.time()
     np.save(full_path, the_list)
     t1 = time.time()

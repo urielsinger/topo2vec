@@ -26,6 +26,7 @@ from topo2vec.datasets.several_classes_datasets import SeveralClassesDataset
 from topo2vec.modules.svm_on_latent_tester import svm_classifier_test_build_datasets
 import numpy as np
 
+from topo2vec.background import PROJECT_SCALES_DICT
 
 class Classifier(LightningModule):
 
@@ -54,11 +55,19 @@ class Classifier(LightningModule):
         logging.info(self.class_names)
         self.class_paths = CLASS_PATHS
 
+        #for using different scales
+        self.scales_dict = None
+        if hparams.different_scales:
+            self.scales_dict = PROJECT_SCALES_DICT
+
         # for the scale experiment
         self.scale_exp = int(hparams.scale_exp)
         self.scale_exp_class_name = hparams.scale_exp_class_name
         self.scale_exp_class_path = hparams.scale_exp_class_path
         self.scale_exp_random_seed = hparams.scale_exp_random_seed
+        self.scale_exp_only_higher_than = int(hparams.scale_exp_only_higher_than)
+        if self.scale_exp_only_higher_than == -999:
+            self.scale_exp_only_higher_than = None
 
     def prepare_data(self):
         '''
@@ -72,26 +81,30 @@ class Classifier(LightningModule):
             self.train_dataset = OneVsRandomDataset(self.original_radiis, size_train, TRAIN_HALF,
                                                     self.scale_exp_class_path,
                                                     # f'scale_exp_{self.scale_exp_class_name}_vs_random_train',
-                                                    radii=self.radii, random_seed=self.scale_exp_random_seed)
+                                                    radii=self.radii, random_seed=self.scale_exp_random_seed,
+                                                    only_higher_than = self.scale_exp_only_higher_than)
             self.validation_dataset = OneVsRandomDataset(self.original_radiis, size_val, VALIDATION_HALF,
                                                          self.scale_exp_class_path,
                                                          # f'scale_exp_{self.scale_exp_class_name}_vs_random_validation',
-                                                         radii=self.radii, random_seed=self.scale_exp_random_seed)
+                                                         radii=self.radii, random_seed=self.scale_exp_random_seed,
+                                                         only_higher_than = self.scale_exp_only_higher_than)
         else:
             self.train_dataset = SeveralClassesDataset(self.original_radiis, TRAIN_HALF, size_train, self.class_paths,
                                                        self.class_names,
-                                                       'num_classes_' + str(self.num_classes) + '_train', self.radii)
+                                                       'num_classes_' + str(self.num_classes) + '_train', self.radii,
+                                                       scales_dict=self.scales_dict)
 
             self.validation_dataset = SeveralClassesDataset(self.original_radiis, VALIDATION_HALF, size_val,
                                                             self.class_paths, self.class_names,
                                                             'num_classes_' + str(self.num_classes) + '_validation',
-                                                            self.radii)
+                                                            self.radii, scales_dict=self.scales_dict)
 
         if LOAD_CLASSES_LARGE:
             self.test_dataset = SeveralClassesDataset(self.original_radiis, VALIDATION_HALF, self.size_test,
                                                       CLASS_PATHS_TEST,
                                                       CLASS_NAMES_TEST,
-                                                      'num_classes_' + str(self.num_classes) + '_test', self.radii)
+                                                      'num_classes_' + str(self.num_classes) + '_test', self.radii,
+                                                      scales_dict=self.scales_dict)
         else:
             self.test_dataset = None
 
@@ -325,7 +338,7 @@ class Classifier(LightningModule):
         avg_accuracy = torch.tensor([torch.stack([x[name + '_tp'] for x in outputs]).sum() / torch.stack(
             [torch.tensor([x[name + '_total']]) for x in outputs]).sum()])
         y_true = np.concatenate([x['y'] for x in outputs])
-        probas = np.concatenate([x['outputs'].numpy() for x in outputs])
+        probas = np.concatenate([x['outputs'].cpu().numpy() for x in outputs])
         if len(np.unique(y_true)) == probas.shape[1]:
             avg_f1_micro = sklearn.metrics.f1_score(y_true, np.argmax(probas, axis = 1), average='micro')
             avg_f1_macro = sklearn.metrics.f1_score(y_true, np.argmax(probas, axis = 1), average='macro')
@@ -420,6 +433,7 @@ class Classifier(LightningModule):
         parser.add_argument('--train_all_resnet', dest='train_all_resnet', action='store_true',
                             help='put if using a resnet architecture and want to train it all')
 
+
         # if the model is for scale exsperiment: should be trained on one vs random #
         #############################################################################
         parser.add_argument('--scale_exp', dest='scale_exp', action='store_true',
@@ -430,6 +444,8 @@ class Classifier(LightningModule):
                             help='path to the json file of the class of this experiment')
         parser.add_argument('--scale_exp_random_seed', type=int, default=55,
                             help='random seed for building the train dataset')
+        parser.add_argument('--scale_exp_only_higher_than', type=int, default=-999,
+                            help='minimal height for class')
 
         # the classes data #
         ####################
@@ -438,6 +454,9 @@ class Classifier(LightningModule):
                             help='portion of the total_dataset_Size to put into training.')
         parser.add_argument('--size_test', type=int, default=55,
                             help='what is the total size of the wanted test data (from data/overpass_classes_Data/tests)')
+
+        parser.add_argument('--different_scales', dest='different_scales', action='store_true',
+                            help='if Ture, original radii will be ignored and the class names will imply what is the original radius for the class')
 
         # training constants #
         ######################

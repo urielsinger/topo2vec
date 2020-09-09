@@ -7,16 +7,17 @@ from torch.utils.data import ConcatDataset, Subset
 
 from topo2vec.datasets.class_dataset import ClassDataset
 from topo2vec.datasets.multi_radius_dataset import MultiRadiiDataset
-
+from topo2vec.datasets.scales_dict import ScalesDict
 
 class SeveralClassesDataset(MultiRadiiDataset):
     '''
     A dataset that is a union of some class-datasets, to be used specifically in
     multiclaass/binary classification purposes
     '''
+
     def __init__(self, original_radiis: List[int], outer_polygon: Polygon, wanted_size: int,
                  class_paths: List[str], class_names: List[str], dataset_type_name: str,
-                 radii: List[int] = None, random_seed=None):
+                 radii: List[int] = None, random_seed=None, scales_dict: ScalesDict = None):
         '''
 
         Args:
@@ -34,8 +35,11 @@ class SeveralClassesDataset(MultiRadiiDataset):
         self.class_names_to_indexes = {}
         for i in range(len(self.class_names)):
             self.class_names_to_indexes[self.class_names[i]] = i
-        class_wanted_size = int(wanted_size / (len(class_names)*len(original_radiis))) + 1
-        for i, class_path in enumerate(class_paths):
+        class_wanted_size = int(wanted_size / (len(class_names) * len(original_radiis))) + 1
+        old_original_radiis = original_radiis
+        for (i, class_path), class_name in zip(enumerate(class_paths), class_names):
+            if scales_dict is not None and class_name in scales_dict.dict:
+                original_radiis = [[scales_dict.dict[class_name]]]
             class_dataset = ClassDataset(class_path, i, original_radiis=original_radiis,
                                          wanted_size=class_wanted_size,
                                          outer_polygon=outer_polygon,
@@ -44,12 +48,12 @@ class SeveralClassesDataset(MultiRadiiDataset):
 
             # logging.info(f'{dataset_type_name} dataset: {len(class_dataset)} {class_names[i]} points')
             self.all_datasets.append(class_dataset)
+            original_radiis = old_original_radiis
 
         size = min([len(dataset) for dataset in self.all_datasets])
         wanted_indices = list(range(0, size, 1))
         all_datasets = [Subset(dataset, wanted_indices) for dataset in self.all_datasets]
         self.combined_dataset = ConcatDataset(all_datasets)
-
 
     def class_name_to_index(self, class_name: str) -> int:
         '''
@@ -67,4 +71,3 @@ class SeveralClassesDataset(MultiRadiiDataset):
 
     def __len__(self):
         return len(self.combined_dataset)
-

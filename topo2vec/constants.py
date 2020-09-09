@@ -1,21 +1,23 @@
 import os
 from pathlib import Path
 
-#current_dir = os.getcwd()
-#BASE_LOCATION = current_dir + '/'
+# current_dir = os.getcwd()
+# BASE_LOCATION = current_dir + '/'
 
-#when on server itself
+# when on server itself
 from common.geographic.geo_utils import build_polygon
 
 # BASE_LOCATION = 'C:\\Users\\USER\\Desktop\\Thesis\\topo2vec\\'
-#when inside the docker
+# when inside the docker
 BASE_LOCATION = '/home/root/'
+
+# BASE_LOCATION = '/mnt/repositories/topo2vec_kavitzky_outside/'
 
 # run in background - the service for getting visualizations of lon, lats
 ELEVATION_BASE_DIR1 = BASE_LOCATION + 'data/elevation/big_europe'
 
 MASK_BASE_DIR = BASE_LOCATION + 'data/elevation/big_europe'
-equatorial_circumference_of_earth = 40075016.686 #m
+equatorial_circumference_of_earth = 40075016.686  # m
 from shapely.geometry import Polygon, Point
 
 N49_E05_STREAMS = BASE_LOCATION + 'data/N049E005/classes/streams.geojson'
@@ -43,8 +45,8 @@ POINT_TO_SEARCH_SIMILAR_LARGE = BASE_LOCATION + 'data/overpass_classes_data/poin
 POINT_TO_SEARCH_SIMILAR_SMALL = BASE_LOCATION + 'data/overpass_classes_data/points_search_similar/points_to_search_similar_(49,5,50,59).json'
 GROUP_TO_SEARCH_SIMILAR_LONGS_LARGE = BASE_LOCATION + 'data/overpass_classes_data/points_search_similar/group_to_search_similar_longs(45,10,50,15).json'
 
-SAVE_PATH = BASE_LOCATION + 'data/pretrained_models/final_hypeparams_search'
-
+SAVE_PATH = BASE_LOCATION + 'data/pretrained_models/multiclass_convnet_final/20000'
+# SAVE_PATH = BASE_LOCATION + 'data/pretrained_models/multiclass_convnet_final/1000'
 Path(SAVE_PATH).mkdir(parents=True, exist_ok=True)
 
 VALIDATION_HALF_LARGE = Polygon([(5, 45), (5, 50), (10, 50),
@@ -70,17 +72,16 @@ Path(CACHE_BASE_DIR).mkdir(parents=True, exist_ok=True)
 
 NONE_STR = 'None'
 
-#server routes
+# server routes
 GET_CLASS_POINTS_ROUTE = '/get_class'
 GET_SIMILAR_POINTS_ROUTE = '/get_similar'
 points_inside = [Point(5.0658811, 45.0851164),
                  Point(5.058811, 45.01164)]
 small_polygon = build_polygon(35.3, 33.11, 35.35, 33.15)
 goral_hights = build_polygon(34.7, 31.3, 34.9, 31.43)
-north_is = build_polygon(35.1782, 32.8877, 35.5092,  33.0524)
-north_is_small = build_polygon(35.3582, 32.9877, 35.4292,  33.0200)
+north_is = build_polygon(35.1782, 32.8877, 35.5092, 33.0524)
+north_is_small = build_polygon(35.3582, 32.9877, 35.4292, 33.0200)
 
-
-SCALES_DICT_DIR = os.join(BASE_LOCATION, 'data/scales_dicts')
-
+### init the scales dict ###
+SCALES_DICT_DIR = os.path.join(BASE_LOCATION, 'data/scales_dicts')
 Path(SCALES_DICT_DIR).mkdir(parents=True, exist_ok=True)

@@ -14,12 +14,13 @@ import pandas as pd
 
 TEST_SIZE = 1000
 
-RADII = 4
+RADII = 8
 
-arch = 'BasicConvNetLatentSmallForScale' #'BasicConvNetLatent' #
+arch = 'BasicConvNetLatent' #'BasicConvNetLatentSmallForScale'  #
+
 
 def std_mean_accuracy_radius_class(train_set_size_for_scales_experiment, random_seeds, MAX_EPOCHS,
-                                   original_radii_to_check, EXP_LOGS_PATH, class_name):
+                                   original_radii_to_check, EXP_LOGS_PATH, class_name, only_higher_than=-999):
     class_json_location = BASE_LOCATION + f'data/overpass_classes_data/{class_name}_(45,5,50,15).json'
     if class_name == 'streams':
         class_json_location = BASE_LOCATION + f'data/overpass_classes_data_all/overpass_classes_data/{class_name}_(45,5,50,15).json'
@@ -35,8 +36,10 @@ def std_mean_accuracy_radius_class(train_set_size_for_scales_experiment, random_
         '--scale_exp',
         '--scale_exp_class_name', class_name,
         '--scale_exp_class_path', class_json_location,
+        '--scale_exp_only_higher_than', str(only_higher_than),
         '--num_classes', '2',
-        '--radii', f'[{RADII}]'
+        '--radii', f'[{RADII}]',
+        '--use_gpu'
     ]
     validation_accuracies_means = []
     validation_accuracies_stds = []
@@ -51,8 +54,7 @@ def std_mean_accuracy_radius_class(train_set_size_for_scales_experiment, random_
             trainer = pl.Trainer(max_epochs=MAX_EPOCHS, logger=logger)
             classifier_current_args = classifier_parser.parse_args(parse_args_list +
                                                                    ['--scale_exp_random_seed', str(random_seed),
-                                                                    '--original_radii',
-                                                                    f'[[{original_radii}]]'
+                                                                    '--original_radii', f'[[{original_radii}]]',
                                                                     ])
             model = Classifier(classifier_current_args)
             trainer.fit(model)
@@ -74,11 +76,11 @@ def std_mean_accuracy_radius_class(train_set_size_for_scales_experiment, random_
 
 
 train_set_size_for_scales_experiment = 1000
-random_seeds = list(range(880, 900))
+random_seeds = list(range(890, 900))
 MAX_EPOCHS = 25
-original_radii_to_check = list(range(4, 21, 1))
+original_radii_to_check = list(range(8, 121, 4))
 EXP_LOGS_PATH = BASE_LOCATION + 'tb_logs/scale_experiment'
-class_names = ['streams', 'cliffs', 'rivers', 'peaks', 'saddles']
+class_names = ['peaks']  # ['streams', 'cliffs', 'rivers', 'peaks', 'saddles']
 
 import matplotlib.pyplot as plt
 
@@ -87,7 +89,7 @@ def save_and_plot(original_radii_to_check, validation_accuracies_means, validati
     plt.plot(original_radii_to_check, validation_accuracies_means, 'o')
     plt.xlabel('original size')
     plt.ylabel('accuracy')
-    title = f'{class_name} vs random, {MAX_EPOCHS} epochs, {train_set_size_for_scales_experiment} train samples, {len(random_seeds)} seeds, {TEST_SIZE} test samples, radii {RADII}, arch {arch}, original radii {str(original_radii_to_check[0])}-{str(original_radii_to_check[-1])},{original_radii_to_check[1]-original_radii_to_check[0]} '
+    title = f'{class_name} vs random, {MAX_EPOCHS} epochs, {train_set_size_for_scales_experiment} train samples, {len(random_seeds)} seeds, {TEST_SIZE} test samples, radii {RADII}, arch {arch}, original radii {str(original_radii_to_check[0])}-{str(original_radii_to_check[-1])},{original_radii_to_check[1] - original_radii_to_check[0]} '
     plt.title(title)
     plt.errorbar(original_radii_to_check, validation_accuracies_means, yerr=validation_accuracies_stds)
     plt.show()
@@ -104,7 +106,7 @@ start_time = time.time()
 for class_name in class_names:
     validation_accuracies_means, validation_accuracies_stds = std_mean_accuracy_radius_class(
         train_set_size_for_scales_experiment, random_seeds, MAX_EPOCHS,
-        original_radii_to_check, EXP_LOGS_PATH, class_name)
+        original_radii_to_check, EXP_LOGS_PATH, class_name, 3000)
     save_and_plot(original_radii_to_check, validation_accuracies_means, validation_accuracies_stds, class_name)
 
 print("--- %s seconds ---" % (time.time() - start_time))

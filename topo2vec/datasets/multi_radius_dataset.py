@@ -42,6 +42,7 @@ class MultiRadiiDataset(Dataset):
         self.outer_polygon = outer_polygon
         self.points_locations = None
 
+
     def add_points_as_patches_to_actual_patches(self, points: List[Point], file_path: str = None):
         '''
         add the ndarrays that represent the points to the self.actual_points list

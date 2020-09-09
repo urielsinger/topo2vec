@@ -7,9 +7,9 @@ from topo2vec.task_handler import TaskHandler
 classifier_parser = Classifier.get_args_parser()
 
 classifier_regular_args = classifier_parser.parse_args(['--save_model',
-                                                        '--learning_rate', '1e-4',
-                                                        '--max_epochs', '100',
-                                                        '--total_dataset_size', '10000',
+                                                        '--learning_rate', '1e-5',
+                                                        '--max_epochs', '300',
+                                                        '--total_dataset_size', '20000',
                                                         '--arch', 'LinearLayerOnTop',
                                                         '--svm_classify_latent_space',
                                                         '--name', 'classifier',
@@ -17,9 +17,10 @@ classifier_regular_args = classifier_parser.parse_args(['--save_model',
                                                         '--pytorch_module', 'AutoencoderFineTuner',
                                                         '--original_radiis', '[[34, 136], [68, 272], [102, 408]]',
                                                         '--radii', '[34, 136]',
-                                                        '--logs_path', ON_TOP_LOGS_PATH
+                                                        '--logs_path', ON_TOP_LOGS_PATH,
+                                                        '--use_gpu'
                                                         ])
 
-fine_tuner = AutoencoderFineTuner(classifier_regular_args, superresolution_model, retrain=True)
+fine_tuner = AutoencoderFineTuner(classifier_regular_args, superresolution_model)#, retrain=True)
 lab = TaskHandler(classifier_regular_args, fine_tuner)
 lab.run()

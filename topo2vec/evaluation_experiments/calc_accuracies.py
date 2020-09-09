@@ -25,7 +25,7 @@ size_val = 1000
 RANDOM_SEED = 665
 europe_dataset_ordinary = SeveralClassesDataset(original_radiis, VALIDATION_HALF, size_val, CLASS_PATHS, CLASS_NAMES,
                                                 'europe_dataset_for_eval_regular', random_seed=RANDOM_SEED)
-europe_dataset_superresolution_train = SeveralClassesDataset([[34, 136]], TRAIN_HALF, 800, CLASS_PATHS, CLASS_NAMES,
+europe_dataset_superresolution_train = SeveralClassesDataset([[34, 136]], TRAIN_HALF, 16000, CLASS_PATHS, CLASS_NAMES,
                                                              'europe_dataset_for_train_superresolution',
                                                              radii=[34, 136], random_seed=RANDOM_SEED)
 europe_dataset_superresolution = SeveralClassesDataset([[34, 136]], VALIDATION_HALF, size_val, CLASS_PATHS, CLASS_NAMES,
@@ -62,5 +62,5 @@ with torch.no_grad():
         df.append({'name': name, 'accuracy': accuracy, 'f1_micro': f1_micro, 'f1_macro': f1_macro}, ignore_index=True)
 
 SAVE_PATH_calc_accuracies = 'results/calc_accuracies'
-Path(os.join(BASE_LOCATION, SAVE_PATH_calc_accuracies)).mkdir(parents=True, exist_ok=True)
-df.to_excel(os.join(BASE_LOCATION, SAVE_PATH_calc_accuracies, str(time.strftime('%Y-%m-%d  %H:%M:%S'))))
+Path(os.path.join(BASE_LOCATION, SAVE_PATH_calc_accuracies)).mkdir(parents=True, exist_ok=True)
+df.to_excel(os.path.join(BASE_LOCATION, SAVE_PATH_calc_accuracies, str(time.strftime('%Y-%m-%d  %H:%M:%S')) + '.xlsx'))
