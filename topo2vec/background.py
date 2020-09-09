@@ -43,7 +43,7 @@ if LOAD_CLASSES_LARGE:
 
     scales_dict_8 = {'streams': 11,
                    'saddles': 8,
-                   'rivers': 16,
+                   'rivers': 12,
                    'peaks': 11,
                    'cliffs': 9}
     scales_dict = {'streams': 8,

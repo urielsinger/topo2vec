@@ -45,7 +45,7 @@ POINT_TO_SEARCH_SIMILAR_LARGE = BASE_LOCATION + 'data/overpass_classes_data/poin
 POINT_TO_SEARCH_SIMILAR_SMALL = BASE_LOCATION + 'data/overpass_classes_data/points_search_similar/points_to_search_similar_(49,5,50,59).json'
 GROUP_TO_SEARCH_SIMILAR_LONGS_LARGE = BASE_LOCATION + 'data/overpass_classes_data/points_search_similar/group_to_search_similar_longs(45,10,50,15).json'
 
-SAVE_PATH = BASE_LOCATION + 'data/pretrained_models/multiclass_convnet_final/20000'
+SAVE_PATH = BASE_LOCATION + 'data/pretrained_models/multiclass_convnet_final/250'
 # SAVE_PATH = BASE_LOCATION + 'data/pretrained_models/multiclass_convnet_final/1000'
 Path(SAVE_PATH).mkdir(parents=True, exist_ok=True)
 

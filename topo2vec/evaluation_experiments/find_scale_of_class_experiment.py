@@ -14,9 +14,9 @@ import pandas as pd
 
 TEST_SIZE = 1000
 
-RADII = 8
+RADII = 4
 
-arch = 'BasicConvNetLatent' #'BasicConvNetLatentSmallForScale'  #
+arch = 'BasicConvNetLatentSmallForScale'  #'BasicConvNetLatent'
 
 
 def std_mean_accuracy_radius_class(train_set_size_for_scales_experiment, random_seeds, MAX_EPOCHS,
@@ -39,7 +39,6 @@ def std_mean_accuracy_radius_class(train_set_size_for_scales_experiment, random_
         '--scale_exp_only_higher_than', str(only_higher_than),
         '--num_classes', '2',
         '--radii', f'[{RADII}]',
-        '--use_gpu'
     ]
     validation_accuracies_means = []
     validation_accuracies_stds = []
@@ -78,9 +77,9 @@ def std_mean_accuracy_radius_class(train_set_size_for_scales_experiment, random_
 train_set_size_for_scales_experiment = 1000
 random_seeds = list(range(890, 900))
 MAX_EPOCHS = 25
-original_radii_to_check = list(range(8, 121, 4))
+original_radii_to_check = list(range(4, 21, 1))
 EXP_LOGS_PATH = BASE_LOCATION + 'tb_logs/scale_experiment'
-class_names = ['peaks']  # ['streams', 'cliffs', 'rivers', 'peaks', 'saddles']
+class_names = ['streams', 'cliffs', 'rivers', 'peaks', 'saddles'] # ['peaks']  #
 
 import matplotlib.pyplot as plt
 
@@ -106,7 +105,7 @@ start_time = time.time()
 for class_name in class_names:
     validation_accuracies_means, validation_accuracies_stds = std_mean_accuracy_radius_class(
         train_set_size_for_scales_experiment, random_seeds, MAX_EPOCHS,
-        original_radii_to_check, EXP_LOGS_PATH, class_name, 3000)
+        original_radii_to_check, EXP_LOGS_PATH, class_name)
     save_and_plot(original_radii_to_check, validation_accuracies_means, validation_accuracies_stds, class_name)
 
 print("--- %s seconds ---" % (time.time() - start_time))

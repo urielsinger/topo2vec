@@ -14,7 +14,7 @@ PROTOCOL = 'http'
 IP = 'topo2vec_kavitzky_web_api_1'
 # outside docker:
 # IP = '159.122.160.134'
-PORT = '7654'
+PORT = '7653'
 
 ADDRESS = f'{PROTOCOL}://{IP}:{PORT}'
 

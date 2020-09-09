@@ -26,14 +26,18 @@ def svm_accuracy_on_dataset_in_latent_space(SVMClassifier, dataset: Dataset, mod
 
     '''
     X, y = get_dataset_as_tensor(dataset)
-    if use_gpu or model.hparams.use_gpu:
+    if model is not None and (use_gpu or model.hparams.use_gpu):
         X = X.cuda()
-    if use_gpu:
-        latent = model.forward(X)
-    else:
-        _, latent = model.forward(X)
 
-    if use_gpu or model.hparams.use_gpu:
+    if model is not None:
+        if use_gpu:
+            latent = model.forward(X)
+        else:
+            _, latent = model.forward(X)
+    else:
+        latent = X.reshape(len(X), -1)
+
+    if model is not None and (use_gpu or model.hparams.use_gpu):
         latent = latent.cpu()
     predicted = SVMClassifier.predict(latent.numpy())
     accuracy = accuracy_score(y.numpy(), predicted)
@@ -98,19 +102,19 @@ def svm_classifier_test(model, svm_train_dataset, svm_validation_dataset, test_d
 
     '''
     X_train, y_train = get_dataset_as_tensor(svm_train_dataset)
-    if use_gpu or model.hparams.use_gpu:
+    if model is not None and (use_gpu or model.hparams.use_gpu):
         X_train = X_train.cuda()
 
-    if model is not None: # if None - we mean plain svm on the images
-        if use_gpu:
+    if model is not None:  # if None - we mean plain svm on the images
+        if use_gpu:  # if True - it is constractive
             latent_train = model.forward(X_train)
         else:
             _, latent_train = model.forward(X_train)
     else:
-        latent_train = X_train.flatten()
+        latent_train = X_train.reshape(len(X_train), -1)
     SVMClassifier = svm.SVC(probability=True)
 
-    if use_gpu or model.hparams.use_gpu:
+    if model is not None and (use_gpu or model.hparams.use_gpu):
         latent_train = latent_train.cpu()
         y_train = y_train.cpu()
 
@@ -136,8 +140,9 @@ def svm_classifier_test(model, svm_train_dataset, svm_validation_dataset, test_d
         test_accuracy, test_auc = svm_accuracy_on_dataset_in_latent_space(SVMClassifier,
                                                                           test_dataset, model, predict_probas=True,
                                                                           multi=True, use_gpu=use_gpu)
-    model.svm_validation_accuracy = validation_accuracy
-    model.svm_test_accuracy = test_accuracy
+    if model is not None: # not an svm model
+        model.svm_validation_accuracy = validation_accuracy
+        model.svm_test_accuracy = test_accuracy
 
     return {f'svm_train_{type_of_svm_evaluation_name}_accuracy': train_accuracy,
             f'svm_test_{type_of_svm_evaluation_name}_accuracy': test_accuracy,

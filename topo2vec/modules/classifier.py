@@ -28,6 +28,7 @@ import numpy as np
 
 from topo2vec.background import PROJECT_SCALES_DICT
 
+
 class Classifier(LightningModule):
 
     def __init__(self, hparams: Namespace):
@@ -55,7 +56,7 @@ class Classifier(LightningModule):
         logging.info(self.class_names)
         self.class_paths = CLASS_PATHS
 
-        #for using different scales
+        # for using different scales
         self.scales_dict = None
         if hparams.different_scales:
             self.scales_dict = PROJECT_SCALES_DICT
@@ -82,12 +83,12 @@ class Classifier(LightningModule):
                                                     self.scale_exp_class_path,
                                                     # f'scale_exp_{self.scale_exp_class_name}_vs_random_train',
                                                     radii=self.radii, random_seed=self.scale_exp_random_seed,
-                                                    only_higher_than = self.scale_exp_only_higher_than)
+                                                    only_higher_than=self.scale_exp_only_higher_than)
             self.validation_dataset = OneVsRandomDataset(self.original_radiis, size_val, VALIDATION_HALF,
                                                          self.scale_exp_class_path,
                                                          # f'scale_exp_{self.scale_exp_class_name}_vs_random_validation',
                                                          radii=self.radii, random_seed=self.scale_exp_random_seed,
-                                                         only_higher_than = self.scale_exp_only_higher_than)
+                                                         only_higher_than=self.scale_exp_only_higher_than)
         else:
             self.train_dataset = SeveralClassesDataset(self.original_radiis, TRAIN_HALF, size_train, self.class_paths,
                                                        self.class_names,
@@ -340,8 +341,8 @@ class Classifier(LightningModule):
         y_true = np.concatenate([x['y'] for x in outputs])
         probas = np.concatenate([x['outputs'].cpu().numpy() for x in outputs])
         if len(np.unique(y_true)) == probas.shape[1]:
-            avg_f1_micro = sklearn.metrics.f1_score(y_true, np.argmax(probas, axis = 1), average='micro')
-            avg_f1_macro = sklearn.metrics.f1_score(y_true, np.argmax(probas, axis = 1), average='macro')
+            avg_f1_micro = sklearn.metrics.f1_score(y_true, np.argmax(probas, axis=1), average='micro')
+            avg_f1_macro = sklearn.metrics.f1_score(y_true, np.argmax(probas, axis=1), average='macro')
 
         else:
             avg_f1_micro = -0.0000009
@@ -374,8 +375,8 @@ class Classifier(LightningModule):
         self.logger.experiment.add_embedding(embedding, metadata=y, label_img=images_set_to_show)
 
     def configure_optimizers(self):
-        optimizer = torch.optim.Adam(self.parameters(), lr=self.hparams.learning_rate)
-        # weight_decay=self.hparams.weight_decay
+        weight_decay = self.hparams.weight_decay
+        optimizer = torch.optim.Adam(self.parameters(), lr=self.hparams.learning_rate, weight_decay=weight_decay)
         return [optimizer]
 
     def get_hyperparams_value_for_maximizing(self):
@@ -433,7 +434,6 @@ class Classifier(LightningModule):
         parser.add_argument('--train_all_resnet', dest='train_all_resnet', action='store_true',
                             help='put if using a resnet architecture and want to train it all')
 
-
         # if the model is for scale exsperiment: should be trained on one vs random #
         #############################################################################
         parser.add_argument('--scale_exp', dest='scale_exp', action='store_true',
@@ -466,7 +466,7 @@ class Classifier(LightningModule):
         parser.add_argument('--total_dataset_size', type=int, default=75000)
         parser.add_argument('--max_epochs', default=100, type=int, metavar='N',
                             help='number of total epochs to run')
-        parser.add_argument('--wd', '--weight-decay', default=1e-4, type=float,
+        parser.add_argument('--wd', '--weight-decay', default=0, type=float,
                             metavar='W', help='weight decay (default: 1e-4)',
                             dest='weight_decay')
 

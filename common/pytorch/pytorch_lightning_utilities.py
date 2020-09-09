@@ -41,11 +41,11 @@ def get_dataset_latent_space_as_np(feature_extractor, images_as_tensor: Tensor):
 
     '''
     images_as_tensor = images_as_tensor.float()
-    if feature_extractor.hparams.use_gpu:
+    if feature_extractor.hparams.contrastive:
         images_as_tensor = images_as_tensor.cuda()
     _, images_latent_as_tensor = feature_extractor.forward(images_as_tensor)
     images_latent_as_np = images_latent_as_tensor.data
-    if feature_extractor.hparams.use_gpu:
+    if feature_extractor.hparams.contrastive:
         images_latent_as_np = images_latent_as_np.cpu()
     images_latent_as_np = images_latent_as_np.numpy()
     return images_latent_as_np
