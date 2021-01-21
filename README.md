@@ -51,7 +51,7 @@ and then run the python files inside "evaluation experiments".
 
 For example, after downloading the data, to hyper-parameter search of the basic CNN baseline: (for more options of the bash file, look at the 'classifier.py' file)
 ```
-python multi_class_experiment_hyperparams.py
+python experiments/multi_class_experiment_hyperparams.py
 ```
 This file builds a parser and puts inside it the params we used for our hyper-parameter search.
 
@@ -59,7 +59,11 @@ Or as another example, to train the topo2vec-4 arch, run:
 ```
 python TO_ADD_HERE
 ```
- 
+
+To run the SVM experiment that we introduced in the paper, one must edit the knn_or_svm_random_vs_classes file to contain the new models he trained, and run:
+ ```
+python evaluation_experiments/knn_or_svm_random_vs_classes.py
+```
 - Using the GUI server for exploration - go to the gui's container address:BOKEH_PORT (as in the .env file), e.g.:
 ![Topo2vec_GUI](https://i.imgur.com/saxMBlD.png)
 
