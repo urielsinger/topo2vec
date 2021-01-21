@@ -1,9 +1,0 @@
-what should be done next:
-1. put the lost elevation file from the drive to the right place
-2. take the jsons from the drive (rivers, saddles, peaks, cliffs) and put them in data/overpass_classes_data ( if it still does not work - take them from topo2vec_ilay)
-3. take the final models from the drive and put them in the final_model folder
-4. take the for_eval jsons from the drive in to the
-
-2 + 4 is just replacing the overpass_classes_data folder from the drive to the deployment.
-
-5. run the calc_accuracies, knn_random_vs_classes experiments from evaluation_experiments
