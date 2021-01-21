@@ -45,7 +45,7 @@ scripts/get_elevation_data.sh min_lon, min_lat, max_lon, max_lat
 It is much recommended to download the the data inside the docker container.
 
 ## Usage
-For exploring the experiments in the paper, first download the data (as in the "download the data" section), 
+- For exploring the experiments in the paper, first download the data (as in the "download the data" section), 
 then train the appropriate models you want - using the training files inside the "experiments" folder (it is recommended to use tensorboard),
 and then run the python files inside "evaluation experiments".
 
@@ -60,7 +60,7 @@ Or as another example, to train the topo2vec-4 arch, run:
 python TO_ADD_HERE
 ```
  
-2. Using the GUI server for exploration - go to the gui's container address:BOKEH_PORT (as in the .env file), e.g.:
+- Using the GUI server for exploration - go to the gui's container address:BOKEH_PORT (as in the .env file), e.g.:
 ![Topo2vec_GUI](https://i.imgur.com/saxMBlD.png)
 
 
