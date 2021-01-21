@@ -48,7 +48,7 @@ It is much recommended to download the the data inside the docker container.
 For exploring the experiments in the paper, first download the data (as in the "download the data" section), 
 then train the appropriate models you want - using the training files inside the "experiments" folder (it is recommended to use tensorboard),
 and then run the python files inside "evaluation experiments".
- 
+
 For example, after downloading the data, to hyper-parameter search of the basic CNN baseline: (for more options of the bash file, look at the 'classifier.py' file)
 ```
 python multi_class_experiment_hyperparams.py
@@ -56,7 +56,9 @@ python multi_class_experiment_hyperparams.py
 This file builds a parser and puts inside it the params we used for our hyper-parameter search.
 
 Or as another example, to train the topo2vec-4 arch, run:
-
+```
+python TO_ADD_HERE
+```
  
 2. Using the GUI server for exploration - go to the gui's container address:BOKEH_PORT (as in the .env file), e.g.:
 ![Topo2vec_GUI](https://i.imgur.com/saxMBlD.png)
