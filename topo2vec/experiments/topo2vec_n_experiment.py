@@ -3,7 +3,7 @@ from topo2vec.background import LOAD_CLASSES_LARGE
 from topo2vec.modules import Classifier
 
 ######################################################################################################
-# an ordinary autoencoder experiment - change the "classifier_regular_args" to make other experiments #
+# an ordinary topo2vec-4 experiment - change the "autoencoder_regular_args" to make other experiments #
 ######################################################################################################
 
 parser = Classifier.get_args_parser()

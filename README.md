@@ -57,7 +57,7 @@ This file builds a parser and puts inside it the params we used for our hyper-pa
 
 Or as another example, to train the topo2vec-4 arch, run:
 ```
-python TO_ADD_HERE
+python experiments/topo2vec_n_experiment.py
 ```
 
 To run the SVM experiment that we introduced in the paper, one must edit the knn_or_svm_random_vs_classes file to contain the new models he trained, and run:
