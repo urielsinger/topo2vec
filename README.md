@@ -41,10 +41,10 @@ It is much recommended to download the the data inside the docker container.
 ## Usage
 1. For exploring the experiments in the paper, first download the data (as in the "download the data" section), 
 then train the appropriate models you want - using the training files inside the "experiments" folder (it is recommended to use tensorboard),
-and then run the python files inside "evaluation experiments"
+and then run the python files inside "evaluation experiments".
  
 2. Using the GUI server for exploration - go to the gui's container address:BOKEH_PORT (as in the .env file), e.g.:
-![Topo2vec_GUI](https://ibb.co/PmTRv8Z)
+![Topo2vec_GUI](https://i.imgur.com/saxMBlD.png)
 
 
 ## Cite
