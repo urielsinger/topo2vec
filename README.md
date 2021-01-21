@@ -39,12 +39,12 @@ a. download the needed data:
 It is much recommended to download the the data inside the docker container.
 
 ## Usage
-1. For exploring the experiments in the paper, first download the data (as in the "download the data" section)
+1. For exploring the experiments in the paper, first download the data (as in the "download the data" section), 
+then train the appropriate models you want - using the training files inside the "experiments" folder (it is recommended to use tensorboard),
 and then run the python files inside "evaluation experiments"
  
-2. Using the GUI server for exploration - go to the gui's container address/BOKEH_PORT (as in the environment.yml file)
+2. Using the GUI server for exploration - go to the gui's container address:BOKEH_PORT (as in the .env file)
   
-3. 
 
 ## Cite
 Please cite our paper if you use this code in your own work:
@@ -54,12 +54,3 @@ Please cite our paper if you use this code in your own work:
   title={Topo2vec: Topography Embedding Using the Fractal Effect}
 }
 ```
-# initial setup of the project:
-
-b. run the project:
-
-c. run additional debugging tools:
-1. run tensorboard using "scripts/tensorboard.sh port_num"
-    - add the needed ports to the docker-compose file.
-2. run jupyter notebook using "scripts/jupyter.sh port_num"
-    - add the needed ports to the docker-compose file.
