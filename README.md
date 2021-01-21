@@ -30,7 +30,7 @@ activate topo2vec, uninstall torch, and run: "pip install torch==1.6.0+cu101 tor
  - follow the environment.yml file and try to build it locally (this may not work according to your machine state and is not recommended)
 
 
-#Download the data
+## Download the data
 a. download the needed data:
 1. run the "scripts/get_elevation_data.sh min_lon, min_lat, max_lon, max_lat"
 2. edit and run the "scripts/get_classes_data.sh min_lon, min_lat, max_lon, max_lat"
