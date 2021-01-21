@@ -43,8 +43,9 @@ It is much recommended to download the the data inside the docker container.
 then train the appropriate models you want - using the training files inside the "experiments" folder (it is recommended to use tensorboard),
 and then run the python files inside "evaluation experiments"
  
-2. Using the GUI server for exploration - go to the gui's container address:BOKEH_PORT (as in the .env file)
-  
+2. Using the GUI server for exploration - go to the gui's container address:BOKEH_PORT (as in the .env file), e.g.:
+![Topo2vec_GUI](https://ibb.co/PmTRv8Z)
+
 
 ## Cite
 Please cite our paper if you use this code in your own work:
