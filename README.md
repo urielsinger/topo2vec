@@ -4,8 +4,8 @@ This repository provides an implementation of *Topo2vec*, all baselines, and cod
 > Topo2vec: Topography Embedding Using the Fractal Effect<br>
 
 The *Topo2vec* algorithm is the first embedding technique for topographic data, based on the fractal effect.
-![Topo2vec](architecture.jpg)
-
+![Topo2vec_latent_example](https://i.imgur.com/LVB8Ri8.jpeg)
+A qualitative (not cherry picked!) experiment - example image and closes images in the latent space. 
 
 ## Build the environment
  - compose the full system (including gui server and api server) using docker-compose and the docker-compose.yml file.
