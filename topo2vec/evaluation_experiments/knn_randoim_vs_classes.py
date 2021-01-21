@@ -30,15 +30,15 @@ EXP_LOGS_PATH = BASE_LOCATION + 'tb_logs/scale_experiment'
 
 original_radii = 8
 original_radiis = [[8, 16, 24]]
-test_set_size_for_knn = 100
+test_set_size_for_knn = 1000
 RESNET_RADII = [224, 224, 224]
 special_classes_for_validation_others = ['alpine_huts', 'antenas', 'airialway_stations']  # 350 achievable
 
-special_classes_for_validation_topo = ['rivers', 'saddles', 'peaks']  # 1000 achievable
+special_classes_for_validation_topo = ['rivers', 'saddles', 'peaks', 'cliffs']  # 1000 achievable
 
 special_classes_for_validation_semi_topo = ['waterfalls', 'sinkholes']  # 450 achievable
 
-special_classes_for_validation = special_classes_for_validation_semi_topo
+special_classes_for_validation = special_classes_for_validation_topo
 
 # train_set_size_for_knn = 5 * len(special_classes_for_validation)
 
@@ -46,10 +46,10 @@ special_classes_for_validation = special_classes_for_validation_semi_topo
 # train_set_size_for_knn_min = 2
 # step = 1000
 # number_of_examples = list(range(train_set_size_for_knn_min, train_set_size_for_knn_max, step))
-number_of_examples_topo = [20, 50, 100, 500, 1000]
+number_of_examples_topo = [1000]
 number_of_examples_semi_topo = [100, 200, 400]  # [10, 20, 50, 100, 200, 400]
-number_of_examples_semi_others = [10, 20, 50, 100, 150, 350]
-number_of_examples = number_of_examples_semi_topo
+number_of_examples_semi_others = [50, 100, 150, 350]
+number_of_examples = number_of_examples_topo
 
 class_paths_special, class_names_special = get_paths_and_names_wanted(
     special_classes_for_validation, CLASS_PATHS_SPECIAL, CLASS_NAMES_SPECIAL)
@@ -142,6 +142,7 @@ def get_accuracy_small_net(train_set_size_for_knn, class_name, class_path, rando
     torch.manual_seed(random_seed)
     cudnn.deterministic = True
     np.random.seed(random_seed)
+    np.random.seed(random_seed)
     import pytorch_lightning as pl
     logger = TensorBoardLogger(EXP_LOGS_PATH, name=f'{random_seed}_{class_name}_train_size{train_set_size_for_knn}')
 
@@ -155,20 +156,24 @@ def get_accuracy_small_net(train_set_size_for_knn, class_name, class_path, rando
     test_accuracy = model.get_accuracy_for_small_dataset(test_dataset)
 
 
+rescaling = ''
 for special_class_path, special_class_name in zip(class_paths_special, class_names_special):
     print(f'making datasets for {special_class_name}')
-    if special_class_name in PROJECT_SCALES_DICT:
+    if False and special_class_name in PROJECT_SCALES_DICT.dict:
+        rescaling = 'rescaling'
         original_radii = PROJECT_SCALES_DICT.dict[special_class_name]
         original_radiis = [[original_radii, 2 * original_radii, 3 * original_radii]]
 
     knn_special_test_dataset = OneVsRandomDataset(original_radiis, test_set_size_for_knn, VALIDATION_HALF,
-                                                  special_class_path, random_seed=665)
+                                                  special_class_path, random_seed=665, radii=[8])
     knn_special_test_dataset_flat = OneVsRandomDataset([[original_radii]], test_set_size_for_knn, VALIDATION_HALF,
-                                                       special_class_path, random_seed=665)
+                                                       special_class_path, random_seed=665, radii=[8])
     knn_special_test_dataset_resnet = OneVsRandomDataset(original_radiis, test_set_size_for_knn, VALIDATION_HALF,
                                                          special_class_path, radii=RESNET_RADII, random_seed=665)
-    knn_special_test_dataset_superresolution = OneVsRandomDataset([[34, 136]], test_set_size_for_knn, VALIDATION_HALF,
-                                                                  special_class_path, radii=[34, 136], random_seed=665)
+    knn_special_test_dataset_superresolution = OneVsRandomDataset(
+        [[2 * (2 * original_radii + 1), 8 * (2 * original_radii + 1)]],
+        test_set_size_for_knn, VALIDATION_HALF,
+        special_class_path, radii=[34, 136], random_seed=665)
     print('made the datasets')
     on_latent_accuracy = []
     classic_1000_accuracy = []
@@ -212,81 +217,82 @@ for special_class_path, special_class_name in zip(class_paths_special, class_nam
         for seed in tqdm.tqdm(seeds):
             print(f'making dataset for seed:{seed}')
             knn_special_train_dataset = OneVsRandomDataset(original_radiis, train_set_size_for_knn, TRAIN_HALF,
-                                                           special_class_path, random_seed=seed)
+                                                           special_class_path, random_seed=seed, radii=[8])
 
-            knn_special_train_dataset_flat = OneVsRandomDataset([[8]], train_set_size_for_knn, TRAIN_HALF,
-                                                                special_class_path, random_seed=seed)
+            knn_special_train_dataset_flat = OneVsRandomDataset([[original_radii]], train_set_size_for_knn, TRAIN_HALF,
+                                                                special_class_path, random_seed=seed, radii=[8])
             knn_special_train_dataset_resnet = OneVsRandomDataset(original_radiis, train_set_size_for_knn, TRAIN_HALF,
                                                                   special_class_path, radii=RESNET_RADII,
                                                                   random_seed=seed)
-            knn_special_train_dataset_superresolution = OneVsRandomDataset([[34, 136]], train_set_size_for_knn,
-                                                                           TRAIN_HALF,
-                                                                           special_class_path, radii=[34, 136],
-                                                                           random_seed=seed)
+            knn_special_train_dataset_superresolution = OneVsRandomDataset(
+                [[2 * (2 * original_radii + 1), 8 * (2 * original_radii + 1)]], train_set_size_for_knn,
+                TRAIN_HALF,
+                special_class_path, radii=[34, 136],
+                random_seed=seed)
             # special_classic_list.append(
             #     get_accuracy_small_net(train_set_size_for_knn, special_class_name, special_class_path, seed,
             #                            knn_special_test_dataset_flat))
             with torch.no_grad():
                 classifier_special_classes_test_log_dict_plain = \
-                    classifier_test(None, knn_special_train_dataset_flat, knn_special_train_dataset_flat,
+                    classifier_test(None, knn_special_train_dataset_flat, knn_special_test_dataset_flat,
                                     knn_special_test_dataset_flat, 'special')
 
             with torch.no_grad():
                 classifier_special_classes_test_log_dict_resnet = \
                     classifier_test(topo_resnet_model, knn_special_train_dataset_resnet,
-                                    knn_special_train_dataset_resnet,
+                                    knn_special_test_dataset_resnet,
                                     knn_special_test_dataset_resnet, 'special')
 
             with torch.no_grad():
                 classifier_special_classes_test_log_dict_resnet_transfer = \
                     classifier_test(topo_resnet_full, knn_special_train_dataset_resnet,
-                                    knn_special_train_dataset_resnet,
+                                    knn_special_test_dataset_resnet,
                                     knn_special_test_dataset_resnet, 'special')
 
             with torch.no_grad():
                 classifier_special_classes_test_log_dict_amphib_autoencoder = \
-                    classifier_test(amphib_autoencoder, knn_special_train_dataset, knn_special_train_dataset,
+                    classifier_test(amphib_autoencoder, knn_special_train_dataset, knn_special_test_dataset,
                                     knn_special_test_dataset, 'special')
 
             with torch.no_grad():
                 classifier_special_classes_test_log_dict_contrastive = \
-                    classifier_test(contastive_model, knn_special_train_dataset_flat, knn_special_train_dataset_flat,
+                    classifier_test(contastive_model, knn_special_train_dataset_flat, knn_special_test_dataset_flat,
                                     knn_special_test_dataset_flat, 'special', use_gpu=True)
 
             with torch.no_grad():
                 classifier_special_classes_test_log_dict_classic_best_1000 = \
                     classifier_test(classic_models_best_1000, knn_special_train_dataset_flat,
-                                    knn_special_train_dataset_flat,
+                                    knn_special_test_dataset_flat,
                                     knn_special_test_dataset_flat, 'special')
 
             with torch.no_grad():
                 classifier_special_classes_test_log_dict_classic_best_5000 = \
                     classifier_test(classic_models_best_5000, knn_special_train_dataset_flat,
-                                    knn_special_train_dataset_flat,
+                                    knn_special_test_dataset_flat,
                                     knn_special_test_dataset_flat, 'special')
 
             with torch.no_grad():
                 classifier_special_classes_test_log_dict_classic_best_20000 = \
                     classifier_test(classic_models_best_20000, knn_special_train_dataset_flat,
-                                    knn_special_train_dataset_flat,
+                                    knn_special_test_dataset_flat,
                                     knn_special_test_dataset_flat, 'special')
 
             with torch.no_grad():
                 classifier_special_classes_test_log_dict_superresolution = \
                     classifier_test(superresolution_model, knn_special_train_dataset_superresolution,
-                                    knn_special_train_dataset_superresolution,
+                                    knn_special_test_dataset_superresolution,
                                     knn_special_test_dataset_superresolution, 'special')
 
             with torch.no_grad():
                 classifier_special_classes_test_log_dict_pix2pix = \
                     classifier_test(pix2pix_model, knn_special_train_dataset_superresolution,
-                                    knn_special_train_dataset_superresolution,
+                                    knn_special_test_dataset_superresolution,
                                     knn_special_test_dataset_superresolution, 'special')
 
             with torch.no_grad():
                 classifier_special_classes_test_log_dict_unet = \
                     classifier_test(unet_model, knn_special_train_dataset_superresolution,
-                                    knn_special_train_dataset_superresolution,
+                                    knn_special_test_dataset_superresolution,
                                     knn_special_test_dataset_superresolution, 'special')
 
             knn_list.append(classifier_special_classes_test_log_dict_plain[f'{classifier}_test_special_{what_to_plot}'])
@@ -312,11 +318,11 @@ for special_class_path, special_class_name in zip(class_paths_special, class_nam
             unet_list.append(
                 classifier_special_classes_test_log_dict_unet[f'{classifier}_test_special_{what_to_plot}'])
 
-        logging.info(f'size of dataset = {len(knn_special_test_dataset)}')
-        logging.info('special classic_list on the classic 1000 latent space')
-        logging.info(special_classic_list)
-        special_classic_accuracy.append(np.mean(special_classic_list))
-        special_classic_std.append(np.std(special_classic_list))
+        # logging.info(f'size of dataset = {len(knn_special_test_dataset)}')
+        # logging.info('special classic_list on the classic 1000 latent space')
+        # logging.info(special_classic_list)
+        # special_classic_accuracy.append(np.mean(special_classic_list))
+        # special_classic_std.append(np.std(special_classic_list))
 
         logging.info(f'size of dataset = {len(knn_special_test_dataset)}')
         logging.info('classic_1000_list on the classic 1000 latent space')
@@ -388,66 +394,68 @@ for special_class_path, special_class_name in zip(class_paths_special, class_nam
     import matplotlib.pyplot as plt
     import pandas as pd
 
-    plt.plot(number_of_examples, special_classic_accuracy, label=f'special_classic on latent {what_to_plot}')
+    results_df = pd.DataFrame(columns=['name', 'number_of_examples', 'accuracies', 'stds'])
+
+    # plt.plot(number_of_examples, special_classic_accuracy, label=f'special_classic on latent {what_to_plot}')
     results_df = results_df.append({'name': 'classicnet_1000 on latent', 'number_of_examples': str(number_of_examples),
                                     'accuracies': str(special_classic_accuracy), 'stds': str(special_classic_std)},
                                    ignore_index=True)
 
     results_df = pd.DataFrame(columns=['name', 'number_of_examples', 'accuracies', 'stds'])
-    plt.plot(number_of_examples, classic_1000_accuracy, label=f'classicnet_1000 on latent {what_to_plot}')
+    # plt.plot(number_of_examples, classic_1000_accuracy, label=f'classicnet_1000 on latent {what_to_plot}')
     results_df = results_df.append({'name': 'classicnet_1000 on latent', 'number_of_examples': str(number_of_examples),
                                     'accuracies': str(classic_1000_accuracy), 'stds': str(classic_1000_std)},
                                    ignore_index=True)
 
-    plt.plot(number_of_examples, classic_5000_accuracy, label=f'classicnet_5000 on latent {what_to_plot}')
+    # plt.plot(number_of_examples, classic_5000_accuracy, label=f'classicnet_5000 on latent {what_to_plot}')
     results_df = results_df.append({'name': 'classicnet_5000 on latent', 'number_of_examples': str(number_of_examples),
                                     'accuracies': str(classic_5000_accuracy), 'stds': str(classic_5000_std)},
                                    ignore_index=True)
-    plt.plot(number_of_examples, classic_20000_accuracy, label=f'classicnet_20000 on latent {what_to_plot}')
+    # plt.plot(number_of_examples, classic_20000_accuracy, label=f'classicnet_20000 on latent {what_to_plot}')
     results_df = results_df.append({'name': 'classicnet_20000 on latent', 'number_of_examples': str(number_of_examples),
                                     'accuracies': str(classic_20000_accuracy), 'stds': str(classic_20000_std)},
                                    ignore_index=True)
-    plt.plot(number_of_examples, contrastive_on_latent_accuracy, label=f'contrastive on latent {what_to_plot}')
+    # plt.plot(number_of_examples, contrastive_on_latent_accuracy, label=f'contrastive on latent {what_to_plot}')
     results_df = results_df.append({'name': 'contrastive on latent', 'number_of_examples': str(number_of_examples),
                                     'accuracies': str(contrastive_on_latent_accuracy),
                                     'stds': str(contrastive_on_latent_std)}, ignore_index=True)
-    plt.plot(number_of_examples, resnet_accuracy, label=f'resnet on latent {what_to_plot}')
+    # plt.plot(number_of_examples, resnet_accuracy, label=f'resnet on latent {what_to_plot}')
     results_df = results_df.append({'name': 'resnet on latent', 'number_of_examples': str(number_of_examples),
                                     'accuracies': str(resnet_accuracy), 'stds': str(resnet_std)}, ignore_index=True)
-    plt.plot(number_of_examples, resnet_transfer_accuracy, label=f'resnet full transfer on latent {what_to_plot}')
+    # plt.plot(number_of_examples, resnet_transfer_accuracy, label=f'resnet full transfer on latent {what_to_plot}')
     results_df = results_df.append(
         {'name': 'resnet full transfer on latent', 'number_of_examples': str(number_of_examples),
          'accuracies': str(resnet_transfer_accuracy), 'stds': str(resnet_transfer_std)}, ignore_index=True)
-    plt.plot(number_of_examples, amphib_ae_accuracy, label=f'amphib ae {what_to_plot}')
+    # plt.plot(number_of_examples, amphib_ae_accuracy, label=f'amphib ae {what_to_plot}')
     results_df = results_df.append({'name': 'amphib ae on latent', 'number_of_examples': str(number_of_examples),
                                     'accuracies': str(amphib_ae_accuracy), 'stds': str(amphib_ae_std)},
                                    ignore_index=True)
-    plt.plot(number_of_examples, on_plain_accuracy, label=f'on plain {what_to_plot}')
+    # plt.plot(number_of_examples, on_plain_accuracy, label=f'on plain {what_to_plot}')
     results_df = results_df.append({'name': 'on_plain on latent', 'number_of_examples': str(number_of_examples),
                                     'accuracies': str(on_plain_accuracy), 'stds': str(on_plain_std)}, ignore_index=True)
-    plt.plot(number_of_examples, superresolution_accuracy, label=f'superresolution {what_to_plot}')
+    # plt.plot(number_of_examples, superresolution_accuracy, label=f'superresolution {what_to_plot}')
     results_df = results_df.append({'name': 'superresolution on latent', 'number_of_examples': str(number_of_examples),
                                     'accuracies': str(superresolution_accuracy), 'stds': str(superresolution_std)},
                                    ignore_index=True)
 
-    plt.plot(number_of_examples, pix2pix_accuracy, label=f'pix2pix {what_to_plot}')
+    # plt.plot(number_of_examples, pix2pix_accuracy, label=f'pix2pix {what_to_plot}')
     results_df = results_df.append({'name': 'pix2pix on latent', 'number_of_examples': str(number_of_examples),
                                     'accuracies': str(pix2pix_accuracy), 'stds': str(pix2pix_std)},
                                    ignore_index=True)
 
-    plt.plot(number_of_examples, unet_accuracy, label=f'superresolution {what_to_plot}')
+    # plt.plot(number_of_examples, unet_accuracy, label=f'superresolution {what_to_plot}')
     results_df = results_df.append({'name': 'unet on latent', 'number_of_examples': str(number_of_examples),
                                     'accuracies': str(unet_accuracy), 'stds': str(unet_std)},
                                    ignore_index=True)
 
-    plt.legend()
-    plt.title(f'{classifier} - few shot: {special_class_name} vs. random')
-    plt.xlabel('number of poositive examples')
-    plt.ylabel(f'{what_to_plot}')
+    # plt.legend()
+    # plt.title(f'{classifier} - few shot: {special_class_name} vs. random')
+    # plt.xlabel('number of poositive examples')
+    # plt.ylabel(f'{what_to_plot}')
     Path(baes_path).mkdir(parents=True, exist_ok=True)
 
-    plt.savefig(f'{baes_path}/{special_class_name}_{what_to_plot}_{classifier}.png')
-    plt.clf()
+    # plt.savefig(f'{baes_path}/{special_class_name}_{what_to_plot}_{classifier}.png')
+    # plt.clf()
 
     results_df.to_excel(os.path.join(baes_path,
-                                     f'{what_to_plot}_{special_class_name}_type-{classifier}_seeds-{len(seeds)}.xlsx'))
+                                     f'{what_to_plot}_{special_class_name}_type-{classifier}_seeds-{len(seeds)}{rescaling}lal.xlsx'))

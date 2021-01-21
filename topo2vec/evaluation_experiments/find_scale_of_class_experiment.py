@@ -1,6 +1,4 @@
 import random
-import time
-
 import torch
 from pytorch_lightning.loggers import TensorBoardLogger
 from torch.backends import cudnn
@@ -11,6 +9,7 @@ import pytorch_lightning as pl
 import numpy as np
 from topo2vec.modules import Classifier, OneVsRandomDataset
 import pandas as pd
+import time
 
 TEST_SIZE = 1000
 
@@ -75,11 +74,11 @@ def std_mean_accuracy_radius_class(train_set_size_for_scales_experiment, random_
 
 
 train_set_size_for_scales_experiment = 1000
-random_seeds = list(range(890, 900))
+random_seeds = list(range(541, 542))
 MAX_EPOCHS = 25
 original_radii_to_check = list(range(4, 21, 1))
 EXP_LOGS_PATH = BASE_LOCATION + 'tb_logs/scale_experiment'
-class_names = ['streams', 'cliffs', 'rivers', 'peaks', 'saddles'] # ['peaks']  #
+class_names = ['rivers', 'peaks', 'saddles'] # ['streams', 'cliffs', 'rivers', 'peaks', 'saddles'] # ['peaks']  #
 
 import matplotlib.pyplot as plt
 
@@ -95,7 +94,7 @@ def save_and_plot(original_radii_to_check, validation_accuracies_means, validati
     dataframe = pd.DataFrame(
         list(zip(original_radii_to_check, validation_accuracies_means, validation_accuracies_stds)),
         columns=['original_radii', 'mean', 'std'])
-    dataframe.to_excel('results_evaluation_experiments_scale/' + title + '.xlsx')
+    dataframe.to_excel('results_evaluation_experiments_scale/' + title + 'seed' + str(random_seeds)+'.xlsx')
 
 
 import time

@@ -3,6 +3,7 @@ import os
 import torch
 
 from topo2vec.constants import BASE_LOCATION
+from topo2vec.models.basic_conv_net_latent_dtm import ResNet18
 from topo2vec.modules import Classifier, Autoencoder, Superresolution, pix2pix
 from topo2vec.models import BasicConvNetLatentDTM
 from topo2vec.modules import Classifier, Autoencoder, Superresolution, pix2pix
@@ -154,7 +155,11 @@ superresolution_model = load_model_from_file(
     SUPERRESOLUTION_HPARAMS)
 
 checkpoint = torch.load(os.path.join(FINAL_MODEL_DIR, "20200908_165032_model_best.pth.tar"))
-contastive_model = BasicConvNetLatentDTM(None).cuda()
+checkpoint = torch.load(os.path.join(FINAL_MODEL_DIR, "20200909_103841_checkpoint.pth.tar"))
+checkpoint = torch.load(os.path.join(FINAL_MODEL_DIR, "20200909_094840_checkpoint.pth.tar"))
+checkpoint = torch.load(os.path.join(FINAL_MODEL_DIR, "20200909_213024_model_best.pth.tar"))
+
+contastive_model = ResNet18(20).cuda()
 
 contastive_model.load_state_dict(checkpoint['model'])
 
@@ -208,4 +213,8 @@ PIX2PIX_HPARAMS = Classifier.get_args_parser().parse_args(
 )
 pix2pix_model = load_model_from_file(
     'pix2pix_UNet_[34, 136]_lr_0.0002_size_100000_num_classes_4_latent_size_128_train_all_resnet_False.pt',
+    PIX2PIX_HPARAMS)
+
+pix2pix_model = load_model_from_file(
+    'pix2pix-finetune_UNet_[34, 136]_lr_0.0002_size_100000_num_classes_4_latent_size_128_train_all_resnet_False.pt',
     PIX2PIX_HPARAMS)

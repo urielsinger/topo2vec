@@ -9,6 +9,7 @@ import matplotlib
 from api_client import client_lib
 from common.geographic.geo_map import GeoMap
 from common.geographic.geo_utils import meters2degrees, point_to_location
+from visualization_server import visualizer
 
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -16,7 +17,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from folium import IFrame
 
-from common.pytorch.visualizations import convert_multi_radius_ndarray_to_printable
+from common.pytorch.visualizations import convert_multi_radius_ndarray_to_printable, \
+    convert_multi_radius_list_to_printable
 
 FOLIUM_COLORS = [
     'red',
@@ -102,6 +104,8 @@ class TopoMap(GeoMap):
             location=self.start_location,
             zoom_start=self.start_zoom,
             tiles='Stamen Terrain'
+            # tiles='MapQuest Open Aerial'
+
         )
         self.map = geo_map
 
@@ -155,14 +159,14 @@ class TopoMap(GeoMap):
 
         '''
         _, height, width = images.shape
-        scale = 10
+        scale = 30
         for point, image in zip(points, images):
             if type(point) is Point:
                 point = [point.x, point.y]
             html = '<img src="data:image/png;base64,{}">'.format
             encoded = self.get_encoded_image(image, resolution=resolution, scale=scale)
             iframe = IFrame(html(encoded), width=(width * scale) + 20, height=(height * scale) + 20)
-            popup = folium.Popup(iframe, max_width=530, max_height=300)
+            popup = folium.Popup(iframe, max_width=1530, max_height=1300)
             icon = folium.Icon(color=color, icon="ok")
             folium.Marker(point[::-1], popup=popup, tooltip=tooltip,
                           icon=icon).add_to(self.map)
@@ -217,7 +221,15 @@ class TopoMap(GeoMap):
 
         '''
         closest_points, closest_images = client_lib.get_top_n_similar_points_in_polygon(points, n, polygon, meters_step, test_radius)
-        closest_images = convert_multi_radius_ndarray_to_printable(closest_images, dir=False)
+        points_list = []
+        for lon, lat in zip(closest_points[:,0], closest_points[:,1]):
+            if lon != "" and lat != "":
+                lon = float(lon) if lon != "" else 0
+                lat = float(lat) if lat != "" else 0
+                point = Point(lon, lat)
+                points_list.append(point)
+        images, _ = visualizer.get_points_as_list_of_np_arrays(points_list, [3, 15, 30], 15)  # TODO: change the const!!
+        closest_images = convert_multi_radius_list_to_printable(images, dir=False)
         self.add_points_with_images(closest_points, closest_images, color)
 
     def add_random_class_points(self, polygon: Polygon, meters_step: float, class_name: str, test_radius: int,

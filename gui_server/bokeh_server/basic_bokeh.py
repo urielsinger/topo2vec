@@ -13,6 +13,7 @@ import os
 import folium
 import time
 
+import shapely
 from bokeh.layouts import column, row
 from bokeh.models import Slider, TextInput, Div, Select, Button
 from shapely.geometry import Point, Polygon
@@ -21,7 +22,8 @@ import sys
 from pathlib import Path
 
 from api_client import client_lib
-from topo2vec.constants import north_is_small
+from topo2vec.background import VALIDATION_HALF, TRAIN_HALF
+from topo2vec.constants import north_is_small, small_in_europe, another_small_in_europe
 from visualization_server import visualizer
 
 from common.pytorch.visualizations import convert_multi_radius_list_to_printable
@@ -37,7 +39,7 @@ def set_working_polygon(polygon: Polygon):
     client_lib.set_working_polygon(polygon)
     global WORKING_POLYGON
     WORKING_POLYGON = visual_topography_profiler._get_working_polygon()
-set_working_polygon(north_is_small)
+set_working_polygon(small_in_europe)
 
 
 class BasicBokeh:
@@ -56,8 +58,8 @@ class BasicBokeh:
         self.folium_fig = self.bokeh_new_class_folium(lonlat_text_inputs=self.lonlat_text_inputs)
 
         # Set up widgets
-        self.meters_step = Slider(title="meters_step", value=80, start=10, end=500, step=10)
-        self.number_of_points_to_show = Slider(title="number of points to show", value=5, start=1, end=100)
+        self.meters_step = Slider(title="meters_step", value=400, start=10, end=500, step=10)
+        self.number_of_points_to_show = Slider(title="number of points to show", value=2, start=1, end=100)
         self.threshold = Slider(title="threshold for class", value=0, start=0, end=1, step=0.01)
         self.test_minimal_resolution = Slider(title="minimal resolution", value=8, start=2, end=50)
 
@@ -100,7 +102,7 @@ class BasicBokeh:
 
     def bokeh_new_class_folium(self, file_name: str = 'folium',
                                lonlat_text_inputs: list = None,
-                               height: int = 600, width: int = 850):
+                               height: int = 1600, width: int = 1850):
         # topo_map.add_points_with_text(points_chosen, text='original images')
         # folium.LayerControl().add_to(self.topo_map.map)
         # folium.plugins.MeasureControl().add_to(topo_map.map)
@@ -124,6 +126,11 @@ class BasicBokeh:
         click_str = f"""
                     f.contentWindow.document.body.onclick = 
                     function() {{
+                        console.log('fsdfs')
+                        console.log({file_name_hash})
+                        console.log({lonlat_text_inputs[0].id})
+                        console.log({lonlat_text_inputs[1].id})
+
                         ff = document.getElementById('{file_name_hash}');
                         popup = ff.contentWindow.document.getElementsByClassName('leaflet-popup-content')[0];
                         popup_text = popup.innerHTML
@@ -169,6 +176,8 @@ class BasicBokeh:
                                          test_radius=int(self.test_minimal_resolution.value))
         r = int(self.test_minimal_resolution.value)
         images, _ = visualizer.get_points_as_list_of_np_arrays(points_chosen, [r, 2*r, 3*r], 8)  # TODO: change the const!!
+        # images, _ = visualizer.get_points_as_list_of_np_arrays(points_chosen, [3, 10, 50], 15)  # TODO: change the const!!
+
         points_images = convert_multi_radius_list_to_printable(images, dir=False)
         self.topo_map.add_points_with_images(points_chosen, points_images, color='green')
         # self.topo_map.add_points_with_text(points_chosen, color='green', text='chosen')

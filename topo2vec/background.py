@@ -46,13 +46,18 @@ if LOAD_CLASSES_LARGE:
                    'rivers': 12,
                    'peaks': 11,
                    'cliffs': 9}
+    scales_dict_8_new = {'streams': 8,
+                   'saddles': 8,
+                   'rivers': 16,
+                   'peaks': 8,
+                   'cliffs': 96}
     scales_dict = {'streams': 8,
                    'saddles': 8,
                    'rivers': 8,
                    'peaks': 8,
                    'cliffs': 8}
     sd = ScalesDict()
-    sd.init_from_dict(scales_dict_8)
+    sd.init_from_dict(scales_dict_8_new)
     sd.save_to_file()
 
     PROJECT_SCALES_DICT = sd

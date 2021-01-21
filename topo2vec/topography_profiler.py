@@ -74,20 +74,45 @@ FINAL_HPARAMS = Classifier.get_args_parser().parse_args(
      '--num_classes', '4',
      ]
 )
+
+SUPERRESOLUTION_HPARAMS = Classifier.get_args_parser().parse_args(
+    [
+        '--save_model',
+        '--index_in', '1',
+        '--index_out', '0',
+        '--learning_rate', '0.0015',
+        '--max_epochs', '300',
+        '--total_dataset_size', '100000',
+        '--arch', 'UNet',
+        '--svm_classify_latent_space',
+        '--knn_method_for_typical_choosing', 'regular',
+        '--name', 'Superresolution',
+        '--pytorch_module', 'Superresolution',
+        '--random_set_size_for_svm', '2000',
+        '--latent_space_size', '600',
+        '--svm_classify_latent_space',
+        '--test_knn',
+        '--original_radiis', '[[34, 136], [68, 272], [102, 408]]',
+        '--radii', '[34, 136]',
+        '--upsample'
+    ]
+)
 final_model_classifier = None
 
 
 def load_final_model(final_model_name: str):
     load_path = os.path.join(FINAL_MODEL_DIR, final_model_name)
     global final_model_classifier
-    final_model_classifier = Classifier(FINAL_HPARAMS)
+    final_model_classifier = Classifier(SUPERRESOLUTION_HPARAMS)
     final_model_classifier.load_state_dict(torch.load(load_path, map_location=torch.device('cpu')))
     final_model_classifier.eval()
 
 
-load_final_model('final_model81624.pt')
-FINAL_RADII = str_to_int_list(FINAL_HPARAMS.radii)
-FINAL_ORIGINAL_RADIIS = str_to_int_list(FINAL_HPARAMS.original_radiis)
+# load_final_model('final_model81624.pt')
+load_final_model('Superresolution_UNet_[34, 136]_lr_0.0015_size_100000_num_classes_4_latent_size_600_train_all_resnet_False.pt')
+
+FINAL_RADII = str_to_int_list(SUPERRESOLUTION_HPARAMS.radii)
+FINAL_ORIGINAL_RADIIS = str_to_int_list(SUPERRESOLUTION_HPARAMS.original_radiis)
 
 
 ################################################################################
