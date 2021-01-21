@@ -32,16 +32,31 @@ activate topo2vec, uninstall torch, and run: "pip install torch==1.6.0+cu101 tor
 
 ## Download the data
 a. download the needed data:
-1. run the "scripts/get_elevation_data.sh min_lon, min_lat, max_lon, max_lat"
-2. edit and run the "scripts/get_classes_data.sh min_lon, min_lat, max_lon, max_lat"
+1. to download the elevation data, run in bash:
+```
+scripts/get_elevation_data.sh min_lon, min_lat, max_lon, max_lat
+```
+2. edit to choose what classes to download from OSM, run:
+```
+scripts/get_elevation_data.sh min_lon, min_lat, max_lon, max_lat
+```
 3. put all the classes' test data in the data/overpass_classes_data/tests in the needed json format (the same one as in the train)
 
 It is much recommended to download the the data inside the docker container.
 
 ## Usage
-1. For exploring the experiments in the paper, first download the data (as in the "download the data" section), 
+For exploring the experiments in the paper, first download the data (as in the "download the data" section), 
 then train the appropriate models you want - using the training files inside the "experiments" folder (it is recommended to use tensorboard),
 and then run the python files inside "evaluation experiments".
+ 
+For example, after downloading the data, to hyper-parameter search of the basic CNN baseline: (for more options of the bash file, look at the 'classifier.py' file)
+```
+python multi_class_experiment_hyperparams.py
+```
+This file builds a parser and puts inside it the params we used for our hyper-parameter search.
+
+Or as another example, to train the topo2vec-4 arch, run:
+
  
 2. Using the GUI server for exploration - go to the gui's container address:BOKEH_PORT (as in the .env file), e.g.:
 ![Topo2vec_GUI](https://i.imgur.com/saxMBlD.png)
