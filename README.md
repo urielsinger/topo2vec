@@ -1,6 +1,6 @@
 Topo2vec: Topography Embedding Using the Fractal Effect
 ====
-This repository provides an implementation of *Topo2vec*, all baselines, and code for datasets building and experiments, as described in the paper:<br>
+This repository provides an implementation of *Topo2vec*, all baselines, code for datasets building, and experiments, as described in the paper:<br>
 > Topo2vec: Topography Embedding Using the Fractal Effect<br>
 
 The *Topo2vec* algorithm is the first embedding technique for topographic data, based on the fractal effect.
@@ -9,11 +9,11 @@ A qualitative (not cherry picked!) experiment - example image and closes images 
 
 ## Build the environment
  - compose the full system (including gui server and api server) using docker-compose and the docker-compose.yml file.
- 1. define the wanted ports for the project in the .env file
+ define the wanted ports for the project in the .env file
   ```angular2
 docker-compose build --no-cache
 ```
- 3. in the root folder run:
+ in the root folder run:
   ```angular2
 docker compose up
 ```
